@@ -1,0 +1,29 @@
+{% extends 'users/base.html' %}
+{% block conteudo %}
+<h1> Registrar </h1>
+<form method="POST">
+    {% csrf_token %}
+    <div class="textfield">
+        <label for="usuario"> Usuário </label>
+
+        {{ form.username }}
+
+    </div>
+    <div class="textfield">
+        <label for="Senha"> Senha </label>
+
+        {{ form.password1 }}
+
+    </div>
+
+    <div class="textfield">
+        <label for="Senha"> Confirme sua senha </label>
+
+        {{ form.password2 }}
+
+
+    </div>
+    <button class="btn-login"> Login </button>
+    <button class="btn-cadastrar"> Cadastrar </button>
+</form>
+{% endblock conteudo %}
