@@ -1,5 +1,4 @@
 {% extends 'users/base.html' %}
-{% load crispy_forms_tags %}
 {% block conteudo %}
 <h1> Registrar </h1>
 <form method="POST">
@@ -7,7 +6,10 @@
     <div class="textfield">
         {{ form }}
     </div>
-    <button class="btn-login"> Login </button>
-    <button class="btn-cadastrar"> Cadastrar </button>
+    <button class="btn-cadastrar" type="submit"> Cadastrar </button>
 </form>
+<div class="buttons">
+    <p>Já é cadastrado?</p>
+    <a class="btn-login" href="{% url 'login' %}"> Login </a>
+</div>
 {% endblock conteudo %}

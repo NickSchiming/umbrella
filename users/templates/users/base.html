@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,11 +9,12 @@
     <link rel="stylesheet" type="text/css" href="{% static 'users/css/style.css' %}">
     <title> Login </title>
 </head>
+
 <body>
     <div class="main-login">
         <div class="left-login">
-             <h1> Seja bem vindo! </h1>
-             <img src="{% static 'users/img/garota.svg' %}" class="left-login-image" alt="Garota segurando guarda chuva"> 
+            <h1> Seja bem vindo! </h1>
+            <img src="{% static 'users/img/garota.svg' %}" class="left-login-image" alt="Garota segurando guarda chuva">
         </div>
 
         <div class="right-login">
@@ -23,5 +25,11 @@
         </div>
 
     </div>
+
+    <script src={% static 'jquery-3.6.1.min.js' %}></script>
+    <script src={% static 'jquery.mask.min.js' %}></script>
+    <script src={% static 'users/js/mascara.js' %}></script>
+
 </body>
+
 </html>
