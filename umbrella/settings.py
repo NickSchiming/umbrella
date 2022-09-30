@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
+    'vendas.apps.VendasConfig',
     "phonenumber_field",
     'django.contrib.admin',
     'django.contrib.auth',
