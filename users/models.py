@@ -76,6 +76,23 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=timezone.now,
     )
 
+    class Types(models.TextChoices):
+        REVENDEDOR = "REVENDEDOR", 'Revendedor'
+        LOJA = "LOJA", 'Loja'
+        SUPERVISOR = "SUPERVISOR", 'Supervisor'
+        FRANQUIA = "FRANQUIA", 'Franquia'
+
+    base_type = Types.REVENDEDOR
+
+    type = models.CharField(
+        _("type"), max_length=50, choices=Types.choices, default=base_type
+    )
+
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+    def save(self, *arg, **kwargs):
+        if not self.pk:
+            self.type = self.base_type
+            return super().save(*arg, **kwargs)
