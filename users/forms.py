@@ -12,20 +12,3 @@ class UserRegisterForm(UserCreationForm):
     class Meta:
         model = models.User
         fields = ['email',]
-
-class UserUpdateForm(forms.ModelForm):
-    email = forms.EmailField()
-
-    class Meta:
-        model = models.User
-        fields = ['email']
-
-class PerfilRevendedor(forms.ModelForm):
-    
-    # def __init__(self, user, *args, **kwargs):
-    #     self.user = user
-    #     super(PerfilRevendedor, self).__init__(*args, **kwargs)
-    
-    class Meta:
-        model = models.Revendedor
-        fields =['nome','cpf','telefone','endereco','datanasc']

@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'vendas.apps.VendasConfig',
     "phonenumber_field",
+    'sweetify',
+    'crispy_forms',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -132,3 +134,5 @@ AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 AUTH_USER_MODEL = 'users.User'
 
 LOGIN_REDIRECT_URL = 'vendas-home'
+
+SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'

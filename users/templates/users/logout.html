@@ -1,0 +1,12 @@
+{% extends 'users/base.html' %}
+{% block conteudo %}
+<h1> Logout </h1>
+<div class="textfield">
+    <h2>Você saiu do site!</h2>
+</div>
+
+<div class="buttons">
+    <p>Fazer login novamente?</p>
+    <a class="btn-login" href="{% url 'login' %}"> Login </a>
+</div>
+{% endblock conteudo %}

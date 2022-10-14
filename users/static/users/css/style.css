@@ -53,7 +53,7 @@ body {
     background: #b90504;
     border-radius: 20px;
     box-shadow: 0px 10px 40px #00000056;
-    height:fit-content;
+    height: fit-content;
 }
 
 .card-login>form {
@@ -169,14 +169,19 @@ a.btn-login {
     box-shadow: 0px 0px 0px 3px #fff;
 }
 
-p{
+p {
     margin: auto;
     font-size: 20px;
 }
 
-.buttons{
+.buttons {
     display: flex;
     width: 100%;
     margin-top: 15px;
     height: 51px;
+}
+
+h2 {
+    color: black;
+    margin: 50px auto 50px auto;
 }

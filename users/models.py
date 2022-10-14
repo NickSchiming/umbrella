@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils.translation import gettext_lazy as _
 
 
+
+
 class UserManager(BaseUserManager):
     # n sei o que é
     use_in_migrations = True
@@ -99,8 +101,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
 
     # override no save pada colocar o tipo padrão na cração do objeto
-    def save(self, *arg, **kwargs):
+    def save(self, *args, **kwargs):
         if not self.pk:
             self.type = self.base_type
-            return super().save(*arg, **kwargs)
+            return super().save(*args, **kwargs)
 
