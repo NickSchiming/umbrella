@@ -1,5 +1,5 @@
 from django import forms
-from .models import Revendedor
+from .models import Revendedor, Pedido
 from users.models import User
 
 
@@ -16,4 +16,8 @@ class PerfilRevendedor(forms.ModelForm):
         model = Revendedor
         fields =['nome','cpf','telefone','endereco','datanasc','is_aprovado',]
         
-        
+
+class FormPedido(forms.ModelForm):       
+    class Meta:
+        model = Pedido
+        fields = '__all__'

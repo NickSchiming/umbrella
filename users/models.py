@@ -4,14 +4,12 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils.translation import gettext_lazy as _
 
 
-
-
 class UserManager(BaseUserManager):
     # n sei o que é
     use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
-        
+
         if not email:
             raise ValueError('O email não pode ficar em branco')
 
@@ -26,7 +24,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(email, password, **extra_fields)
-    
+
     # define um create superuser para não usar username
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
@@ -47,37 +45,29 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
 
     # campo extra customizado
-    email = models.EmailField(
-        unique=True,
-        max_length=255,
-        blank=False,
-    )
+    email = models.EmailField(_('email'), unique=True)
 
     # campos do AbstractUser que serão utilizados
 
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
-        help_text=_(
-            'Designates whether the user can log into '
-            'this admin site.'
-        ),
     )
 
     is_active = models.BooleanField(
         _('active'),
         default=True,
-        help_text=_(
-            'Designates whether this user should be '
-            'treated as active. Unselect this instead '
-            'of deleting accounts.'
-        ),
     )
 
-    date_joined = models.DateTimeField(
-        _('date joined'),
+    """criado = models.DateTimeField(
+        _('criado'),
         default=timezone.now,
     )
+    
+    atualizado = models.DateTimeField(
+        _('atualizado'),
+        default=timezone.now,
+    ) """
 
     # lista de tipos para dar permissoes especiais
     class Types(models.TextChoices):
@@ -100,9 +90,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     # determina o campo usado como login
     USERNAME_FIELD = 'email'
 
-    # override no save pada colocar o tipo padrão na cração do objeto
+    class Meta:
+        verbose_name = "Conta"
+        verbose_name_plural = "Contas"
+
+    def __str__(self):
+        return self.email
+
+    # override no save para colocar o tipo padrão na cração do objeto
     def save(self, *args, **kwargs):
         if not self.pk:
             self.type = self.base_type
             return super().save(*args, **kwargs)
-
+        else:
+            return super().save(*args, **kwargs)

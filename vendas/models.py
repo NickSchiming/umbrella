@@ -2,6 +2,7 @@ from email.policy import default
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from users.models import User
+from django.conf import settings
 
 
 class Supervisor(models.Model):
@@ -32,12 +33,17 @@ class Revendedor(models.Model):
 
     # um revendedor é associado a um supervisor e um suppervisor à muitos revendedores
     # on_delete=SET_NULL pos ao deletar um supervisor o revendedor não é deletado, o camppo vira null
-    supervisor = models.ForeignKey(Supervisor, verbose_name=_("supervisor"), on_delete=models.SET_NULL, null=True)
+    supervisor = models.ForeignKey(Supervisor, verbose_name=_(
+        "supervisor"), on_delete=models.SET_NULL, null=True)
 
-    is_aprovado = models.BooleanField(_('aprovado'),default=False)
+    is_aprovado = models.BooleanField(_('aprovado'), default=False)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Revendedor"
+        verbose_name_plural = "Revendedores"
 
     def __str__(self):
         return self.nome
@@ -75,6 +81,17 @@ class Loja(models.Model):
     def __str__(self):
         return self.razaosocial
 
+class Produto(models.Model):
+    codigo = models.IntegerField(
+        _("codigo do pedido"), unique=True, primary_key=True)
+
+    descricao = models.CharField(_("descrição"), max_length=200)
+    nome = models.CharField(_("nome do produto"), max_length=100, unique=True)
+    qtde_estoque = models.IntegerField(_("quantidade em estoque"))
+    valor = models.FloatField(_("valor do produto"))
+
+    def __str__(self):
+        return self.nome
 
 class Pedido(models.Model):
 
@@ -105,6 +122,8 @@ class Pedido(models.Model):
     # nf = models.IntegerField(_("nota fiscal"))
 
     valor = models.FloatField(_("valor total do pedido"))
+    
+    metodo_de_pagamento = models.CharField(max_length=200, blank=True)
 
     # um pedido é associado a uma franquia e uma franquia à muitos pedidos
     # on_delete=SET_NULL pos ao deletar uma franquia o pedido não é deletado, o camppo vira null
@@ -123,12 +142,19 @@ class Pedido(models.Model):
 
     # um pedido pode (blank=True) ser associado a um revendedor e um revendedor à muitos pedidos
     # on_delete=SET_NULL pos ao deletar um revendedor o pedido não é deletado, o camppo vira null
-    revendedor = models.ForeignKey(Revendedor, verbose_name=_(
+    revendedor = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_(
         "revendedor"), on_delete=models.SET_NULL, null=True, blank=True)
+    
+    
+    produto = models.ForeignKey(Produto, verbose_name=_(
+        "produto"), on_delete=models.CASCADE)
 
     def __str__(self):
         return self.cod_pedido
-
+    
+    def calcular(self):
+        pass
+        
 
 class Meta(models.Model):
 
@@ -156,26 +182,13 @@ class Meta(models.Model):
         return self.nivel
 
 
-class Produto(models.Model):
-    codigo = models.IntegerField(
-        _("codigo do pedido"), unique=True, primary_key=True)
-
-    descricao = models.CharField(_("descrição"), max_length=200)
-    nome = models.CharField(_("nome do produto"), max_length=100, unique=True)
-    qtde_estoque = models.IntegerField(_("quantidade em estoque"))
-    valor = models.FloatField(_("valor do produto"))
-
-    def __str__(self):
-        return self.nome
-
-
-class item_pedido(models.Model):
+""" class item_pedido(models.Model):
     pedido = models.ForeignKey(Pedido, verbose_name=_(
         "pedido"), on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, verbose_name=_(
         "produto"), on_delete=models.CASCADE)
 
-    quantidade = models.IntegerField(_("quantidade do produto"))
+    quantidade = models.IntegerField(_("quantidade do produto")) """
 
 
 class Nota_fiscal(models.Model):

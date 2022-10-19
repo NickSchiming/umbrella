@@ -1,7 +1,18 @@
+from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import sweetify
-from .forms import UserUpdateForm, PerfilRevendedor
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+from vendas.models import Pedido, Revendedor
+from .forms import *
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView
+)
 
 
 def home(request):
@@ -35,3 +46,21 @@ def perfil(request):
     }
 
     return render(request, 'vendas/perfil.html', context)
+
+
+def fazer_pedido(request):
+    PedidoFormSet = inlineformset_factory(
+        User, Pedido, fields=('produto',), extra=3)
+    formset = PedidoFormSet(
+        queryset=Pedido.objects.none(), instance=request.user)
+
+    if request.method == 'POST':
+        #print('Printing POST:', request.POST)
+        form = FormPedido(request.POST)
+        formset = PedidoFormSet(request.POST, instance=request.user)
+        if formset.is_valid():
+            formset.save()
+            return redirect('/')
+
+    context = {'form': formset}
+    return render(request, 'vendas/pedido_form.html', context)
