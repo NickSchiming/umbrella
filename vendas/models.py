@@ -7,8 +7,7 @@ from django.conf import settings
 
 class Supervisor(models.Model):
     # um perfil de Supervisor deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de Supervisor
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # campos de perfil
     nome = models.CharField(_("nome"), max_length=100)
@@ -20,12 +19,11 @@ class Supervisor(models.Model):
 
 class Revendedor(models.Model):
     # um perfil de Revendedor deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de Revendedor
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='revendedor')
 
     # campos de perfil
     nome = models.CharField(_("nome"), max_length=100, null=True)
-    cpf = models.IntegerField(_("cpf"), unique=True, null=True)
+    cpf = models.IntegerField(_("cpf"),null=True)
     telefone = models.IntegerField(_("telefone"), null=True)
     endereco = models.CharField(_("endereço"), max_length=200, null=True)
     datanasc = models.DateField(
@@ -51,12 +49,11 @@ class Revendedor(models.Model):
 
 class Franquia(models.Model):
     # um perfil de franquia deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de franquia
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     # campos de perfil
     razaosocial = models.CharField(_("razão social"), max_length=150)
-    cnpj = models.IntegerField(_("cnpj"), unique=True)
+    cnpj = models.IntegerField(_("cnpj"), primary_key=True)
     endereco = models.CharField(_("endereço"), max_length=200)
 
     def __str__(self):
@@ -65,12 +62,11 @@ class Franquia(models.Model):
 
 class Loja(models.Model):
     # um perfil de loja deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de loja
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     # campos de perfil
     razaosocial = models.CharField(_("razão social"), max_length=150)
-    cnpj = models.IntegerField(_("cnpj"), unique=True)
+    cnpj = models.IntegerField(_("cnpj"), primary_key=True)
     endereco = models.CharField(_("endereço"), max_length=200)
 
     # uma loja é associada a uma franquia e uma franquia à muitos lojas
@@ -83,20 +79,20 @@ class Loja(models.Model):
 
 class Produto(models.Model):
     codigo = models.IntegerField(
-        _("codigo do pedido"), unique=True, primary_key=True)
+        _("codigo do pedido"), primary_key=True)
 
-    descricao = models.CharField(_("descrição"), max_length=200)
-    nome = models.CharField(_("nome do produto"), max_length=100, unique=True)
-    qtde_estoque = models.IntegerField(_("quantidade em estoque"))
-    valor = models.FloatField(_("valor do produto"))
+    descricao = models.CharField(_("descrição"), max_length=200, null=True)
+    nome = models.CharField(_("nome do produto"), max_length=100, unique=True, null=True)
+    qtde_estoque = models.IntegerField(_("quantidade em estoque"), null=True)
+    valor = models.FloatField(_("valor do produto"), null=True)
 
     def __str__(self):
-        return self.nome
+        return str(self.codigo) + ' - ' + self.nome
 
 class Pedido(models.Model):
 
     cod_pedido = models.IntegerField(
-        _("código do pedido"), unique=True, primary_key=True)
+        _("código do pedido"), primary_key=True)
 
     # lista de opções para status do ppedido
     APROV_PEND = "aprovação_pendente"
@@ -182,17 +178,19 @@ class Meta(models.Model):
         return self.nivel
 
 
-""" class item_pedido(models.Model):
+class Item_pedido(models.Model):
     pedido = models.ForeignKey(Pedido, verbose_name=_(
         "pedido"), on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, verbose_name=_(
         "produto"), on_delete=models.CASCADE)
 
-    quantidade = models.IntegerField(_("quantidade do produto")) """
+    quantidade = models.IntegerField(_("quantidade"))
+    subtotal = models.IntegerField(_("subtotal"))
+
 
 
 class Nota_fiscal(models.Model):
-    nf = models.IntegerField(_("nota fiscal"), unique=True, primary_key=True)
+    nf = models.IntegerField(_("nota fiscal"), primary_key=True)
 
     valor = models.FloatField(_("valor"))
     data_emissao = models.DateTimeField(

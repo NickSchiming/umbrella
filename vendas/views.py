@@ -1,18 +1,11 @@
+from sqlite3 import DatabaseError
 from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import sweetify
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-from vendas.models import Pedido, Revendedor
+from vendas.models import Pedido
 from .forms import *
-from django.views.generic import (
-    ListView,
-    DetailView,
-    CreateView,
-    UpdateView,
-    DeleteView
-)
 
 
 def home(request):
@@ -49,18 +42,32 @@ def perfil(request):
 
 
 def fazer_pedido(request):
-    PedidoFormSet = inlineformset_factory(
-        User, Pedido, fields=('produto',), extra=3)
-    formset = PedidoFormSet(
-        queryset=Pedido.objects.none(), instance=request.user)
+    ItemPedidoFormSet = inlineformset_factory(
+       Pedido, Item_pedido,  fields=('produto', 'quantidade'), extra=1)
 
-    if request.method == 'POST':
-        #print('Printing POST:', request.POST)
-        form = FormPedido(request.POST)
-        formset = PedidoFormSet(request.POST, instance=request.user)
+    pedido = Pedido.objects.get()
+    
+    if request.method == 'GET':
+         formset = ItemPedidoFormSet(request.GET or None)
+    elif request.method == 'POST':
+        formset = ItemPedidoFormSet(request.POST)
         if formset.is_valid():
-            formset.save()
+            for form in formset:
+                if form.is_valid():
+                    try:
+                        if form.cleaned_data.get('DELETE') and form.instance.pk:
+                            form.instance.delete()
+                        else:
+                            instance = form.save(commit=False)
+                            instance.pedido = request.pedido
+                            instance.save()
+                            sweetify.success(request, "Payments saved successfully")
+                    except DatabaseError:
+                        sweetify.error(request, "Database error. Please try again")
             return redirect('/')
+    # else:
+    #     formset = ItemPedidoFormSet(
+    #         queryset=Pedido.objects.none())
 
-    context = {'form': formset}
+    context = {'formset': formset}
     return render(request, 'vendas/pedido_form.html', context)
