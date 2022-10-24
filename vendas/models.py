@@ -1,5 +1,5 @@
 from email.policy import default
-from django.db import models
+from django.db import DatabaseError, models
 from django.utils.translation import gettext_lazy as _
 from users.models import User
 from django.conf import settings
@@ -53,7 +53,7 @@ class Franquia(models.Model):
 
     # campos de perfil
     razaosocial = models.CharField(_("razão social"), max_length=150)
-    cnpj = models.IntegerField(_("cnpj"), primary_key=True)
+    cnpj = models.IntegerField(_("cnpj"), unique=True)
     endereco = models.CharField(_("endereço"), max_length=200)
 
     def __str__(self):
@@ -66,7 +66,7 @@ class Loja(models.Model):
 
     # campos de perfil
     razaosocial = models.CharField(_("razão social"), max_length=150)
-    cnpj = models.IntegerField(_("cnpj"), primary_key=True)
+    cnpj = models.IntegerField(_("cnpj"), unique=True)
     endereco = models.CharField(_("endereço"), max_length=200)
 
     # uma loja é associada a uma franquia e uma franquia à muitos lojas
@@ -79,7 +79,7 @@ class Loja(models.Model):
 
 class Produto(models.Model):
     codigo = models.IntegerField(
-        _("codigo do pedido"), primary_key=True)
+        _("codigo do produto"), unique=True)
 
     descricao = models.CharField(_("descrição"), max_length=200, null=True)
     nome = models.CharField(_("nome do produto"), max_length=100, unique=True, null=True)
@@ -88,11 +88,13 @@ class Produto(models.Model):
 
     def __str__(self):
         return str(self.codigo) + ' - ' + self.nome
+    
+
 
 class Pedido(models.Model):
 
-    cod_pedido = models.IntegerField(
-        _("código do pedido"), primary_key=True)
+    # cod_pedido = models.IntegerField(
+    #     _("código do pedido"), primary_key=True)
 
     # lista de opções para status do ppedido
     APROV_PEND = "aprovação_pendente"
@@ -110,21 +112,33 @@ class Pedido(models.Model):
     ]
 
     status = models.CharField(choices=opcoes_status, max_length=50)
-
+    
     data = models.DateTimeField(
         _("data do pedido"), auto_now=True, auto_now_add=False)
 
     # estranho parece na vdd ser uma relação com objetos nota fiscal
     # nf = models.IntegerField(_("nota fiscal"))
 
-    valor = models.FloatField(_("valor total do pedido"))
+    total = models.FloatField(_("valor total do pedido"))
     
-    metodo_de_pagamento = models.CharField(max_length=200, blank=True)
+    CREDITO = "credito"
+    DEBITO = "debito"
+    PIX = "pix"
+    BOLETO = "boleto"
+    
+    opcoes_pagamento = [
+        (CREDITO, "Credito"),
+        (DEBITO, "Debito"),
+        (PIX, "Pix"),
+        (BOLETO, "Boleto"),
+    ]
+    
+    metodo_de_pagamento = models.CharField(choices=opcoes_pagamento, max_length=200)
 
     # um pedido é associado a uma franquia e uma franquia à muitos pedidos
     # on_delete=SET_NULL pos ao deletar uma franquia o pedido não é deletado, o camppo vira null
     franquia = models.ForeignKey(Franquia, verbose_name=_(
-        "franquia"), on_delete=models.SET_NULL, null=True)
+        "franquia"), on_delete=models.SET_NULL, null=True, blank=True)
 
     # um pedido pode (blank=True) ser associado a uma loja e uma loja à muitos pedidos
     # on_delete=SET_NULL pos ao deletar uma loja o pedido não é deletado, o camppo vira null
@@ -141,17 +155,46 @@ class Pedido(models.Model):
     revendedor = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_(
         "revendedor"), on_delete=models.SET_NULL, null=True, blank=True)
     
+
+    def __str__(self):
+        return str(self.id)
     
+    # def calcula_total(self):
+    #     self.total = 0
+    #     itens = Item_pedido.objects.get(pedido=self)
+    #     for item in itens:
+    #         self.total += item.subtotal
+        
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.status = self.APROV_PEND
+        
+        # if Item_pedido.objects.get(pedido=self):
+        #     Pedido.calcula_total(self)
+        return super().save(*args, **kwargs)
+        
+        
+    
+        
+class Item_pedido(models.Model):
+    
+    pedido = models.ForeignKey(Pedido, verbose_name=_(
+        "Pedido"), on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, verbose_name=_(
         "produto"), on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.cod_pedido
+    quantidade = models.IntegerField(_("quantidade"))
+    subtotal = models.IntegerField(_("preço"))
     
-    def calcular(self):
-        pass
+    
+    def save(self, *args, **kwargs):
+        if self.produto.qtde_estoque < self.quantidade:
+            DatabaseError('Quantidade em estoque insuficiente')
+        else:
+            self.subtotal = self.quantidade * self.produto.valor
+            self.produto.qtde_estoque -= self.quantidade
+        super().save(*args, **kwargs)
         
-
 class Meta(models.Model):
 
     BRONZE = "bronze"
@@ -167,7 +210,7 @@ class Meta(models.Model):
     ]
 
     nivel = models.CharField(choices=opcoes_nivel,
-                             max_length=50, primary_key=True)
+                             max_length=50)
     valor = models.FloatField(_("valor"))
     recompensa = models.CharField(_("recompensa"), max_length=150)
 
@@ -178,19 +221,12 @@ class Meta(models.Model):
         return self.nivel
 
 
-class Item_pedido(models.Model):
-    pedido = models.ForeignKey(Pedido, verbose_name=_(
-        "pedido"), on_delete=models.CASCADE)
-    produto = models.ForeignKey(Produto, verbose_name=_(
-        "produto"), on_delete=models.CASCADE)
 
-    quantidade = models.IntegerField(_("quantidade"))
-    subtotal = models.IntegerField(_("subtotal"))
 
 
 
 class Nota_fiscal(models.Model):
-    nf = models.IntegerField(_("nota fiscal"), primary_key=True)
+    nf = models.IntegerField(_("nota fiscal"), unique=True)
 
     valor = models.FloatField(_("valor"))
     data_emissao = models.DateTimeField(

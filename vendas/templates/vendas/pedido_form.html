@@ -2,9 +2,19 @@
 {% load crispy_forms_tags %}
 {% block content %}
 <div class="content-section">
+
+
     <form id="form-conteiner" method="POST">
-        {% csrf_token %}
         <legend class="border-bottom mb-4">Pedido</legend>
+        {% csrf_token %}
+        {% if request.user.type == 'REVENDEDOR' %}
+            {{pedido.franquia}}
+            {{pedido.supervisor}}
+            {{pedido.data}}
+            {{forms.metodo_de_pagamento}}
+
+        {% endif%}
+        <legend class="border-bottom mb-4">Produtos</legend>
         <div id="form-group">
             {{ formset.management_form }}
             {% for form in formset %}
@@ -22,7 +32,6 @@
                 <button id="rmv-form" class="btn btn-danger" type="button">Remover</button>
                 <br>
             </div>
-                
         </div>
             <button class="btn btn-outline-info" type="submit">Fazer Pedido</button>
 

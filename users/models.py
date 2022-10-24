@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 
@@ -101,6 +100,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.type = self.base_type
-            return super().save(*args, **kwargs)
-        else:
-            return super().save(*args, **kwargs)
+            
+        return super().save(*args, **kwargs)
+

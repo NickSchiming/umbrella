@@ -1,8 +1,10 @@
-from sqlite3 import DatabaseError
+import datetime
 from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import sweetify
+from django.views.generic import ListView
+
 
 from vendas.models import Pedido
 from .forms import *
@@ -40,34 +42,58 @@ def perfil(request):
 
     return render(request, 'vendas/perfil.html', context)
 
-
+@login_required
 def fazer_pedido(request):
-    ItemPedidoFormSet = inlineformset_factory(
-       Pedido, Item_pedido,  fields=('produto', 'quantidade'), extra=1)
+            
+    pedido_forms = Pedido(data=datetime.datetime.now())
+    item_pedido_formSet = inlineformset_factory(
+       Pedido, Item_pedido,form=FormItemPedido,  fields=('produto', 'quantidade'), extra=1, can_delete=False, validate_min=True)
+        
+    if request.method == 'POST':
+        forms = FormPedido(request.POST, request.FILES, instance=pedido_forms, prefix='principal')
+        formset = item_pedido_formSet(request.POST, request.FILES, instance=pedido_forms, prefix='produto')
 
-    pedido = Pedido.objects.get()
-    
-    if request.method == 'GET':
-         formset = ItemPedidoFormSet(request.GET or None)
-    elif request.method == 'POST':
-        formset = ItemPedidoFormSet(request.POST)
-        if formset.is_valid():
-            for form in formset:
-                if form.is_valid():
-                    try:
-                        if form.cleaned_data.get('DELETE') and form.instance.pk:
-                            form.instance.delete()
-                        else:
-                            instance = form.save(commit=False)
-                            instance.pedido = request.pedido
-                            instance.save()
-                            sweetify.success(request, "Payments saved successfully")
-                    except DatabaseError:
-                        sweetify.error(request, "Database error. Please try again")
-            return redirect('/')
-    # else:
-    #     formset = ItemPedidoFormSet(
-    #         queryset=Pedido.objects.none())
+        if forms.is_valid() and formset.is_valid():
+            forms = forms.save(commit=False)
+            forms.save()
+            formset.save()
+            sweetify.success(
+            request, 'Pedido feito com sucesso')
+            return redirect('')
 
-    context = {'formset': formset}
+    else:
+            forms = FormPedido(instance=pedido_forms, prefix='principal')
+            formset = item_pedido_formSet(instance=pedido_forms, prefix='produto')
+        
+    # if request.method == 'GET':
+    #      formset = ItemPedidoFormSet(request.GET or None)
+    # elif request.method == 'POST':
+    #     formset = ItemPedidoFormSet(request.POST)
+    #     if formset.is_valid():
+    #         for form in formset:
+    #             if form.is_valid():
+    #                 try:
+    #                     if form.cleaned_data.get('DELETE') and form.instance.pk:
+    #                         form.instance.delete()
+    #                     else:
+    #                         instance = form.save(commit=False)
+    #                         instance.pedido = request.pedido
+    #                         instance.save()
+    #                         sweetify.success(request, "Payments saved successfully")
+    #                 except DatabaseError:
+    #                     sweetify.error(request, "Database error. Please try again")
+    #         return redirect('/')
+    # # else:
+    # #     formset = ItemPedidoFormSet(
+    # #         queryset=Pedido.objects.none())
+
+    context = {
+        
+        'pedido': pedido_forms,
+        'forms': forms,
+        'formset': formset,
+    }
     return render(request, 'vendas/pedido_form.html', context)
+
+class listar_pedidos(ListView):
+    models = Pedido

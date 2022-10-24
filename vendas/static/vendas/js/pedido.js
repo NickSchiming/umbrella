@@ -1,4 +1,3 @@
-
 $('#add-form').click(function () {
     var form_idx = $('#id_item_pedido_set-TOTAL_FORMS').val();
     $('#form-group').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
@@ -70,3 +69,29 @@ $("form").submit(function () {
         $("form").append(input)
     }
 });
+
+$('#btn').on('click', function() {
+    alert('Text1 changed!');
+});
+
+$('#oi').on('input', function() {
+    alert('Text1 changed!');
+});
+
+// $(document).on('input','.item_pedido-form', function(e){
+//     e.preventDefault();
+//     var total = parseInt($('#id_item_pedido_set-TOTAL_FORMS').val());
+//     console.log("total forms: ", total);
+//     var forms = $('.item_pedido-form');
+//     // console.log("forms length: ", forms.length);
+//     var formlength = forms.length - 1;
+//     var idstring = '#id_item_pedido_set-TOTAL_FORMS';
+//     $(idstring).val(parseInt(formlength));
+//     // console.log("formlength: ", formlength);
+//     for (var i = 0, formCount = formlength; i < formCount; i++) {
+//         $(forms.get(i)).find("label[for='preco']").each(function () {
+//             this.replaceWith('Preço: {{form.calcula_subtotal}}');
+//         });
+//     }
+//     return false;
+//   })

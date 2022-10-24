@@ -22,7 +22,10 @@ class FormPedido(forms.ModelForm):
         model = Pedido
         fields = '__all__'
         
+        
 class FormItemPedido(forms.ModelForm):
+    
     class meta:
         models = Item_pedido
-        fields = ['produto', 'quantidade']
+        fields = ['produto', 'quantidade','subtotal']
+        
