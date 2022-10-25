@@ -1,0 +1,223 @@
+forms.py
+
+class FormPedido(forms.ModelForm):       
+    class Meta:
+        model = Pedido
+        fields = '__all__'
+        
+        
+class FormItemPedido(forms.ModelForm):
+    
+    class meta:
+        models = Item_pedido
+        fields = ['produto', 'quantidade','subtotal']
+
+
+views.py
+
+@login_required
+def fazer_pedido(request):
+            
+    pedido_forms = Pedido(data=datetime.datetime.now())
+    item_pedido_formSet = inlineformset_factory(
+       Pedido, Item_pedido,form=FormItemPedido,  fields=('produto', 'quantidade'), extra=1, can_delete=False, validate_min=True)
+        
+    if request.method == 'POST':
+        forms = FormPedido(request.POST, request.FILES, instance=pedido_forms, prefix='principal')
+        formset = item_pedido_formSet(request.POST, request.FILES, instance=pedido_forms, prefix='produto')
+
+        if forms.is_valid() and formset.is_valid():
+            forms = forms.save(commit=False)
+            forms.save()
+            formset.save()
+            sweetify.success(
+            request, 'Pedido feito com sucesso')
+            return redirect('')
+
+    else:
+            forms = FormPedido(instance=pedido_forms, prefix='principal')
+            formset = item_pedido_formSet(instance=pedido_forms, prefix='produto')
+        
+    # if request.method == 'GET':
+    #      formset = ItemPedidoFormSet(request.GET or None)
+    # elif request.method == 'POST':
+    #     formset = ItemPedidoFormSet(request.POST)
+    #     if formset.is_valid():
+    #         for form in formset:
+    #             if form.is_valid():
+    #                 try:
+    #                     if form.cleaned_data.get('DELETE') and form.instance.pk:
+    #                         form.instance.delete()
+    #                     else:
+    #                         instance = form.save(commit=False)
+    #                         instance.pedido = request.pedido
+    #                         instance.save()
+    #                         sweetify.success(request, "Payments saved successfully")
+    #                 except DatabaseError:
+    #                     sweetify.error(request, "Database error. Please try again")
+    #         return redirect('/')
+    # # else:
+    # #     formset = ItemPedidoFormSet(
+    # #         queryset=Pedido.objects.none())
+
+    context = {
+        
+        'pedido': pedido_forms,
+        'forms': forms,
+        'formset': formset,
+    }
+    return render(request, 'vendas/pedido_form.html', context)
+
+class listar_pedidos(ListView):
+    models = Pedido
+
+
+
+template base
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no" />
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+  <link rel="stylesheet" type="text/css" href="{% static 'vendas/css/style.css' %}">
+
+  {% if title %}
+  <title>Umbrella - {{ title }}</title>
+  {% else %}
+  <title>Umbrella</title>
+  {% endif %}
+
+  <script type="text/javascript">
+		var user = '{{request.user}}'
+
+		function getToken(name) {
+		    var cookieValue = null;
+		    if (document.cookie && document.cookie !== '') {
+		        var cookies = document.cookie.split(';');
+		        for (var i = 0; i < cookies.length; i++) {
+		            var cookie = cookies[i].trim();
+		            // Does this cookie string begin with the name we want?
+		            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+		                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		                break;
+		            }
+		        }
+		    }
+		    return cookieValue;
+		}
+		var csrftoken = getToken('csrftoken')
+
+		function getCookie(name) {
+		    // Split cookie string and get all individual name=value pairs in an array
+		    var cookieArr = document.cookie.split(";");
+
+		    // Loop through the array elements
+		    for(var i = 0; i < cookieArr.length; i++) {
+		        var cookiePair = cookieArr[i].split("=");
+
+		        /* Removing whitespace at the beginning of the cookie name
+		        and compare it with the given string */
+		        if(name == cookiePair[0].trim()) {
+		            // Decode the cookie value and return
+		            return decodeURIComponent(cookiePair[1]);
+		        }
+		    }
+
+		    // Return null if not found
+		    return null;
+		}
+		var cart = JSON.parse(getCookie('cart'))
+
+		if (cart == undefined){
+			cart = {}
+			console.log('Cart Created!', cart)
+			document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+		}
+		console.log('Cart:', cart)
+	
+	</script>
+
+</head>
+
+<body>
+  <header class="site-header">
+    <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+      <div class="container">
+        <a class="navbar-brand mr-4" href="{% url 'vendas-home' %}">Umbrella</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
+          aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarToggle">
+          <div class="navbar-nav mr-auto">
+            {% if request.user.type == 'REVENDEDOR' %}
+            <a class="nav-item nav-link" href="{% url 'produtos' %}">Fazer Pedido</a>
+            <a class="nav-item nav-link" href="#">Meus Pedidos</a>
+            <a class="nav-item nav-link" href="{% url 'carrinho' %}">Carrinho</a>
+            <a class="nav-item nav-link" href="{% url 'perfil' %}">Gerenciar Cadastro</a>
+            {% else %}
+            {% if request.user.type == 'SUPERVISOR' %}
+            <a class="nav-item nav-link" href="#">Consultar Pedidos</a>
+            <a class="nav-item nav-link" href="#">Consultar Revendedores</a>
+            {% else %}
+            {% if request.user.type == 'LOJA' %}
+            <a class="nav-item nav-link" href="#">Fazer Pedido</a>
+            <a class="nav-item nav-link" href="#">Meus Pedidos</a>
+            {% else %}
+            {% if request.user.type == 'FRANQUIA' %}
+            <a class="nav-item nav-link" href="#">Consultar Pedidos</a>
+            <a class="nav-item nav-link" href="#">Consultar Revendedores</a>
+            <a class="nav-item nav-link" href="#">Relatorios</a>
+            {% endif %}
+            {% endif %}
+            {% endif %}
+            {% endif %}
+
+          </div>
+          <!-- Navbar Right Side -->
+          <div class="navbar-nav">
+            <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <main role="main" class="container">
+    <div class="row">
+      <div class="col-md-8">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.6.1.js"
+  integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI="
+  crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <script src={% static 'vendas/js/pedido.js' %}></script>
+</body>
+
+</html>
+
+</html>
+
+{% load sweetify %}
+{% sweetify %}

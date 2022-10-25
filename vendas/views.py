@@ -4,6 +4,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import sweetify
 from django.views.generic import ListView
+from django.http import JsonResponse
+import json
+from .models import * 
+from .utils import cookieCarrinho, dadosCarrinho
+import logging
+
 
 
 from vendas.models import Pedido
@@ -42,58 +48,59 @@ def perfil(request):
 
     return render(request, 'vendas/perfil.html', context)
 
-@login_required
-def fazer_pedido(request):
-            
-    pedido_forms = Pedido(data=datetime.datetime.now())
-    item_pedido_formSet = inlineformset_factory(
-       Pedido, Item_pedido,form=FormItemPedido,  fields=('produto', 'quantidade'), extra=1, can_delete=False, validate_min=True)
-        
-    if request.method == 'POST':
-        forms = FormPedido(request.POST, request.FILES, instance=pedido_forms, prefix='principal')
-        formset = item_pedido_formSet(request.POST, request.FILES, instance=pedido_forms, prefix='produto')
 
-        if forms.is_valid() and formset.is_valid():
-            forms = forms.save(commit=False)
-            forms.save()
-            formset.save()
-            sweetify.success(
-            request, 'Pedido feito com sucesso')
-            return redirect('')
+def produtos(request):
+	dados = dadosCarrinho(request)
 
-    else:
-            forms = FormPedido(instance=pedido_forms, prefix='principal')
-            formset = item_pedido_formSet(instance=pedido_forms, prefix='produto')
-        
-    # if request.method == 'GET':
-    #      formset = ItemPedidoFormSet(request.GET or None)
-    # elif request.method == 'POST':
-    #     formset = ItemPedidoFormSet(request.POST)
-    #     if formset.is_valid():
-    #         for form in formset:
-    #             if form.is_valid():
-    #                 try:
-    #                     if form.cleaned_data.get('DELETE') and form.instance.pk:
-    #                         form.instance.delete()
-    #                     else:
-    #                         instance = form.save(commit=False)
-    #                         instance.pedido = request.pedido
-    #                         instance.save()
-    #                         sweetify.success(request, "Payments saved successfully")
-    #                 except DatabaseError:
-    #                     sweetify.error(request, "Database error. Please try again")
-    #         return redirect('/')
-    # # else:
-    # #     formset = ItemPedidoFormSet(
-    # #         queryset=Pedido.objects.none())
+	itensCarrinho = dados['itensCarrinho']
+	pedido = dados['pedido']
+	itens = dados['itens']
 
-    context = {
-        
-        'pedido': pedido_forms,
-        'forms': forms,
-        'formset': formset,
-    }
-    return render(request, 'vendas/pedido_form.html', context)
+	produtos = Produto.objects.all()
+	context = {'produtos':produtos, 'itensCarrinho':itensCarrinho}
+	return render(request, 'vendas/produtos.html', context)
 
-class listar_pedidos(ListView):
-    models = Pedido
+def carrinho(request):
+	data = dadosCarrinho(request)
+
+	itensCarrinho = data['itensCarrinho']
+	pedido = data['pedido']
+	itens = data['itens']
+
+	context = {'itens':itens, 'pedido':pedido, 'itensCarrinho':itensCarrinho}
+	return render(request, 'vendas/carrinho.html', context)
+
+def checkout(request):
+	data = dadosCarrinho(request)
+	
+	itensCarrinho = data['itensCarrinho']
+	pedido = data['pedido']
+	itens = data['itens']
+
+	context = {'itens':itens, 'pedido':pedido, 'itensCarrinho':itensCarrinho}
+	return render(request, 'vendas/checkout.html', context)
+
+def atualizarItem(request):
+	data = json.loads(request.body)
+	idProduto = data['idProduto']
+	action = data['action']
+	print('Action:', action)
+	print('Product:', idProduto)
+
+	revendedor = request.user
+	produto = Produto.objects.get(id=idProduto)
+	pedido, created = Pedido.objects.get_or_create(revendedor=revendedor)
+
+	itemPedido, created = ItemPedido.objects.get_or_create(pedido=pedido, produto=produto)
+
+	if action == 'add':
+		itemPedido.quantidade = (itemPedido.quantidade + 1)
+	elif action == 'remove':
+		itemPedido.quantidade = (itemPedido.quantidade - 1)
+
+	itemPedido.save()
+
+	if itemPedido.quantidade <= 0:
+		itemPedido.delete()
+
+	return JsonResponse('Item adicionado', safe=False)

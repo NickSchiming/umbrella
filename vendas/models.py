@@ -22,29 +22,29 @@ class Revendedor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='revendedor')
 
     # campos de perfil
-    nome = models.CharField(_("nome"), max_length=100, null=True)
-    cpf = models.IntegerField(_("cpf"),null=True)
-    telefone = models.IntegerField(_("telefone"), null=True)
-    endereco = models.CharField(_("endereço"), max_length=200, null=True)
+    nome = models.CharField(_("Nome"), max_length=100, null=True)
+    cpf = models.IntegerField(_("Cpf"),null=True)
+    telefone = models.IntegerField(_("Telefone"), null=True)
+    endereco = models.CharField(_("Endereço"), max_length=200, null=True)
     datanasc = models.DateField(
-        _("data de nascimento"), auto_now=False, auto_now_add=False, null=True)
+        _("Data de nascimento"), auto_now=False, auto_now_add=False, null=True)
 
     # um revendedor é associado a um supervisor e um suppervisor à muitos revendedores
     # on_delete=SET_NULL pos ao deletar um supervisor o revendedor não é deletado, o camppo vira null
     supervisor = models.ForeignKey(Supervisor, verbose_name=_(
         "supervisor"), on_delete=models.SET_NULL, null=True)
 
-    is_aprovado = models.BooleanField(_('aprovado'), default=False)
+    is_aprovado = models.BooleanField(_('Aprovado'), default=False)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Revendedor"
         verbose_name_plural = "Revendedores"
 
     def __str__(self):
-        return self.nome
+         return self.nome
 
 
 class Franquia(models.Model):
@@ -84,7 +84,7 @@ class Produto(models.Model):
     descricao = models.CharField(_("descrição"), max_length=200, null=True)
     nome = models.CharField(_("nome do produto"), max_length=100, unique=True, null=True)
     qtde_estoque = models.IntegerField(_("quantidade em estoque"), null=True)
-    valor = models.FloatField(_("valor do produto"), null=True)
+    preco = models.FloatField(_("preço do produto"), null=True)
 
     def __str__(self):
         return str(self.codigo) + ' - ' + self.nome
@@ -111,15 +111,14 @@ class Pedido(models.Model):
         (FINALIZADO, "Finalizado"),
     ]
 
-    status = models.CharField(choices=opcoes_status, max_length=50)
+    status = models.CharField(choices=opcoes_status, max_length=50, null=True, blank=True)
     
-    data = models.DateTimeField(
-        _("data do pedido"), auto_now=True, auto_now_add=False)
+    data = models.DateTimeField(_("data do pedido"), auto_now_add=False, null=True, blank=True)
 
     # estranho parece na vdd ser uma relação com objetos nota fiscal
     # nf = models.IntegerField(_("nota fiscal"))
 
-    total = models.FloatField(_("valor total do pedido"))
+    total = models.FloatField(_("valor total do pedido"), null=True, blank=True)
     
     CREDITO = "credito"
     DEBITO = "debito"
@@ -133,7 +132,7 @@ class Pedido(models.Model):
         (BOLETO, "Boleto"),
     ]
     
-    metodo_de_pagamento = models.CharField(choices=opcoes_pagamento, max_length=200)
+    metodo_de_pagamento = models.CharField(choices=opcoes_pagamento, max_length=200, null=True, blank=True)
 
     # um pedido é associado a uma franquia e uma franquia à muitos pedidos
     # on_delete=SET_NULL pos ao deletar uma franquia o pedido não é deletado, o camppo vira null
@@ -159,11 +158,17 @@ class Pedido(models.Model):
     def __str__(self):
         return str(self.id)
     
-    # def calcula_total(self):
-    #     self.total = 0
-    #     itens = Item_pedido.objects.get(pedido=self)
-    #     for item in itens:
-    #         self.total += item.subtotal
+    @property
+    def get_carrinho_total(self):
+        itenspedido = self.itempedido_set.all()
+        total = sum([item.get_total for item in itenspedido])
+        return total 
+
+    @property
+    def get_carrinho_itens(self):
+        itenspedido = self.itempedido_set.all()
+        total = sum([item.quantidade for item in itenspedido])
+        return total 
         
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -176,24 +181,29 @@ class Pedido(models.Model):
         
     
         
-class Item_pedido(models.Model):
+class ItemPedido(models.Model):
     
     pedido = models.ForeignKey(Pedido, verbose_name=_(
-        "Pedido"), on_delete=models.CASCADE)
+        "Pedido"), on_delete=models.SET_NULL, null=True)
     produto = models.ForeignKey(Produto, verbose_name=_(
-        "produto"), on_delete=models.CASCADE)
+        "produto"), on_delete=models.SET_NULL, null=True)
 
-    quantidade = models.IntegerField(_("quantidade"))
-    subtotal = models.IntegerField(_("preço"))
+    quantidade = models.IntegerField(_("quantidade"),default=0, null=True, blank=True)
+    data_adicionado = models.DateTimeField(auto_now_add=True)
     
     
-    def save(self, *args, **kwargs):
-        if self.produto.qtde_estoque < self.quantidade:
-            DatabaseError('Quantidade em estoque insuficiente')
-        else:
-            self.subtotal = self.quantidade * self.produto.valor
-            self.produto.qtde_estoque -= self.quantidade
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if self.produto.qtde_estoque < self.quantidade:
+    #         DatabaseError('Quantidade em estoque insuficiente')
+    #     else:
+    #         self.subtotal = self.quantidade * self.produto.valor
+    #         self.produto.qtde_estoque -= self.quantidade
+    #     super().save(*args, **kwargs)
+        
+    @property
+    def get_total(self):
+        total = self.produto.preco * self.quantidade
+        return total
         
 class Meta(models.Model):
 
