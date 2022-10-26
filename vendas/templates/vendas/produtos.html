@@ -1,19 +1,19 @@
 {% extends 'vendas/base.html' %}
 {% load static %}
 {% block content %}
-    <div class="row">
+	<div class="row">
 		{% for produto in produtos %}
-		<div class="col-lg-4">
-			<div class="box-element product">
-				<h6><strong>{{produto.nome}}</strong></h6>
-				<hr>
+			<div class="col-lg-4">
+				<img class="thumbnail" src="{{produto.imageURL}}">
+				<div class="box-element product">
+					<h6><strong>{{produto.nome}}</strong></h6>
+					<hr>
 
-				<button data-produto="{{produto.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-carrinho">Adicionar ao carrinho</button>
-				<h4 tyle="display: inline-block; float: right"><strong>${{produto.preco}}</strong></h4>
-
+					<button data-produto="{{produto.id}}" data-action="add" class="btn
+						btn-outline-secondary add-btn update-carrinho">Adicionar ao carrinho</button>
+					<h4 tyle="display: inline-block; float: right"><strong>${{produto.preco}}</strong></h4>
+				</div>
 			</div>
-		</div>
 		{% endfor %}
 	</div>
-
 {% endblock content %}

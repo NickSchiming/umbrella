@@ -37,10 +37,10 @@ function updateElementIndex(el, prefix_tag, ndx) {
     var id_regex = new RegExp('(' + prefix_tag + '-\\d+)');
     var replacement = prefix_tag + '-' + ndx;
     // console.log("elemento: ", $(el));
-    if ($( el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
+    if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
     if (el.id) el.id = el.id.replace(id_regex, replacement);
     if (el.name) el.name = el.name.replace(id_regex, replacement);
-    
+
 };
 
 
@@ -70,11 +70,11 @@ $("form").submit(function () {
     }
 });
 
-$('#btn').on('click', function() {
+$('#btn').on('click', function () {
     alert('Text1 changed!');
 });
 
-$('#oi').on('input', function() {
+$('#oi').on('input', function () {
     alert('Text1 changed!');
 });
 

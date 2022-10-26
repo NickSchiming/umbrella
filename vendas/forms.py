@@ -9,13 +9,10 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['email']
-        
-        
+
+
 class PerfilRevendedor(forms.ModelForm):
     class Meta:
         model = Revendedor
-        fields =['nome','cpf','telefone','endereco','datanasc','is_aprovado',]
-        
-
-
-        
+        fields = ['nome', 'cpf', 'telefone',
+                  'endereco', 'datanasc', 'is_aprovado', ]

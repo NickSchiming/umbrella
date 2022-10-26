@@ -11,4 +11,4 @@ class UserRegisterForm(UserCreationForm):
 
     class Meta:
         model = models.User
-        fields = ['email',]
+        fields = ['email', ]

@@ -1,10 +1,10 @@
 {% extends "vendas/base.html" %}
 {% block content %}
-<p>home</p> 
-<p></p>
-{% if user.revendedor.is_aprovado %}
-    <p>Status de cadastro: Aprovado</p>
+    <p>home</p>
+    <p></p>
+    {% if user.revendedor.is_aprovado %}
+        <p>Status de cadastro: Aprovado</p>
     {% else %}
-    <p>Status de cadastro: Pendente</p>
-{% endif %}
+        <p>Status de cadastro: Pendente</p>
+    {% endif %}
 {% endblock content %}

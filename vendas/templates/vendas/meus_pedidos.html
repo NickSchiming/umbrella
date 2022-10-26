@@ -1,0 +1,19 @@
+{% extends 'vendas/base.html' %}
+{% load static %}
+{% block content %}
+	<div class="row">
+		{% for pedido in pedidos %}
+			<div class="col-lg-4">
+				<div class="box-element product">
+					<h6><strong>{{pedido.cod_pedido}}</strong></h6>
+					<hr>
+                    <h6><strong>{{pedido.status}}</strong></h6>
+                    <hr>
+                    <h6><strong>{{pedido.data}}</strong></h6>
+                    <hr>
+                    <a class="btn btn-outline-success" href="{% url 'detalhe_pedido' pedido.id %}">Detalhes</a>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+{% endblock content %}
