@@ -77,25 +77,50 @@
 		aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Alterna navegação">
 		<span class="navbar-toggler-icon"></span>
 		</button>
-
-		<div class="container">
-			<div class="collapse navbar-collapse" id="navbarNavDropdown">
-				<ul class="navbar-nav mr-auto">
-					<li class="nav-item active">
-						<a class="nav-link" href="{% url 'vendas-home' %}">Home<span class="sr-only">(Página atual)</span></a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="{% url 'produtos' %}">Fazer Pedido</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="{% url 'meus_pedidos' %}">Meus Pedidos</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="{% url 'perfil' %}">Gerenciar Cadastro</a>
-					</li>
-				</ul>
+		{% if request.user.type == 'REVENDEDOR' %}
+			<div class="container">
+				<div class="collapse navbar-collapse" id="navbarNavDropdown">
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item active">
+							<a class="nav-link" href="{% url 'vendas-home' %}">Home<span class="sr-only">(Página atual)</span></a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'produtos' %}">Fazer Pedido</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'meus_pedidos' %}">Meus Pedidos</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'perfil' %}">Gerenciar Cadastro</a>
+						</li>
+					</ul>
+				</div>
 			</div>
-		</div>
+		{% elif request.user.type == 'FRANQUIA' %}
+			<div class="container">
+				<div class="collapse navbar-collapse" id="navbarNavDropdown">
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item active">
+							<a class="nav-link" href="{% url 'vendas-home' %}">Home<span class="sr-only">(Página atual)</span></a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'usuarios' %}">Usuarios</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'cadastro_produtos' %}">Produtos</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'perfil' %}">Gerenciar Cadastro</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		{% endif %}
+		
+		
 			
 	    <ul class="navbar-nav ml-auto">
 			

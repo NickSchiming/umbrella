@@ -1,3 +1,4 @@
+from ast import For
 import datetime
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -5,7 +6,7 @@ import sweetify
 from django.http import HttpResponse, JsonResponse
 import json
 from .models import *
-from .utils import  dadosCarrinho
+from .utils import  dadosCarrinho, renderForm
 
 from django.views.generic import (
     ListView,
@@ -135,7 +136,7 @@ def atualizarItem(request):
     if itemPedido.quantidade <= 0:
         itemPedido.delete()
 
-    sweetify.success(request, 'item adicionado', position='top-end', timer=1000, toast=True)
+    sweetify.success(request, 'item adicionado', position='top-end', timer=1000, toast=True, width='10%')
     return JsonResponse('Item adicionado', safe=False)
 
 
@@ -158,11 +159,17 @@ def processarPedido(request):
         pedido.status = pedido.APROV_PEND
         pedido.metodo_de_pagamento = pgto
         pedido.completo = True
-    pedido.save()
     
-    sweetify.success(request,'Pedido feito com sucesso!')
+    estoque = pedido.falta_estoque()
 
-    return JsonResponse('Pedido sucedido', safe=False)
+    if estoque[0]:
+        sweetify.error(request, 'O produto ' + estoque[1] + ' está em falta no momento')
+        return JsonResponse('Falta de estoque', safe=False)
+    else:
+        pedido.baixa_estoque()
+        pedido.save()
+        sweetify.success(request,'Pedido feito com sucesso!')
+        return JsonResponse('Pedido sucedido', safe=False)
 
 def mostrarPedidos(request):
     try:
@@ -171,7 +178,7 @@ def mostrarPedidos(request):
         sweetify.error(request, 'Porfavor cadastre seus dados antes de fazer um pedido')
         return redirect('perfil')
     pedidos = Pedido.objects.filter(revendedor=request.user.revendedor).exclude(completo=False).order_by('-data')
-    
+
     return render(request, "vendas/meus_pedidos.html", {'pedidos': pedidos})
 
 def detalhePedido(request, pk):
@@ -185,6 +192,7 @@ def atualizarPedido(request, pk):
     pedido_ex = Pedido.objects.get(revendedor=request.user.revendedor, completo=False)
     pedido_ex.delete()
     pedido.completo = False
+    pedido.devolve_produtos()
     pedido.save()
     sweetify.success(request, 'Por favor altere o pedido a faça checkout novamente')
     return redirect('produtos')
@@ -192,6 +200,53 @@ def atualizarPedido(request, pk):
 
 def deletarPedido(request, pk):
     pedido = Pedido.objects.get(id=pk)
+    pedido.devolve_produtos()
     pedido.delete()
     sweetify.success(request, 'Pedido excluido com sucesso')
     return redirect('vendas-home')
+
+def lista_usuarios(request):
+    usuarios = User.objects.all()
+    return render(request, "vendas/usuarios.html", {'usuarios': usuarios})
+
+def atualizarUsuario(request, pk):
+    user = User.objects.get(id=pk)
+    context = renderForm(request, user)
+    return render(request, 'vendas/perfil.html', context)
+
+
+def deletarUsuario(request, pk):
+    user = User.objects.get(id=pk)
+    user.delete()
+    sweetify.success(request, 'Usuario excluido com sucesso')
+    return redirect('usuarios')
+
+def lista_pedidos(request):
+    pedidos = Pedido.objects.all().exclude(completo=False)
+    return render(request, "vendas/pedidos.html", {'pedidos': pedidos})
+
+def lista_produtos(request):
+    produtos = Produto.objects.all()
+    return render(request, "vendas/cadastro_produtos.html", {'produtos': produtos})
+
+def atualizarProduto(request, pk):
+    produto = Produto.objects.get(id=pk)
+
+    if request.method == 'POST':
+        form = FormProduto(request.POST, instance=produto)
+        if form.is_valid():
+            form.save()
+            sweetify.success(request, 'Produto atualizados')
+            return redirect('produtos')
+        else:
+            sweetify.error(request, 'Houve um erro na atualização dos dados')
+            return redirect('produtos')
+    else:
+        form = FormProduto(instance=produto)
+
+    return render(request, 'vendas/dados_produtos.html', {'form': form, 'produto':produto})
+
+def deletarProduto(request, pk):
+    produto = Produto.objects.get(id=pk)
+    produto.delete()
+    return redirect('produtos')

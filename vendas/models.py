@@ -20,6 +20,31 @@ class Supervisor(models.Model):
         return self.nome
 
 
+class Meta(models.Model):
+
+    BRONZE = "bronze"
+    PRATA = "prata"
+    OURO = "ouro"
+    DIAMANTE = "diamante"
+
+    opcoes_nivel = [
+        (BRONZE, "Bronzee"),
+        (PRATA, "Prata"),
+        (OURO, "Ouro"),
+        (DIAMANTE, "Diamante"),
+    ]
+
+    nivel = models.CharField(choices=opcoes_nivel,
+                             max_length=50)
+    valor = models.FloatField(_("valor"))
+    recompensa = models.CharField(_("recompensa"), max_length=150)
+
+
+    def __str__(self):
+        return self.nivel
+
+
+
 class Revendedor(models.Model):
     # um perfil de Revendedor deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de Revendedor
     user = models.OneToOneField(
@@ -28,7 +53,8 @@ class Revendedor(models.Model):
     # campos de perfil
     nome = models.CharField(_("Nome"), max_length=100, null=True)
     cpf = models.IntegerField(_("Cpf"), null=True)
-    telefone = models.IntegerField(_("Telefone"), null=True)
+    telefone = models.CharField(_("Telefone"), max_length=15, null=True)
+    cep = models.CharField(_("CEP"), max_length=15, null=True)
     endereco = models.CharField(_("Endereço"), max_length=200, null=True)
     datanasc = models.DateField(
         _("Data de nascimento"), auto_now=False, auto_now_add=False, null=True)
@@ -37,6 +63,8 @@ class Revendedor(models.Model):
     # on_delete=SET_NULL pos ao deletar um supervisor o revendedor não é deletado, o camppo vira null
     supervisor = models.ForeignKey(Supervisor, verbose_name=_(
         "supervisor"), on_delete=models.SET_NULL, null=True)
+
+    meta = models.ForeignKey(Meta, on_delete=models.SET_NULL, null = True)
 
     is_aprovado = models.BooleanField(_('Aprovado'), default=False)
 
@@ -53,7 +81,7 @@ class Revendedor(models.Model):
 
 class Franquia(models.Model):
     # um perfil de franquia deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de franquia
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='franquia')
 
     # campos de perfil
     razaosocial = models.CharField(_("razão social"), max_length=150)
@@ -190,6 +218,27 @@ class Pedido(models.Model):
         total = sum([item.quantidade for item in itenspedido])
         return total
 
+    def falta_estoque(self):
+        itenspedido = self.itempedido_set.all()
+        for item in itenspedido:
+            if item.quantidade > item.produto.qtde_estoque:
+                return [True, item.produto.nome]
+            else:
+                return [False, item.produto.nome]
+
+    def baixa_estoque(self):
+        itenspedido = self.itempedido_set.all()
+        for item in itenspedido:
+            item.produto.qtde_estoque -= item.quantidade
+            item.produto.save()
+        
+    def devolve_produtos(self):
+        itenspedido = self.itempedido_set.all()
+        for item in itenspedido:
+            item.produto.qtde_estoque += item.quantidade
+            item.produto.save()
+        
+
     def save(self, *args, **kwargs):
         if not self.pk:
             self.status = self.APROV_PEND
@@ -228,30 +277,6 @@ class ItemPedido(models.Model):
         return total
 
 
-class Meta(models.Model):
-
-    BRONZE = "bronze"
-    PRATA = "prata"
-    OURO = "ouro"
-    DIAMANTE = "diamante"
-
-    opcoes_nivel = [
-        (BRONZE, "Bronzee"),
-        (PRATA, "Prata"),
-        (OURO, "Ouro"),
-        (DIAMANTE, "Diamante"),
-    ]
-
-    nivel = models.CharField(choices=opcoes_nivel,
-                             max_length=50)
-    valor = models.FloatField(_("valor"))
-    recompensa = models.CharField(_("recompensa"), max_length=150)
-
-    Revendedor = models.ManyToManyField(
-        Revendedor, verbose_name=_("revendedor"))
-
-    def __str__(self):
-        return self.nivel
 
 
 class Nota_fiscal(models.Model):
