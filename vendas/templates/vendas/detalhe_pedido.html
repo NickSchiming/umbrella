@@ -1,0 +1,40 @@
+{% extends "vendas/base.html" %}
+{% block content %}
+  <article class="media content-section">
+    <div class="media-body">
+      <div class="article-metadata">
+        <h2>Código do pedido: {{ pedido.cod_pedido }}</h2>
+        <h6 class="text-muted">Data: {{ pedido.data}}</h6>
+        <h2>Total: ${{ pedido.get_carrinho_total }}</h2>
+        <div class="box-element">
+          <div class="carrinho-row">
+            <div style="flex:2"></div>
+            <div style="flex:2"><strong>Item</strong></div>
+            <div style="flex:1"><strong>Preço</strong></div>
+            <div style="flex:1"><strong>Quantidade</strong></div>
+            <div style="flex:1"><strong>Total</strong></div>
+          </div>
+          {% for item in itens %}
+            <div class="carrinho-row">
+              <div style="flex:2"><img class="row-image" src="{{item.produto.imageURL}}"></div>
+              <div style="flex:2"><p>{{item.produto.nome}}</p></div>
+              <div style="flex:1"><p>${{item.produto.preco|floatformat:2}}</p></div>
+              <div style="flex:1">
+                <p class="quantity">{{item.quantidade}}</p>
+              </div>
+              <div style="flex:1"><p>${{item.get_total|floatformat:2}}</p></div>
+            </div>
+          {% endfor %}
+        </div>
+        
+        {% if pedido.revendedor.user == user %}
+          <div>
+            <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Atualizar</a>
+            <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>
+          </div>
+        {% endif %}
+      </div>
+      
+    </div>
+  </article>
+{% endblock content %}

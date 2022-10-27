@@ -7,7 +7,9 @@ urlpatterns = [
     path('perfil/', views.perfil, name='perfil'),
     
     path('meus_pedidos/', views.mostrarPedidos, name='meus_pedidos'),
-    path('detalhe_pedido/<int:pk>/', detalhePedido.as_view(), name='detalhe_pedido'),
+    path('detalhe_pedido/<int:pk>/', views.detalhePedido, name='detalhe_pedido'),
+    path('atualizar_pedido/<int:pk>/', views.atualizarPedido, name='atualizar_pedido'),
+    path('deletar_pedido/<int:pk>/', views.deletarPedido, name='deletar_pedido'),
 
     path('produtos/', views.produtos, name="produtos"),
     path('carrinho/', views.carrinho, name="carrinho"),

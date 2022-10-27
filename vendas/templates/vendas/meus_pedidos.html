@@ -2,18 +2,29 @@
 {% load static %}
 {% block content %}
 	<div class="row">
-		{% for pedido in pedidos %}
-			<div class="col-lg-4">
-				<div class="box-element product">
-					<h6><strong>{{pedido.cod_pedido}}</strong></h6>
-					<hr>
-                    <h6><strong>{{pedido.status}}</strong></h6>
-                    <hr>
-                    <h6><strong>{{pedido.data}}</strong></h6>
-                    <hr>
-                    <a class="btn btn-outline-success" href="{% url 'detalhe_pedido' pedido.id %}">Detalhes</a>
+		{% if not pedidos %}
+		<h2><strong>Nenhum pedido encontrado</strong></h2>
+		{% else %}
+			{% for pedido in pedidos %}
+				<div class="col-lg-4">
+					<div class="box-element product">
+						<h6><strong>Código do Pedido:</strong></h6>
+						<h6>{{pedido.cod_pedido}}</h6>
+						<hr>
+						<h6><strong>Status:</strong></h6>
+						<h6>{{pedido.status}}</h6>
+						<hr>
+						<h6><strong>Data:</strong></h6>
+						<h6>{{pedido.data|date:"d/m/Y" }}</h6>
+						<hr>
+						<h6><strong>Forma de pagamento:</strong></h6>
+						<h6>{{pedido.metodo_de_pagamento}}</h6>
+						<hr>
+
+						<a class="btn btn-outline-success" href="{% url 'detalhe_pedido' pedido.id %}">Detalhes</a>
+					</div>
 				</div>
-			</div>
-		{% endfor %}
+			{% endfor %}
+		{% endif %}
 	</div>
 {% endblock content %}

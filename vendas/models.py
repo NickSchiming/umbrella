@@ -176,7 +176,7 @@ class Pedido(models.Model):
         "revendedor"), on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return self.cod_pedido
+        return self.id
 
     @property
     def get_carrinho_total(self):
@@ -202,10 +202,10 @@ class Pedido(models.Model):
 class ItemPedido(models.Model):
 
     pedido = models.ForeignKey(Pedido, verbose_name=_(
-        "Pedido"), on_delete=models.SET_NULL, null=True)
+        "Pedido"), on_delete=models.CASCADE, null=True)
     
     produto = models.ForeignKey(Produto, verbose_name=_(
-        "produto"), on_delete=models.SET_NULL, null=True)
+        "produto"), on_delete=models.CASCADE, null=True)
 
     quantidade = models.IntegerField(
         _("quantidade"), default=0, null=True, blank=True)
@@ -220,7 +220,7 @@ class ItemPedido(models.Model):
     #     super().save(*args, **kwargs)
     
     def __str__(self):
-        return self.produto.nome
+        return self.pedido.id
 
     @property
     def get_total(self):

@@ -2,7 +2,7 @@ import datetime
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import sweetify
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 import json
 from .models import *
 from .utils import  dadosCarrinho
@@ -73,7 +73,7 @@ def produtos(request):
 	try:
 		request.user.revendedor
 	except:
-		sweetify.error(request, 'Profavor cadastre seus dados antes de fazer um pedido')
+		sweetify.error(request, 'Porfavor cadastre seus dados antes de fazer um pedido')
 		return redirect('perfil')
 
 	dados = dadosCarrinho(request)
@@ -135,13 +135,14 @@ def atualizarItem(request):
     if itemPedido.quantidade <= 0:
         itemPedido.delete()
 
+    sweetify.success(request, 'item adicionado', position='top-end', timer=1000, toast=True)
     return JsonResponse('Item adicionado', safe=False)
 
 
 def processarPedido(request):
     cod_pedido = datetime.datetime.now().timestamp()
     dados = json.loads(request.body)
-    logger.warning('Dados:' + str(dados))
+    
 
     
     if request.user.is_authenticated:
@@ -151,10 +152,11 @@ def processarPedido(request):
     total = float(dados['form']['total'].replace(',', '.'))
     pedido.cod_pedido = cod_pedido
     
-    
+    pgto = dados['form']['formaPgto']
 
     if total == pedido.get_carrinho_total:
-        pedido.status = 'aprovacao_pendente'
+        pedido.status = pedido.APROV_PEND
+        pedido.metodo_de_pagamento = pgto
         pedido.completo = True
     pedido.save()
     
@@ -163,8 +165,33 @@ def processarPedido(request):
     return JsonResponse('Pedido sucedido', safe=False)
 
 def mostrarPedidos(request):
-    pedidos = Pedido.objects.filter(revendedor=request.user.revendedor)
+    try:
+     request.user.revendedor
+    except:
+        sweetify.error(request, 'Porfavor cadastre seus dados antes de fazer um pedido')
+        return redirect('perfil')
+    pedidos = Pedido.objects.filter(revendedor=request.user.revendedor).exclude(completo=False).order_by('-data')
+    
     return render(request, "vendas/meus_pedidos.html", {'pedidos': pedidos})
 
-class detalhePedido(DetailView):
-    model = Pedido
+def detalhePedido(request, pk):
+    pedido = Pedido.objects.get(id=pk)
+    itens = pedido.itempedido_set.all()
+
+    return render(request, "vendas/detalhe_pedido.html", {'pedido': pedido, 'itens' : itens})
+
+def atualizarPedido(request, pk):
+    pedido = Pedido.objects.get(id=pk)
+    pedido_ex = Pedido.objects.get(revendedor=request.user.revendedor, completo=False)
+    pedido_ex.delete()
+    pedido.completo = False
+    pedido.save()
+    sweetify.success(request, 'Por favor altere o pedido a faça checkout novamente')
+    return redirect('produtos')
+
+
+def deletarPedido(request, pk):
+    pedido = Pedido.objects.get(id=pk)
+    pedido.delete()
+    sweetify.success(request, 'Pedido excluido com sucesso')
+    return redirect('vendas-home')

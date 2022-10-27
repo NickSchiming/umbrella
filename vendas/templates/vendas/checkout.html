@@ -8,12 +8,12 @@
 					<div id="shipping-info">
 						<p>Modo de Pagamento:</p>
 						<div class="form-field">
-							<select name="cars" id="cars">
+							<select name="pgto" id="pgto">
 								<option value="credito">Credito</option>
 								<option value="debito">Debito</option>
 								<option value="pix">Pix</option>
 								<option value="boleto">Boleto</option>
-							  </select>
+							</select>
 						</div>
 						
 					</div>
@@ -48,31 +48,24 @@
 		</div>
 	</div>
 
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
 	<script type="text/javascript">
-		var total = '{{pedido.get_carrinho_total}}'
+		var total = '{{pedido.get_carrinho_total}}';
 
 
 			var form = document.getElementById('form')
 			form.addEventListener('submit', function(e){
 				e.preventDefault()
-				console.log('Form Submitted...')
 				document.getElementById('form-button').classList.add("hidden");
-				submitFormData()
+				var formaPgto = $("#pgto").val()
+				submitFormData(formaPgto)
 			})
 
-			/*
-			document.getElementById('make-payment').addEventListener('click', function(e){
-				submitFormData()
-			})
-			*/
-
-			function submitFormData(){
-				console.log('Payment button clicked')
-
+			function submitFormData(formaPgto){
 				var userFormData = {
-					'name':null,
-					'email':null,
 					'total':total,
+					'formaPgto':formaPgto,
 				}
 
 				var url = "/processarPedido/"
