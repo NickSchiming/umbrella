@@ -29,7 +29,7 @@
         
         {% if pedido.revendedor.user == user %}
           <div>
-            <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Atualizar</a>
+            <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
             <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>
           </div>
         {% endif %}

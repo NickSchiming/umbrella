@@ -117,7 +117,7 @@ class Produto(models.Model):
     descricao = models.CharField(_("descrição"), max_length=200, null=True)
     nome = models.CharField(_("nome do produto"),
                             max_length=100, unique=True, null=True)
-    qtde_estoque = models.IntegerField(_("quantidade em estoque"), null=True)
+    qtde_estoque = models.PositiveIntegerField(_("quantidade em estoque"), null=True)
     preco = models.FloatField(_("preço do produto"), null=True)
     image = models.ImageField(null=True, blank=True)
 
