@@ -80,8 +80,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # campo que armazena o tipo
     type = models.CharField(
-        _("type"), max_length=50, choices=Types.choices, default=base_type
-    )
+        _("tipo"), max_length=50, choices=Types.choices, default=base_type
+    , null = True, blank = True)
 
     # associação com o criado de objetos user
     objects = UserManager()

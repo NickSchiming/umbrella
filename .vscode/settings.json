@@ -1,0 +1,6 @@
+{
+    "discord.enabled": true,
+    "emmet.includeLanguages": {
+        "django-html": "html"
+    }
+}

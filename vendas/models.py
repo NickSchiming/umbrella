@@ -48,7 +48,7 @@ class Meta(models.Model):
 class Revendedor(models.Model):
     # um perfil de Revendedor deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de Revendedor
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name='revendedor')
+        User, on_delete=models.CASCADE)
 
     # campos de perfil
     nome = models.CharField(_("Nome"), max_length=100, null=True)
@@ -81,20 +81,20 @@ class Revendedor(models.Model):
 
 class Franquia(models.Model):
     # um perfil de franquia deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de franquia
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='franquia')
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # campos de perfil
     razaosocial = models.CharField(_("razão social"), max_length=150)
     cnpj = models.IntegerField(_("cnpj"), unique=True)
     endereco = models.CharField(_("endereço"), max_length=200)
 
-    # def __str__(self):
-    #     return self.razaosocial
+    def __str__(self):
+        return self.razaosocial
 
 
 class Loja(models.Model):
     # um perfil de loja deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de loja
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # campos de perfil
     razaosocial = models.CharField(_("razão social"), max_length=150)
@@ -106,8 +106,8 @@ class Loja(models.Model):
     franquia = models.ForeignKey(Franquia, verbose_name=_(
         "franquia"), on_delete=models.SET_NULL, null=True)
 
-    # def __str__(self):
-    #     return self.razaosocial
+    def __str__(self):
+        return self.razaosocial
 
 
 class Produto(models.Model):
@@ -204,7 +204,7 @@ class Pedido(models.Model):
         "revendedor"), on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return self.id
+       return self.cod_pedido
 
     @property
     def get_carrinho_total(self):
@@ -269,7 +269,7 @@ class ItemPedido(models.Model):
     #     super().save(*args, **kwargs)
     
     def __str__(self):
-        return self.pedido.id
+        return self.pedido.cod_pedido
 
     @property
     def get_total(self):

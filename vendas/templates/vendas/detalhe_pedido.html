@@ -5,6 +5,11 @@
       <div class="article-metadata">
         <h2>Código do pedido: {{ pedido.cod_pedido }}</h2>
         <h6 class="text-muted">Data: {{ pedido.data}}</h6>
+        {% if pedido.revendedor %}
+          <h6>Data: {{ pedido.revendedor }}</h6>
+				{% elif pedido.loja %}
+        <h6>Data: {{ pedido.loja }}</h6>
+				  {% endif %}
         <h2>Total: ${{ pedido.get_carrinho_total }}</h2>
         <div class="box-element">
           <div class="carrinho-row">
@@ -27,7 +32,7 @@
           {% endfor %}
         </div>
         
-        {% if pedido.revendedor.user == user %}
+        {% if pedido.revendedor.user == user or user.type == 'FRANQUIA' %}
           <div>
             <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
             <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>

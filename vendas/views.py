@@ -36,38 +36,42 @@ def home(request):
 
 @login_required
 def perfil(request):
-	if request.method == 'POST':
-		u_form = UserUpdateForm(request.POST, instance=request.user)
-		try:
-			p_form = PerfilRevendedor(
-			request.POST, instance=request.user.revendedor)
-		except:
-			p_form = PerfilRevendedor(request.POST)
-		if u_form.is_valid() and p_form.is_valid():
-			u_form.save()
-			form = p_form.save(commit=False)
-			form.user = request.user
-			p_form.save()
-   
-			sweetify.success(request, 'Seus dados foram atualizados')
-			return redirect('perfil')
-		else:
-			sweetify.error(request, 'Houve um erro na atualização dos dados')
-			return redirect('perfil')
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        try:
+            p_form = PerfilRevendedor(
+            request.POST, instance=request.user.revendedor)
+        except:
+            p_form = PerfilRevendedor(request.POST)
 
-	else:
-		u_form = UserUpdateForm(instance=request.user)
-		try:
-			p_form = PerfilRevendedor(instance=request.user.revendedor)
-		except:
-			p_form = PerfilRevendedor()
+        logger.warning(u_form)
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            form = p_form.save(commit=False)
+            form.user = request.user
+            p_form.save()
 
-	context = {
-	'u_form': u_form,
-	'p_form': p_form
-	}
+            sweetify.success(request, 'Seus dados foram atualizados')
+            return redirect('perfil')
+        else:
+            sweetify.error(request, 'Houve um erro na atualização dos dados')
+            return redirect('perfil')
 
-	return render(request, 'vendas/perfil.html', context)
+    else:
+        u_form = UserUpdateForm(instance=request.user)
+        if not request.user.type == 'FRANQUIA':
+            u_form.fields.pop('type')
+        try:
+            p_form = PerfilRevendedor(instance=request.user.revendedor)
+        except:
+            p_form = PerfilRevendedor()
+
+    context = {
+    'u_form': u_form,
+    'p_form': p_form
+    }
+
+    return render(request, 'vendas/perfil.html', context)
 
 @login_required
 def produtos(request):
@@ -228,6 +232,11 @@ def lista_pedidos(request):
 def lista_produtos(request):
     produtos = Produto.objects.all()
     return render(request, "vendas/cadastro_produtos.html", {'produtos': produtos})
+
+def deletarPedido(request, pk):
+    pedido = Pedido.objects.get(id=pk)
+    pedido.delete()
+    return redirect('pedidos')
 
 def atualizarProduto(request, pk):
     produto = Produto.objects.get(id=pk)

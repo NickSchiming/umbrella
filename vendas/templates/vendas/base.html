@@ -77,7 +77,7 @@
 		aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Alterna navegação">
 		<span class="navbar-toggler-icon"></span>
 		</button>
-		{% if request.user.type == 'REVENDEDOR' %}
+		{% if request.user.type == 'REVENDEDOR' or request.user.type == 'LOJA'%}
 			<div class="container">
 				<div class="collapse navbar-collapse" id="navbarNavDropdown">
 					<ul class="navbar-nav mr-auto">

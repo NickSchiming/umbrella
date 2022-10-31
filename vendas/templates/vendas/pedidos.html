@@ -17,11 +17,22 @@
 						<h6><strong>Data:</strong></h6>
 						<h6>{{pedido.data|date:"d/m/Y" }}</h6>
 						<hr>
+						{% if pedido.revendedor %}
+							<h6><strong>Revendedor:</strong></h6>
+							<h6>{{pedido.revendedor}}</h6>
+							<hr>
+						{% elif pedido.loja %}
+							<h6><strong>Loja:</strong></h6>
+							<h6>{{pedido.loja}}</h6>
+							<hr>
+						{% endif %}
+						
 						<h6><strong>Forma de pagamento:</strong></h6>
 						<h6>{{pedido.metodo_de_pagamento}}</h6>
 						<hr>
 
 						<a class="btn btn-outline-success" href="{% url 'detalhe_pedido' pedido.id %}">Detalhes</a>
+						<!-- <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a> -->
 					</div>
 				</div>
 			{% endfor %}

@@ -1,7 +1,7 @@
 import sweetify
 from django.shortcuts import render, redirect
 
-from vendas.forms import PerfilFranquia, PerfilRevendedor, UserUpdateForm
+from vendas.forms import PerfilFranquia, PerfilLoja, PerfilRevendedor, PerfilSupervisor, UserUpdateForm
 from .models import *
 import logging
 
@@ -75,6 +75,72 @@ def renderForm(request, user):
                     p_form = PerfilFranquia(instance=user.franquia)
                 except:
                     p_form = PerfilFranquia()
+
+            return {
+            'u_form': u_form,
+            'p_form': p_form
+            }
+        
+        elif user.type == 'LOJA':
+            if request.method == 'POST':
+                u_form = UserUpdateForm(request.POST, instance=user)
+                try:
+                    p_form = PerfilLoja(
+                    request.POST, instance=user.loja)
+                except:
+                    p_form = PerfilLoja(request.POST)
+                if u_form.is_valid() and p_form.is_valid():
+                    u_form.save()
+                    form = p_form.save(commit=False)
+                    logger.warning(user)
+                    form.user = user
+                    logger.warning(form.user)
+                    logger.warning(p_form.save())
+                    p_form.save()
+
+                    sweetify.success(request, 'Seus dados foram atualizados')
+                else:
+                    sweetify.error(request, 'Houve um erro na atualização dos dados')
+
+            else:
+                u_form = UserUpdateForm(instance=user)
+                try:
+                    p_form = PerfilLoja(instance=user.loja)
+                except:
+                    p_form = PerfilLoja()
+
+            return {
+            'u_form': u_form,
+            'p_form': p_form
+            }
+        
+        elif user.type == 'SUPERVISOR':
+            if request.method == 'POST':
+                u_form = UserUpdateForm(request.POST, instance=user)
+                try:
+                    p_form = PerfilSupervisor(
+                    request.POST, instance=user.supervisor)
+                except:
+                    p_form = PerfilSupervisor(request.POST)
+                if u_form.is_valid() and p_form.is_valid():
+                    u_form.save()
+                    form = p_form.save(commit=False)
+                    logger.warning(user)
+                    form.user = user
+                    logger.warning(form.user)
+                    logger.warning(p_form.save())
+                    p_form.save()
+
+                    sweetify.success(request, 'Seus dados foram atualizados')
+                else:
+                    sweetify.error(request, 'Houve um erro na atualização dos dados')
+
+            else:
+                u_form = UserUpdateForm(instance=user)
+                try:
+                    p_form = PerfilSupervisor(instance=user.supervisor)
+                except:
+                    p_form = PerfilSupervisor()
 
             return {
             'u_form': u_form,
