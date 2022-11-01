@@ -1,18 +1,28 @@
 var updateBtns = document.getElementsByClassName('update-carrinho')
+var inputs = document.getElementsByClassName('inputquantity')
+
+
+$(document).ready(function(){
+	console.log('inputs:', inputs)
+	console.log('length:', inputs.length)
+})
 
 for (i = 0; i < updateBtns.length; i++) {
 	updateBtns[i].addEventListener('click', function () {
 		var idProduto = this.dataset.produto
 		var action = this.dataset.action
-		console.log('idProduto:', idProduto, 'Action:', action)
-		console.log('USER:', user)
+		updateUserOrder(idProduto, action)
 
-		if (user == 'AnonymousUser') {
-			addCookieItem(idProduto, action)
-		} else {
-			updateUserOrder(idProduto, action)
-		}
 	})
+}
+
+
+for (i = 0; i < inputs.length; i++) {
+	inputs[i].addEventListener('change', function () {
+		var idProduto = this.dataset.produto
+		var action = this.value
+		updateUserOrder(idProduto, action)
+	});
 }
 
 function updateUserOrder(idProduto, action) {
@@ -34,30 +44,5 @@ function updateUserOrder(idProduto, action) {
 		});
 }
 
-function addCookieItem(idProduto, action) {
-	console.log('User is not authenticated')
-
-	if (action == 'add') {
-		if (carrinho[idProduto] == undefined) {
-			carrinho[idProduto] = { 'quantidade': 1 }
-
-		} else {
-			carrinho[idProduto]['quantidade'] += 1
-		}
-	}
-
-	if (action == 'remove') {
-		carrinho[idProduto]['quantidade'] -= 1
-
-		if (carrinho[idProduto]['quantidade'] <= 0) {
-			console.log('Item should be deleted')
-			delete cart[idProduto];
-		}
-	}
-	console.log('CARRINHO:', carrinho)
-	document.cookie = 'carrinho=' + JSON.stringify(cart) + ";domain=;path=/"
-
-	location.reload()
-}
 
 

@@ -22,7 +22,7 @@ class PerfilRevendedor(forms.ModelForm):
     class Meta:
         model = Revendedor
         fields = ['nome', 'cpf', 'telefone','cep',
-                  'endereco', 'datanasc',]
+                  'endereco', 'datanasc', 'is_aprovado']
 
 class PerfilFranquia(forms.ModelForm):
     class Meta:

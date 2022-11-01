@@ -37,7 +37,7 @@
 						<div style="flex:2"><p>{{item.produto.nome}}</p></div>
 						<div style="flex:1"><p>${{item.produto.preco|floatformat:2}}</p></div>
 						<div style="flex:1">
-							<p class="quantity">{{item.quantidade}}</p>
+							<input class="inputquantity" value="{{item.quantidade}}" data-produto="{{item.produto.id}}" type="number">
 							<div class="quantity">
 								<img data-produto="{{item.produto.id}}" data-action="add"
 									class="chg-quantity update-carrinho" src="{% static 'vendas/images/arrow-up.png' %}">
@@ -51,4 +51,5 @@
 			</div>
 		</div>
 	</div>
+
 {% endblock content %}

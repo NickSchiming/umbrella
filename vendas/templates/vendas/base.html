@@ -118,6 +118,25 @@
 					</ul>
 				</div>
 			</div>
+		{% elif request.user.type == 'SUPERVISOR' %}
+			<div class="container">
+				<div class="collapse navbar-collapse" id="navbarNavDropdown">
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item active">
+							<a class="nav-link" href="{% url 'vendas-home' %}">Home<span class="sr-only">(Página atual)</span></a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'usuarios' %}">Usuarios</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'perfil' %}">Gerenciar Cadastro</a>
+						</li>
+					</ul>
+				</div>
+			</div>
 		{% endif %}
 		
 		

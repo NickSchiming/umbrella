@@ -99,8 +99,8 @@ h6 {
 	display: inline-block;
 	font-weight: 700;
 	padding-right: 10px;
-
-
+	position:relative;
+	top:-5px
 }
 
 .chg-quantity {
@@ -122,4 +122,20 @@ h6 {
 
 .img-icone {
 	width: 22px;
+}
+
+.inputquantity::-webkit-outer-spin-button,
+.inputquantity::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  -moz-appearance: textfield;
+  margin: 0;
+}
+
+
+.inputquantity {
+	width: 35px;
+	margin-right: 5px;
+	position:relative;
+	top:-11px
 }

@@ -97,6 +97,7 @@ def renderForm(request, user):
     context = {
         'u_form': u_form,
         'p_form': p_form,
+        'user': user,
         'reload': reload
     }
 
@@ -104,10 +105,8 @@ def renderForm(request, user):
 
 
 def salvaForm(request, user, p_form, u_form):
-    logger.warning(p_form.has_changed())
     if p_form.has_changed():
         if u_form.is_valid() and p_form.is_valid():
-            logger.warning('temNone: ' + str(temNone(p_form)))
             if temNone(p_form):
                 sweetify.error(
                     request, 'Preencha todos os campos para continuar')
@@ -124,6 +123,14 @@ def salvaForm(request, user, p_form, u_form):
         if u_form.is_valid():
             u_form.save()
             sweetify.success(request, 'Seus dados foram atualizados')
+
+    if request.user.type == 'SUPERVISOR' and user.type == 'REVENDEDOR':
+        user.revendedor.supervisor = request.user.supervisor
+        user.revendedor.save()
+    
+    if request.user.type == 'FRANQUIA' and user.type == 'SUPERVISOR':
+        user.supervisor.franquia = request.user.franquia
+        user.supervisor.save()
 
     return True
 

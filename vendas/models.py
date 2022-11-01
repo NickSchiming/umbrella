@@ -7,6 +7,18 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+class Franquia(models.Model):
+    # um perfil de franquia deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de franquia
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    # campos de perfil
+    razaosocial = models.CharField(
+        _("razão social"), max_length=150, blank=True)
+    cnpj = models.IntegerField(_("cnpj"), unique=True, blank=True)
+    endereco = models.CharField(_("endereço"), max_length=200, blank=True)
+
+    def __str__(self):
+        return self.razaosocial
 
 class Supervisor(models.Model):
     # um perfil de Supervisor deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de Supervisor
@@ -15,6 +27,8 @@ class Supervisor(models.Model):
     # campos de perfil
     nome = models.CharField(_("nome"), max_length=100, blank=True)
     cpf = models.IntegerField(_("cpf"), unique=True, blank=True)
+
+    franquia = models.ForeignKey(Franquia, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.nome
@@ -78,18 +92,7 @@ class Revendedor(models.Model):
         return self.nome
 
 
-class Franquia(models.Model):
-    # um perfil de franquia deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de franquia
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    # campos de perfil
-    razaosocial = models.CharField(
-        _("razão social"), max_length=150, blank=True)
-    cnpj = models.IntegerField(_("cnpj"), unique=True, blank=True)
-    endereco = models.CharField(_("endereço"), max_length=200, blank=True)
-
-    def __str__(self):
-        return self.razaosocial
 
 
 class Loja(models.Model):

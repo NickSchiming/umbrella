@@ -1,7 +1,7 @@
 from ast import For
 import datetime
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 import sweetify
 from django.http import HttpResponse, JsonResponse
 import json
@@ -47,8 +47,10 @@ def perfil(request):
             except:
                 p_form = PerfilRevendedor(request.POST)
 
+            if not request.user.type == 'FRANQUIA' or not request.user.type == 'SUPERVISOR':
+                p_form.fields.pop('is_aprovado')
+
             if u_form.is_valid() and p_form.is_valid():
-                logger.warning(temNone(p_form))
                 if temNone(p_form):
                     sweetify.warning(
                         request, 'Preencha todos os campos para continuar')
@@ -72,6 +74,8 @@ def perfil(request):
                 p_form = PerfilRevendedor(instance=request.user.revendedor)
             except:
                 p_form = PerfilRevendedor()
+            if not request.user.type == 'FRANQUIA' or not request.user.type == 'SUPERVISOR':
+                p_form.fields.pop('is_aprovado')
     elif request.user.type == 'LOJA':
         if request.method == 'POST':
             u_form = UserUpdateForm(request.POST, instance=request.user)
@@ -107,6 +111,42 @@ def perfil(request):
                 p_form = PerfilLoja(instance=request.user.loja)
             except:
                 p_form = PerfilLoja()
+    
+    elif request.user.type == 'SUPERVISOR':
+        if request.method == 'POST':
+            u_form = UserUpdateForm(request.POST, instance=request.user)
+            if not request.user.type == 'FRANQUIA':
+                u_form.fields.pop('type')
+            try:
+                p_form = PerfilSupervisor(
+                    request.POST, instance=request.user.revendedor)
+            except:
+                p_form = PerfilSupervisor(request.POST)
+
+            if u_form.is_valid() and p_form.is_valid():
+                if temNone(p_form):
+                    sweetify.warning(
+                        request, 'Preencha todos os campos para continuar')
+                else:
+                    u_form.save()
+                    form = p_form.save(commit=False)
+                    form.user = request.user
+                    p_form.save()
+                    sweetify.success(request, 'Seus dados foram atualizados')
+                    return redirect('perfil')
+            else:
+                sweetify.error(
+                    request, 'Houve um erro na atualização dos dados')
+                return redirect('perfil')
+
+        else:
+            u_form = UserUpdateForm(instance=request.user)
+            if not request.user.type == 'FRANQUIA':
+                u_form.fields.pop('type')
+            try:
+                p_form = PerfilSupervisor(instance=request.user.supervisor)
+            except:
+                p_form = PerfilSupervisor()
 
     context = {
         'u_form': u_form,
@@ -115,8 +155,11 @@ def perfil(request):
 
     return render(request, 'vendas/perfil.html', context)
 
+# def aprovado_check(user):
+#     return user.revendedor.is_aprovado
 
 @login_required
+# @user_passes_test(aprovado_check, login_url='vendas-home')
 def produtos(request):
     try:
         request.user.revendedor
@@ -133,7 +176,13 @@ def produtos(request):
 
     produtos = Produto.objects.all()
     context = {'produtos': produtos, 'itensCarrinho': itensCarrinho}
-    return render(request, 'vendas/produtos.html', context)
+
+    if request.user.revendedor.is_aprovado:
+        return render(request, 'vendas/produtos.html', context)
+    else:
+        sweetify.warning(request, 'por favor aguarde o cadastro ser aprovado')
+        return redirect('vendas-home')
+        
 
 
 def carrinho(request):
@@ -164,8 +213,6 @@ def atualizarItem(request):
     data = json.loads(request.body)
     idProduto = data['idProduto']
     action = data['action']
-    print('Action:', action)
-    print('Product:', idProduto)
 
     revendedor = request.user.revendedor
     produto = Produto.objects.get(id=idProduto)
@@ -179,6 +226,8 @@ def atualizarItem(request):
         itemPedido.quantidade = (itemPedido.quantidade + 1)
     elif action == 'remove':
         itemPedido.quantidade = (itemPedido.quantidade - 1)
+    else:
+        itemPedido.quantidade = int(action)
 
     itemPedido.save()
 

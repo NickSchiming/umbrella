@@ -3,10 +3,22 @@
 {% block content %}
 <div class="content-section">
   <div class="media">
-    <div class="media-body">
-      <h2 class="account-heading">{{ user.username }}</h2>
-      <p class="text-secondary">{{ user.email }}</p>
-    </div>
+    {% if user %}
+      <div class="media-body">
+        <h2 class="account-heading">{{ user.revendedor.nome }}</h2>
+        <h2 class="account-heading">{{ user.supervisor.nome }}</h2>
+        <p class="text-secondary">{{ user.email }}</p>
+        <p class="text-secondary">{{ user.revendedor.supervisor }}</p>
+        <p class="text-secondary">{{ user.supervisor.franquia }}</p>
+      </div>
+    {% else %} 
+      <div class="media-body">
+        <h2 class="account-heading">{{ user.revendedor.nome }}</h2>
+        <h2 class="account-heading">{{ user.supervisor.nome }}</h2>
+        <p class="text-secondary">{{ user.email }}</p>
+        <p class="text-secondary">Supervisor: {{ request.user.revendedor.supervisor }}</p>
+      </div>
+    {% endif %}
   </div>
   <form id="form" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
