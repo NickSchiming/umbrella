@@ -13,8 +13,8 @@ class Supervisor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # campos de perfil
-    nome = models.CharField(_("nome"), max_length=100)
-    cpf = models.IntegerField(_("cpf"), unique=True)
+    nome = models.CharField(_("nome"), max_length=100, blank=True)
+    cpf = models.IntegerField(_("cpf"), unique=True, blank=True)
 
     def __str__(self):
         return self.nome
@@ -39,10 +39,8 @@ class Meta(models.Model):
     valor = models.FloatField(_("valor"))
     recompensa = models.CharField(_("recompensa"), max_length=150)
 
-
     def __str__(self):
         return self.nivel
-
 
 
 class Revendedor(models.Model):
@@ -51,20 +49,21 @@ class Revendedor(models.Model):
         User, on_delete=models.CASCADE)
 
     # campos de perfil
-    nome = models.CharField(_("Nome"), max_length=100, null=True)
-    cpf = models.IntegerField(_("Cpf"), null=True)
-    telefone = models.CharField(_("Telefone"), max_length=15, null=True)
-    cep = models.CharField(_("CEP"), max_length=15, null=True)
-    endereco = models.CharField(_("Endereço"), max_length=200, null=True)
+    nome = models.CharField(_("Nome"), max_length=100, blank=True)
+    cpf = models.IntegerField(_("Cpf"), blank=True)
+    telefone = models.CharField(_("Telefone"), max_length=15, blank=True)
+    cep = models.CharField(_("CEP"), max_length=15, blank=True)
+    endereco = models.CharField(_("Endereço"), max_length=200, blank=True)
     datanasc = models.DateField(
-        _("Data de nascimento"), auto_now=False, auto_now_add=False, null=True)
+        _("Data de nascimento"), auto_now=False, auto_now_add=False, blank=True)
 
     # um revendedor é associado a um supervisor e um suppervisor à muitos revendedores
     # on_delete=SET_NULL pos ao deletar um supervisor o revendedor não é deletado, o camppo vira null
     supervisor = models.ForeignKey(Supervisor, verbose_name=_(
-        "supervisor"), on_delete=models.SET_NULL, null=True)
+        "supervisor"), on_delete=models.SET_NULL, null=True, blank=True)
 
-    meta = models.ForeignKey(Meta, on_delete=models.SET_NULL, null = True)
+    meta = models.ForeignKey(
+        Meta, on_delete=models.SET_NULL, null=True, blank=True)
 
     is_aprovado = models.BooleanField(_('Aprovado'), default=False)
 
@@ -84,9 +83,10 @@ class Franquia(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # campos de perfil
-    razaosocial = models.CharField(_("razão social"), max_length=150)
-    cnpj = models.IntegerField(_("cnpj"), unique=True)
-    endereco = models.CharField(_("endereço"), max_length=200)
+    razaosocial = models.CharField(
+        _("razão social"), max_length=150, blank=True)
+    cnpj = models.IntegerField(_("cnpj"), unique=True, blank=True)
+    endereco = models.CharField(_("endereço"), max_length=200, blank=True)
 
     def __str__(self):
         return self.razaosocial
@@ -97,14 +97,15 @@ class Loja(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # campos de perfil
-    razaosocial = models.CharField(_("razão social"), max_length=150)
-    cnpj = models.IntegerField(_("cnpj"), unique=True)
-    endereco = models.CharField(_("endereço"), max_length=200)
+    razaosocial = models.CharField(
+        _("razão social"), max_length=150, blank=True)
+    cnpj = models.IntegerField(_("cnpj"), unique=True, blank=True)
+    endereco = models.CharField(_("endereço"), max_length=200, blank=True)
 
     # uma loja é associada a uma franquia e uma franquia à muitos lojas
     # on_delete=SET_NULL pos ao deletar um supervisor o revendedor não é deletado, o camppo vira null
     franquia = models.ForeignKey(Franquia, verbose_name=_(
-        "franquia"), on_delete=models.SET_NULL, null=True)
+        "franquia"), on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.razaosocial
@@ -117,13 +118,13 @@ class Produto(models.Model):
     descricao = models.CharField(_("descrição"), max_length=200, null=True)
     nome = models.CharField(_("nome do produto"),
                             max_length=100, unique=True, null=True)
-    qtde_estoque = models.PositiveIntegerField(_("quantidade em estoque"), null=True)
+    qtde_estoque = models.PositiveIntegerField(
+        _("quantidade em estoque"), null=True)
     preco = models.FloatField(_("preço do produto"), null=True)
     image = models.ImageField(null=True, blank=True)
 
     def __str__(self):
         return str(self.codigo) + ' - ' + self.nome
-
 
     @property
     def imageURL(self):
@@ -156,7 +157,7 @@ class Pedido(models.Model):
 
     status = models.CharField(choices=opcoes_status,
                               max_length=50, null=True, blank=True)
-    
+
     completo = models.BooleanField(default=False)
 
     data = models.DateTimeField(
@@ -203,8 +204,8 @@ class Pedido(models.Model):
     revendedor = models.ForeignKey(Revendedor, verbose_name=_(
         "revendedor"), on_delete=models.SET_NULL, null=True, blank=True)
 
-    def __str__(self):
-       return self.cod_pedido
+    # def __str__(self):
+    # return self.cod_pedido
 
     @property
     def get_carrinho_total(self):
@@ -231,13 +232,12 @@ class Pedido(models.Model):
         for item in itenspedido:
             item.produto.qtde_estoque -= item.quantidade
             item.produto.save()
-        
+
     def devolve_produtos(self):
         itenspedido = self.itempedido_set.all()
         for item in itenspedido:
             item.produto.qtde_estoque += item.quantidade
             item.produto.save()
-        
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -252,7 +252,7 @@ class ItemPedido(models.Model):
 
     pedido = models.ForeignKey(Pedido, verbose_name=_(
         "Pedido"), on_delete=models.CASCADE, null=True)
-    
+
     produto = models.ForeignKey(Produto, verbose_name=_(
         "produto"), on_delete=models.CASCADE, null=True)
 
@@ -267,7 +267,7 @@ class ItemPedido(models.Model):
     #         self.subtotal = self.quantidade * self.produto.valor
     #         self.produto.qtde_estoque -= self.quantidade
     #     super().save(*args, **kwargs)
-    
+
     def __str__(self):
         return self.pedido.cod_pedido
 
@@ -275,8 +275,6 @@ class ItemPedido(models.Model):
     def get_total(self):
         total = self.produto.preco * self.quantidade
         return total
-
-
 
 
 class Nota_fiscal(models.Model):
