@@ -16,8 +16,6 @@ for (i = 0; i < updateBtns.length; i++) {
 }
 
 function updateUserOrder(idProduto, action) {
-	console.log('User is authenticated, sending data...')
-
 	var url = '/atualizar_item/'
 
 	fetch(url, {

@@ -39,6 +39,8 @@ def perfil(request):
     if request.user.type == 'REVENDEDOR':
         if request.method == 'POST':
             u_form = UserUpdateForm(request.POST, instance=request.user)
+            if not request.user.type == 'FRANQUIA':
+                u_form.fields.pop('type')
             try:
                 p_form = PerfilRevendedor(
                     request.POST, instance=request.user.revendedor)
@@ -46,6 +48,7 @@ def perfil(request):
                 p_form = PerfilRevendedor(request.POST)
 
             if u_form.is_valid() and p_form.is_valid():
+                logger.warning(temNone(p_form))
                 if temNone(p_form):
                     sweetify.warning(
                         request, 'Preencha todos os campos para continuar')
@@ -54,9 +57,8 @@ def perfil(request):
                     form = p_form.save(commit=False)
                     form.user = request.user
                     p_form.save()
-
-                sweetify.success(request, 'Seus dados foram atualizados')
-                return redirect('perfil')
+                    sweetify.success(request, 'Seus dados foram atualizados')
+                    return redirect('perfil')
             else:
                 sweetify.error(
                     request, 'Houve um erro na atualização dos dados')
@@ -73,6 +75,8 @@ def perfil(request):
     elif request.user.type == 'LOJA':
         if request.method == 'POST':
             u_form = UserUpdateForm(request.POST, instance=request.user)
+            if not request.user.type == 'FRANQUIA':
+                u_form.fields.pop('type')
             try:
                 p_form = PerfilLoja(
                     request.POST, instance=request.user.revendedor)
@@ -88,9 +92,8 @@ def perfil(request):
                     form = p_form.save(commit=False)
                     form.user = request.user
                     p_form.save()
-
-                sweetify.success(request, 'Seus dados foram atualizados')
-                return redirect('perfil')
+                    sweetify.success(request, 'Seus dados foram atualizados')
+                    return redirect('perfil')
             else:
                 sweetify.error(
                     request, 'Houve um erro na atualização dos dados')
@@ -101,7 +104,7 @@ def perfil(request):
             if not request.user.type == 'FRANQUIA':
                 u_form.fields.pop('type')
             try:
-                p_form = PerfilLoja(instance=request.user.revendedor)
+                p_form = PerfilLoja(instance=request.user.loja)
             except:
                 p_form = PerfilLoja()
 
@@ -257,7 +260,7 @@ def deletarPedido(request, pk):
     pedido.devolve_produtos()
     pedido.delete()
     sweetify.success(request, 'Pedido excluido com sucesso')
-    return redirect('vendas-home')
+    return redirect('pedidos')
 
 
 def lista_usuarios(request):
@@ -270,7 +273,7 @@ def atualizarUsuario(request, pk):
     context = renderForm(request, user)
     if context['reload']:
         del context['reload']
-        return redirect('usuarios')
+        return redirect(request.path_info)
     else:
         del context['reload']
 
@@ -292,13 +295,6 @@ def lista_pedidos(request):
 def lista_produtos(request):
     produtos = Produto.objects.all()
     return render(request, "vendas/cadastro_produtos.html", {'produtos': produtos})
-
-
-def deletarPedido(request, pk):
-    pedido = Pedido.objects.get(id=pk)
-    pedido.delete()
-    return redirect('pedidos')
-
 
 def atualizarProduto(request, pk):
     produto = Produto.objects.get(id=pk)
