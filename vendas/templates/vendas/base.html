@@ -60,7 +60,6 @@
 
 		if (carrinho == undefined){
 			carrinho = {}
-			console.log('Carrinho Criado!', carrinho)
 			document.cookie ='carrinho=' + JSON.stringify(carrinho) + ";domain=;path=/"
 		}
 		console.log('Carrinho:', carrinho)
@@ -124,6 +123,9 @@
 					<ul class="navbar-nav mr-auto">
 						<li class="nav-item active">
 							<a class="nav-link" href="{% url 'vendas-home' %}">Home<span class="sr-only">(Página atual)</span></a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'produtos' %}">Loja</a>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="{% url 'usuarios' %}">Usuarios</a>

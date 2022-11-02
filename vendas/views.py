@@ -24,6 +24,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+global revendedorPed
+revendedorPed = None
+
 
 def home(request):
     if request.user.is_authenticated:
@@ -147,6 +150,39 @@ def perfil(request):
                 p_form = PerfilSupervisor(instance=request.user.supervisor)
             except:
                 p_form = PerfilSupervisor()
+    elif request.user.type == 'FRANQUIA':
+        if request.method == 'POST':
+            u_form = UserUpdateForm(request.POST, instance=request.user)
+            if not request.user.type == 'FRANQUIA':
+                u_form.fields.pop('type')
+            try:
+                p_form = PerfilFranquia(
+                    request.POST, instance=request.user.revendedor)
+            except:
+                p_form = PerfilFranquia(request.POST)
+
+            if u_form.is_valid() and p_form.is_valid():
+                if temNone(p_form):
+                    sweetify.warning(
+                        request, 'Preencha todos os campos para continuar')
+                else:
+                    u_form.save()
+                    form = p_form.save(commit=False)
+                    form.user = request.user
+                    p_form.save()
+                    sweetify.success(request, 'Seus dados foram atualizados')
+                    return redirect('perfil')
+            else:
+                sweetify.error(
+                    request, 'Houve um erro na atualização dos dados')
+                return redirect('perfil')
+
+        else:
+            u_form = UserUpdateForm(instance=request.user)
+            try:
+                p_form = PerfilFranquia(instance=request.user.franquia)
+            except:
+                p_form = PerfilFranquia()
 
     context = {
         'u_form': u_form,
@@ -161,14 +197,20 @@ def perfil(request):
 @login_required
 # @user_passes_test(aprovado_check, login_url='vendas-home')
 def produtos(request):
-    try:
-        request.user.revendedor
-    except:
-        sweetify.error(
-            request, 'Porfavor cadastre seus dados antes de fazer um pedido')
-        return redirect('perfil')
-
-    dados = dadosCarrinho(request)
+    print(revendedorPed)
+    if request.user.type == "REVENDEDOR":
+        try:
+            request.user.revendedor
+        except:
+            sweetify.error(
+                request, 'Porfavor cadastre seus dados antes de fazer um pedido')
+            return redirect('perfil')
+    else:
+        if revendedorPed == None:
+            sweetify.error(request, 'Selecione um pedido para poder altera-lo')
+            return redirect('pedidos')
+    
+    dados = dadosCarrinho(request, revendedorPed)
 
     itensCarrinho = dados['itensCarrinho']
     pedido = dados['pedido']
@@ -177,16 +219,19 @@ def produtos(request):
     produtos = Produto.objects.all()
     context = {'produtos': produtos, 'itensCarrinho': itensCarrinho}
 
-    if request.user.revendedor.is_aprovado:
-        return render(request, 'vendas/produtos.html', context)
+    if request.user.type == "REVENDEDOR":
+        if request.user.revendedor.is_aprovado:
+            return render(request, 'vendas/produtos.html', context)
+        else:
+            sweetify.warning(request, 'por favor aguarde o cadastro ser aprovado')
+            return redirect('vendas-home')
     else:
-        sweetify.warning(request, 'por favor aguarde o cadastro ser aprovado')
-        return redirect('vendas-home')
+        return render(request, 'vendas/produtos.html', context)
         
 
 
 def carrinho(request):
-    data = dadosCarrinho(request)
+    data = dadosCarrinho(request, revendedorPed)
 
     itensCarrinho = data['itensCarrinho']
     pedido = data['pedido']
@@ -198,7 +243,7 @@ def carrinho(request):
 
 
 def checkout(request):
-    data = dadosCarrinho(request)
+    data = dadosCarrinho(request, revendedorPed)
 
     itensCarrinho = data['itensCarrinho']
     pedido = data['pedido']
@@ -213,8 +258,10 @@ def atualizarItem(request):
     data = json.loads(request.body)
     idProduto = data['idProduto']
     action = data['action']
-
-    revendedor = request.user.revendedor
+    if request.user.type == 'REVENDEDOR':
+        revendedor = request.user.revendedor
+    else:
+        revendedor = revendedorPed
     produto = Produto.objects.get(id=idProduto)
     pedido, created = Pedido.objects.get_or_create(
         revendedor=revendedor, completo=False)
@@ -234,7 +281,7 @@ def atualizarItem(request):
     if itemPedido.quantidade <= 0:
         itemPedido.delete()
 
-    sweetify.success(request, 'item adicionado',
+    sweetify.success(request, 'Carrinho atualizado!',
                      position='top-end', timer=1000, toast=True, width='fit-content')
     return JsonResponse('Item adicionado', safe=False)
 
@@ -244,7 +291,11 @@ def processarPedido(request):
     dados = json.loads(request.body)
 
     if request.user.is_authenticated:
-        revendedor = request.user.revendedor
+        if request.user.type == 'REVENDEDOR':
+            revendedor = request.user.revendedor
+        else:
+            revendedor = revendedorPed
+
         pedido, criado = Pedido.objects.get_or_create(
             revendedor=revendedor, completo=False)
 
@@ -292,17 +343,30 @@ def detalhePedido(request, pk):
 
 
 def atualizarPedido(request, pk):
-    pedido = Pedido.objects.get(id=pk)
-    pedido_ex = Pedido.objects.get(
-        revendedor=request.user.revendedor, completo=False)
-    pedido_ex.delete()
-    pedido.completo = False
-    pedido.devolve_produtos()
-    pedido.save()
-    sweetify.success(
-        request, 'Por favor altere o pedido a faça checkout novamente')
-    return redirect('produtos')
-
+    if request.user.type == "REVENDEDOR":
+        pedido = Pedido.objects.get(id=pk)
+        pedido_ex = Pedido.objects.get(
+            revendedor=request.user.revendedor, completo=False)
+        pedido_ex.delete()
+        pedido.completo = False
+        pedido.devolve_produtos()
+        pedido.save()
+        sweetify.success(
+            request, 'Por favor altere o pedido a faça checkout novamente')
+        return redirect('produtos')
+    else:
+        pedido = Pedido.objects.get(id=pk)
+        pedido_ex = Pedido.objects.get(
+            revendedor=pedido.revendedor, completo=False)
+        global revendedorPed
+        revendedorPed = pedido.revendedor
+        pedido_ex.delete()
+        pedido.completo = False
+        pedido.devolve_produtos()
+        pedido.save()
+        sweetify.success(
+            request, 'Por favor altere o pedido a faça checkout novamente')
+        return redirect('produtos')
 
 def deletarPedido(request, pk):
     pedido = Pedido.objects.get(id=pk)
@@ -353,10 +417,8 @@ def atualizarProduto(request, pk):
         if form.is_valid():
             form.save()
             sweetify.success(request, 'Produto atualizados')
-            return redirect('produtos')
         else:
             sweetify.error(request, 'Houve um erro na atualização dos dados')
-            return redirect('produtos')
     else:
         form = FormProduto(instance=produto)
 
@@ -367,3 +429,10 @@ def deletarProduto(request, pk):
     produto = Produto.objects.get(id=pk)
     produto.delete()
     return redirect('produtos')
+
+def aprovarPedido(request, pk):
+    pedido = Pedido.objects.get(id=pk)
+    pedido.status = 'APROVADO'
+    pedido.save()
+    sweetify.success(request, 'Pedido aprovado!')
+    return redirect('pedidos')

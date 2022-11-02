@@ -8,15 +8,22 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def dadosCarrinho(request):
-    if request.user.is_authenticated:
+def dadosCarrinho(request, revendedorPed):
+    if request.user.type == "REVENDEDOR":
         revendedor = request.user.revendedor
         pedido, criado = Pedido.objects.get_or_create(
             revendedor=revendedor, completo=False)
         itens = pedido.itempedido_set.all()
         itensCarrinho = pedido.get_carrinho_itens
-
-    return {'itensCarrinho': itensCarrinho, 'pedido': pedido, 'itens': itens}
+        return {'itensCarrinho': itensCarrinho, 'pedido': pedido, 'itens': itens}
+    else:
+        revendedor = revendedorPed
+        pedido, criado = Pedido.objects.get_or_create(
+            revendedor=revendedor, completo=False)
+        itens = pedido.itempedido_set.all()
+        itensCarrinho = pedido.get_carrinho_itens
+        revendedorPed = None
+        return {'itensCarrinho': itensCarrinho, 'pedido': pedido, 'itens': itens}
 
 
 def renderForm(request, user):

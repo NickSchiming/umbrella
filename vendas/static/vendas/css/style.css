@@ -58,9 +58,9 @@ h6 {
 	display: block;
 	text-align: center;
 	color: #fff;
-	background-color: red;
-	width: 20px;
-	height: 25px;
+	background-color: rgb(211, 8, 8);
+	width: 16px;
+	height: 20px;
 	border-radius: 50%;
 	font-size: 14px;
 }

@@ -38,6 +38,12 @@
             <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
             <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>
           </div>
+        {% elif user.type == 'SUPERVISOR'%}
+        <div>
+          <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
+          <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>
+          <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'aprovar_pedido' pedido.id %}">Aprovar</a>
+        </div>
         {% endif %}
       </div>
       

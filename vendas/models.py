@@ -146,14 +146,12 @@ class Pedido(models.Model):
     # lista de opções para status do ppedido
     APROV_PEND = "aprovacao_pendente"
     APROVADO = "aprovado"
-    RECUSADO = "recusado"
     ENVIADO = "enviado"
     FINALIZADO = "finalizado"
 
     opcoes_status = [
         (APROV_PEND, "Aprovação pendente"),
         (APROVADO, "Aprovado"),
-        (RECUSADO, "Recusado"),
         (ENVIADO, "Enviado"),
         (FINALIZADO, "Finalizado"),
     ]
