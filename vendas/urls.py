@@ -1,5 +1,10 @@
 from django.urls import path
 from . import views
+from .views import (
+    pesquisaProdutos,
+    pesquisaUsuarios,
+    pesquisaPedidos,
+)
 
 urlpatterns = [
     path('', views.home, name='vendas-home'),
@@ -10,6 +15,8 @@ urlpatterns = [
     path('atualizar_pedido/<int:pk>/', views.atualizarPedido, name='atualizar_pedido'),
     path('deletar_pedido/<int:pk>/', views.deletarPedido, name='deletar_pedido'),
     path('aprovar_pedido/<int:pk>/', views.aprovarPedido, name='aprovar_pedido'),
+    path('enviar_pedido/<int:pk>/', views.enviarPedido, name='enviar_pedido'),
+    path('confirmar_pedido/<int:pk>/', views.confirmarPedido, name='enviar_pedido'),
 
     path('produtos/', views.produtos, name="produtos"),
     path('carrinho/', views.carrinho, name="carrinho"),
@@ -28,4 +35,8 @@ urlpatterns = [
     path('cadastro_produtos/', views.lista_produtos, name='cadastro_produtos'),
     path('atualizar_produto/<int:pk>/', views.atualizarProduto, name='atualizar_produto'),
     path('deletar_produto/<int:pk>/', views.deletarProduto, name='deletar_produto'),
+
+    path('pesquisa_usuarios/', pesquisaUsuarios.as_view(), name='pesquisa_usuarios'),
+    path('pesquisa_pedidos/', pesquisaPedidos.as_view(), name='pesquisa_pedidos'),
+    path('pesquisa_produtos/', pesquisaProdutos.as_view(), name='pesquisa_produtos'),
 ]

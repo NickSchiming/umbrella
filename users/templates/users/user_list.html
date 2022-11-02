@@ -7,10 +7,10 @@
 		<button class="btn" type="submit">Pesquisar</button>
   	</form>
 	<div class="row">
-		{% if not usuarios %}
-		<h2><strong>Nenhum pedido encontrado</strong></h2>
+		{% if not object_list %}
+		<h2><strong>Nenhum usuario encontrado</strong></h2>
 		{% else %}
-			{% for usuario in usuarios %}
+			{% for usuario in object_list %}
 				<div class="col-lg-4">
 					<div class="box-element product">
 						<h6><strong>Email:</strong></h6>

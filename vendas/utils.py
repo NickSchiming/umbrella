@@ -16,10 +16,21 @@ def dadosCarrinho(request, revendedorPed):
         itens = pedido.itempedido_set.all()
         itensCarrinho = pedido.get_carrinho_itens
         return {'itensCarrinho': itensCarrinho, 'pedido': pedido, 'itens': itens}
+    elif request.user.type == "LOJA":
+        loja = request.user.loja
+        pedido, criado = Pedido.objects.get_or_create(
+            loja=loja, completo=False)
+        itens = pedido.itempedido_set.all()
+        itensCarrinho = pedido.get_carrinho_itens
+        return {'itensCarrinho': itensCarrinho, 'pedido': pedido, 'itens': itens}
     else:
         revendedor = revendedorPed
-        pedido, criado = Pedido.objects.get_or_create(
-            revendedor=revendedor, completo=False)
+        try:
+            pedido, criado = Pedido.objects.get_or_create(
+                revendedor=revendedor, completo=False)
+        except:
+            pedido, criado = Pedido.objects.get_or_create(
+                loja=revendedor, completo=False)
         itens = pedido.itempedido_set.all()
         itensCarrinho = pedido.get_carrinho_itens
         revendedorPed = None

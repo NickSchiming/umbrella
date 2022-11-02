@@ -1,0 +1,43 @@
+{% extends 'vendas/base.html' %}
+{% load static %}
+{% block content %}
+	<form action="{% url 'pesquisa_pedidos' %}" method="get">
+		<input name="q" type="text" placeholder="Search...">
+		<button class="btn" type="submit">Pesquisar</button>
+	</form>
+    {% if user.type == "REVENDEDOR" or user.type == "LOJA" %}
+        <div class="row">
+            {% for produto in object_list %}
+                <div class="col-lg-4">
+                    <img class="thumbnail" src="{{produto.imageURL}}">
+                    <div class="box-element product">
+                        <h6><strong>{{produto.nome}}</strong></h6>
+                        <hr>
+                        <h6><strong>{{produto.qtde_estoque}}</strong></h6>
+                        <button data-produto="{{produto.id}}" data-action="add" class="btn
+                            btn-outline-secondary add-btn update-carrinho">Adicionar ao carrinho</button>
+                        <h4 tyle="display: inline-block; float: right"><strong>${{produto.preco}}</strong></h4>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="row">
+            {% for produto in object_list %}
+                <div class="col-lg-4">
+                    <img class="thumbnail" src="{{produto.imageURL}}">
+                    <div class="box-element product">
+                        <h6><strong>{{produto.nome}}</strong></h6>
+                        <hr>
+                        <h6><strong>{{produto.qtde_estoque}}</strong></h6>
+                        <h4 tyle="display: inline-block; float: right"><strong>${{produto.preco}}</strong></h4>
+                        <div>
+                            <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_produto' produto.id %}">Atualizar</a>
+                            <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_produto' produto.id %}">Deletar</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock content %}

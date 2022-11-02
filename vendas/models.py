@@ -36,16 +36,16 @@ class Supervisor(models.Model):
 
 class Meta(models.Model):
 
-    BRONZE = "bronze"
-    PRATA = "prata"
-    OURO = "ouro"
-    DIAMANTE = "diamante"
+    BRONZE = "Bronze"
+    PRATA = "Prata"
+    OURO = "Ouro"
+    DIAMANTE = "Diamante"
 
     opcoes_nivel = [
-        (BRONZE, "Bronzee"),
-        (PRATA, "Prata"),
-        (OURO, "Ouro"),
-        (DIAMANTE, "Diamante"),
+        (BRONZE, "bronze"),
+        (PRATA, "prata"),
+        (OURO, "ouro"),
+        (DIAMANTE, "diamante"),
     ]
 
     nivel = models.CharField(choices=opcoes_nivel,
@@ -144,16 +144,16 @@ class Pedido(models.Model):
         _("código do pedido"), max_length=100, null=True)
 
     # lista de opções para status do ppedido
-    APROV_PEND = "aprovacao_pendente"
-    APROVADO = "aprovado"
-    ENVIADO = "enviado"
-    FINALIZADO = "finalizado"
+    APROV_PEND = "Aprovação pendente"
+    APROVADO = "Aprovado"
+    ENVIADO = "Enviado"
+    FINALIZADO = "Finalizado"
 
     opcoes_status = [
-        (APROV_PEND, "Aprovação pendente"),
-        (APROVADO, "Aprovado"),
-        (ENVIADO, "Enviado"),
-        (FINALIZADO, "Finalizado"),
+        (APROV_PEND, "Aprovacao_pendente"),
+        (APROVADO, "aprovado"),
+        (ENVIADO, "enviado"),
+        (FINALIZADO, "finalizado"),
     ]
 
     status = models.CharField(choices=opcoes_status,
@@ -194,11 +194,6 @@ class Pedido(models.Model):
     # on_delete=SET_NULL pos ao deletar uma loja o pedido não é deletado, o camppo vira null
     loja = models.ForeignKey(Loja, verbose_name=_(
         "loja"), on_delete=models.SET_NULL, null=True, blank=True)
-
-    # um pedido pode (blank=True) ser associado a um supervisor e um supervisor à muitos pedidos
-    # on_delete=SET_NULL pos ao deletar um supervisor o pedido não é deletado, o camppo vira null
-    supervisor = models.ForeignKey(Supervisor, verbose_name=_(
-        "supervisor"), on_delete=models.SET_NULL, null=True, blank=True)
 
     # um pedido pode (blank=True) ser associado a um revendedor e um revendedor à muitos pedidos
     # on_delete=SET_NULL pos ao deletar um revendedor o pedido não é deletado, o camppo vira null
