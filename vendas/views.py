@@ -1,5 +1,6 @@
 from ast import For
 import datetime
+from django.forms import formset_factory
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 import sweetify
@@ -231,7 +232,7 @@ def produtos(request):
         if request.user.revendedor.is_aprovado:
             return render(request, 'vendas/produtos.html', context)
         else:
-            sweetify.warning(request, 'por favor aguarde o cadastro ser aprovado')
+            sweetify.info(request, 'por favor aguarde o cadastro ser aprovado')
             return redirect('vendas-home')
     else:
         return render(request, 'vendas/produtos.html', context)
@@ -327,14 +328,21 @@ def processarPedido(request):
                     pedido, criado = Pedido.objects.get_or_create(
                     loja=revendedor, completo=False)
 
+    subtotal = float(dados['form']['subtotal'].replace(',', '.'))
     total = float(dados['form']['total'].replace(',', '.'))
     pedido.cod_pedido = cod_pedido
 
     pgto = dados['form']['formaPgto']
 
-    if total == pedido.get_carrinho_total:
+    if total == pedido.get_meta_total:
         pedido.status = pedido.APROV_PEND
         pedido.metodo_de_pagamento = pgto
+        pedido.subtotal = subtotal
+        pedido.total = total
+        if pedido.revendedor:       
+            pedido.franquia = pedido.revendedor.supervisor.franquia
+        elif pedido.loja:      
+            pedido.franquia = pedido.loja.franquia
         pedido.completo = True
 
     estoque = pedido.falta_estoque()
@@ -389,7 +397,7 @@ def atualizarPedido(request, pk):
         pedido.completo = False
         pedido.devolve_produtos()
         pedido.save()
-        sweetify.success(
+        sweetify.info(
             request, 'Por favor altere o pedido a faça checkout novamente')
         return redirect('produtos')
     elif request.user.type == "LOJA":
@@ -400,7 +408,7 @@ def atualizarPedido(request, pk):
         pedido.completo = False
         pedido.devolve_produtos()
         pedido.save()
-        sweetify.success(
+        sweetify.info(
             request, 'Por favor altere o pedido a faça checkout novamente')
         return redirect('produtos')
     else:
@@ -415,7 +423,7 @@ def atualizarPedido(request, pk):
             pedido.completo = False
             pedido.devolve_produtos()
             pedido.save()
-            sweetify.success(
+            sweetify.info(
                 request, 'Por favor altere o pedido a faça checkout novamente')
             return redirect('produtos')
         except:
@@ -428,7 +436,7 @@ def atualizarPedido(request, pk):
             pedido.completo = False
             pedido.devolve_produtos()
             pedido.save()
-            sweetify.success(
+            sweetify.info(
                 request, 'Por favor altere o pedido a faça checkout novamente')
             return redirect('produtos')
 
@@ -573,3 +581,37 @@ class pesquisaProdutos(ListView):
         )
 
         return object_list
+
+def metas(request):
+    metas = Meta.objects.all()
+    return render(request, "vendas/metas.html", {'metas': metas})
+
+def atualizarMeta(request, pk):
+    meta = Meta.objects.get(id=pk)
+    if request.method == 'POST':
+        form = formMeta(request.POST, instance=meta)
+        if form.is_valid():
+            form.save()
+            sweetify.success(
+                request, 'Meta atualizada!')
+    else:
+        form = formMeta(instance=meta)
+    return render(request, 'vendas/atualizar_meta.html', {'form': form})
+
+def atualizarMetasRevendedores(request):
+
+    revendedores = Revendedor.objects.all()
+    bronze, prata, ouro, diamante = Meta.objects.all()
+
+    for revendedor in revendedores:
+        if revendedor.total_comprado <= bronze.valor:
+            revendedor.meta = bronze
+        elif revendedor.total_comprado <= prata.valor:
+            revendedor.meta = prata
+        elif revendedor.total_comprado <= ouro.valor:
+            revendedor.meta = ouro 
+        else:
+            revendedor.meta = diamante
+        revendedor.save()
+
+    return redirect('metas')

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Franquia, Loja, Produto, Produto, Revendedor, Pedido, ItemPedido, Supervisor
+from .models import Franquia, Loja, Meta, Produto, Produto, Revendedor, Pedido, ItemPedido, Supervisor
 from users.models import User
 
 
@@ -43,3 +43,8 @@ class FormProduto(forms.ModelForm):
     class Meta:
         model = Produto
         fields = ['nome','codigo','qtde_estoque','preco']
+
+class formMeta(forms.ModelForm):
+    class Meta:
+        model = Meta
+        fields = ['valor','desconto']

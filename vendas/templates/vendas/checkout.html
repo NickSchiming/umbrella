@@ -32,7 +32,8 @@
 				<a class="btn btn-outline-dark" href="{% url 'carrinho' %}">&#x2190; voltar
 					ao carrinho</a>
 				<hr>
-				<h3>Order Summary</h3>
+				<h5>Cliente nivel {{pedido.revendedor.meta.nivel}}</h5>
+				<h3>Resumo do pedido</h3>
 				<hr>
 				{% for item in itens %}
 				<div class="carrinho-row">
@@ -43,7 +44,14 @@
 				</div>
 				{% endfor %}
 				<h5>Itens: {{pedido.get_carrinho_itens}}</h5>
-				<h5>Total: ${{pedido.get_carrinho_total|floatformat:2}}</h5>
+				{% if pedido.revendedor.user.type == 'REVENDEDOR' %}
+					<h5>Subtotal: ${{pedido.get_carrinho_total|floatformat:2}}</h5>
+				  	<h5>Desconto: %{{pedido.revendedor.meta.desconto}}</h5>
+					<h5>Total: ${{pedido.get_meta_total|floatformat:2}}</h5>
+				{% elif pedido.loja.user.type == 'LOJA' %}
+					<h5>Total: ${{pedido.get_carrinho_total|floatformat:2}}</h5>
+				{% endif %}
+				
 			</div>
 		</div>
 	</div>
@@ -51,8 +59,14 @@
 	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 
 	<script type="text/javascript">
-		var total = '{{pedido.get_carrinho_total}}';
-
+		
+		if ('{{pedido.revendedor.user.type}}' == 'REVENDEDOR'){
+			var subtotal = '{{pedido.get_carrinho_total}}';
+			var total = '{{pedido.get_meta_total}}';
+			
+		}else if ('{{pedido.loja.user.type}}' == 'LOJA')
+			var total = '{{pedido.get_carrinho_total}}';
+			var subtotal = '{{pedido.get_carrinho_total}}';
 
 			var form = document.getElementById('form')
 			form.addEventListener('submit', function(e){
@@ -64,6 +78,7 @@
 
 			function submitFormData(formaPgto){
 				var userFormData = {
+					'subtotal':subtotal,
 					'total':total,
 					'formaPgto':formaPgto,
 				}

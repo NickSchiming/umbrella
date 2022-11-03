@@ -39,4 +39,8 @@ urlpatterns = [
     path('pesquisa_usuarios/', pesquisaUsuarios.as_view(), name='pesquisa_usuarios'),
     path('pesquisa_pedidos/', pesquisaPedidos.as_view(), name='pesquisa_pedidos'),
     path('pesquisa_produtos/', pesquisaProdutos.as_view(), name='pesquisa_produtos'),
+
+    path('metas/', views.metas, name='metas'),
+    path('atualizar_meta/<int:pk>/', views.atualizarMeta, name='atualizar_meta'),
+    path('atualizar_metas_revendedores/', views.atualizarMetasRevendedores, name='atualizar_metas_revendedores'),
 ]

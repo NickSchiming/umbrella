@@ -51,10 +51,14 @@ class Meta(models.Model):
     nivel = models.CharField(choices=opcoes_nivel,
                              max_length=50)
     valor = models.FloatField(_("valor"))
-    recompensa = models.CharField(_("recompensa"), max_length=150)
+    desconto = models.FloatField(_("desconto"))
 
     def __str__(self):
         return self.nivel
+
+    @property
+    def descontocalc(self):
+        return self.desconto / 100
 
 
 class Revendedor(models.Model):
@@ -90,6 +94,15 @@ class Revendedor(models.Model):
 
     def __str__(self):
         return self.nome
+
+    @property
+    def total_comprado(self):
+        pedidos = self.pedido_set.all()
+        total = sum([pedido.get_carrinho_total for pedido in pedidos])
+        return total
+        
+
+
 
 
 
@@ -167,6 +180,9 @@ class Pedido(models.Model):
     # estranho parece na vdd ser uma relação com objetos nota fiscal
     # nf = models.IntegerField(_("nota fiscal"))
 
+    subtotal = models.FloatField(
+        _("valor pré-desconto do pedido"), null=True, blank=True)
+
     total = models.FloatField(
         _("valor total do pedido"), null=True, blank=True)
 
@@ -202,6 +218,15 @@ class Pedido(models.Model):
 
     # def __str__(self):
     # return self.cod_pedido
+
+    @property
+    def get_meta_total(self):
+        subtotal = self.get_carrinho_total
+        if self.revendedor:
+            total = subtotal * (1 - (self.revendedor.meta.desconto / 100))
+        else:
+            total = subtotal
+        return total
 
     @property
     def get_carrinho_total(self):

@@ -1,0 +1,15 @@
+{% extends "vendas/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="content-section">
+    {% for meta in metas %}
+
+            <h2 class="account-heading">{{ meta.nivel }} - R${{ meta.valor|floatformat:2 }} - %{{ meta.desconto }} </h2>
+            <div class="form-group">
+            <a class="btn btn-outline-info" href="{% url 'atualizar_meta' meta.id %}">Update</a>
+            </div>
+    {% endfor %}
+    <a class="btn btn-outline-success" href="{% url 'atualizar_metas_revendedores'%}">Atualizar metas dos usuarios</a>
+</div>
+
+{% endblock content %}
