@@ -2,11 +2,6 @@ var updateBtns = document.getElementsByClassName('update-carrinho')
 var inputs = document.getElementsByClassName('inputquantity')
 
 
-$(document).ready(function(){
-	console.log('inputs:', inputs)
-	console.log('length:', inputs.length)
-})
-
 for (i = 0; i < updateBtns.length; i++) {
 	updateBtns[i].addEventListener('click', function () {
 		var idProduto = this.dataset.produto
@@ -39,7 +34,7 @@ function updateUserOrder(idProduto, action) {
 		.then((response) => {
 			return response.json();
 		})
-		.then((data) => {
+		.then((dados) => {
 			location.reload()
 		});
 }

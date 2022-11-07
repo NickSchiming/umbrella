@@ -33,7 +33,6 @@ def dadosCarrinho(request, revendedorPed):
                 loja=revendedor, completo=False)
         itens = pedido.itempedido_set.all()
         itensCarrinho = pedido.get_carrinho_itens
-        revendedorPed = None
         return {'itensCarrinho': itensCarrinho, 'pedido': pedido, 'itens': itens}
 
 

@@ -136,6 +136,8 @@ AUTH_USER_MODEL = 'users.User'
 
 LOGIN_REDIRECT_URL = 'vendas-home'
 
+LOGIN_URL = '/login/'
+
 SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
 
 INTERNAL_IPS = [

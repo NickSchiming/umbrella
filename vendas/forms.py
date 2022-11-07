@@ -9,13 +9,6 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['email', 'type']
-    
-    # def __init__(self, *args, **kwargs):
-    #     user = kwargs.pop('user', None)
-    #     super().__init__(*args, **kwargs)
-        
-    #     if  user.type == 'FRANQUIA':
-    #         self.fields += ['type']
 
 
 class PerfilRevendedor(forms.ModelForm):
@@ -42,7 +35,7 @@ class PerfilSupervisor(forms.ModelForm):
 class FormProduto(forms.ModelForm):
     class Meta:
         model = Produto
-        fields = ['nome','codigo','qtde_estoque','preco']
+        fields = ['nome','codigo','qtde_estoque','preco', 'image']
 
 class formMeta(forms.ModelForm):
     class Meta:

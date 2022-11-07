@@ -1,3 +1,4 @@
+from django.utils import timezone
 from email.policy import default
 from django.db import DatabaseError, models
 from django.utils.translation import gettext_lazy as _
@@ -98,7 +99,7 @@ class Revendedor(models.Model):
     @property
     def total_comprado(self):
         pedidos = self.pedido_set.all()
-        total = sum([pedido.get_carrinho_total for pedido in pedidos])
+        total = sum([pedido.get_meta_total for pedido in pedidos])
         return total
         
 
@@ -175,7 +176,7 @@ class Pedido(models.Model):
     completo = models.BooleanField(default=False)
 
     data = models.DateTimeField(
-        _("data do pedido"), auto_now_add=True, null=True, blank=True)
+        _("data do pedido"), default=timezone.now, null=True, blank=True)
 
     # estranho parece na vdd ser uma relação com objetos nota fiscal
     # nf = models.IntegerField(_("nota fiscal"))

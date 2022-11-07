@@ -33,6 +33,7 @@ urlpatterns = [
     path('deletar_pedido/<int:pk>/', views.deletarPedido, name='deletar_pedido'),
 
     path('cadastro_produtos/', views.lista_produtos, name='cadastro_produtos'),
+    path('adicionar_produto/', views.adicionarProduto, name='adicionar_produto'),
     path('atualizar_produto/<int:pk>/', views.atualizarProduto, name='atualizar_produto'),
     path('deletar_produto/<int:pk>/', views.deletarProduto, name='deletar_produto'),
 
@@ -43,4 +44,7 @@ urlpatterns = [
     path('metas/', views.metas, name='metas'),
     path('atualizar_meta/<int:pk>/', views.atualizarMeta, name='atualizar_meta'),
     path('atualizar_metas_revendedores/', views.atualizarMetasRevendedores, name='atualizar_metas_revendedores'),
+
+    path('atualizar_relatorio/', views.atualizarRelatorio, name='atualizar_relatorio'),
+    path('relatorios/', views.relatorios, name='relatorios'),
 ]

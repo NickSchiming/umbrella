@@ -1,0 +1,44 @@
+{% extends 'vendas/base.html' %}
+{% load static %}
+{% block content %}
+
+<button class="btn btn-secondary" data-action="dia">dia</button>
+<button class="btn btn-secondary" data-action="mes">mes</button>
+<button class="btn btn-secondary" data-action="ano">ano</button>
+
+<hr>
+<h6>Total vendido: {{ total }}</h6>
+
+
+    <script>
+        var updateBtns = document.getElementsByClassName('btn-secondary')
+
+        for (i = 0; i < updateBtns.length; i++) {
+            updateBtns[i].addEventListener('click', function () {
+                var action = this.dataset.action
+                carregaDados(action)
+        
+            })
+        }
+
+        function carregaDados(action) {
+        var url = '/atualizar_relatorio/'
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ 'action': action, })
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((dados) => {
+                location.reload()
+            });
+        }
+    </script>
+
+{% endblock content %}
