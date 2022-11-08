@@ -1,11 +1,11 @@
 {% extends 'vendas/base.html' %}
 {% load static %}
 {% block content %}
-	<form action="{% url 'pesquisa_produtos' %}" method="get">
-		<input name="q" type="text" placeholder="Search...">
-		<button class="btn" type="submit">Pesquisar</button>
-	</form>
-	<a class="btn btn-success" href="{% url 'adicionar_produto' %}">Adicionar produto</a>
+	<form class="form-inline" action="{% url 'pesquisa_produtos' %}" method="get" style="display: inline;">
+		<input class="form-control mr-sm-2" name="q" type="search" placeholder="Pesquisar" aria-label="Pesquisar">
+		<button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Pesquisar</button>
+  	</form>
+	<a class="btn btn-success add-prod" href="{% url 'adicionar_produto' %}">Adicionar produto</a>
 	<div class="row">
 		{% for produto in produtos %}
 			<div class="col-lg-4">

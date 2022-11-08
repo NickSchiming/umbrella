@@ -1,19 +1,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
+html{
+	font-size: 18px;
+}
+
 body {
 	margin: 0;
 	padding: 0;
 	font-family: 'Bebas Neue', sans-serif;
 	background-color: #EBEBEB;
-	background-image: url("../images/25.png");
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: center;
 	height: 100vh;
 }
 
+.navbar-brand img {
+	width: 40px;
+	margin-right: 3px;
+}
+
+.nav-container {
+	position: relative;
+	left: 240px;
+}
+
+.navbar-brand {
+	position: relative;
+	top: -1px;
+	font-size: 25px;
+}
+
 .navbar {
-	font-size: 20px;
+	font-size: 25px;
 }
 
 h1,
@@ -45,13 +64,17 @@ h6 {
 }
 
 .bg-dark {
-	background-color: #4f868c !important;
+	background-color: #c0c0c0 !important;
 }
 
 #carrinho-icon {
-	width: 25px;
+	width: 30px;
 	display: inline-block;
 	margin-left: 15px;
+}
+
+.logout {
+	width: 60px;
 }
 
 #carrinho-total {
@@ -121,7 +144,7 @@ h6 {
 }
 
 .img-icone {
-	width: 22px;
+	width: 30px;
 }
 
 .inputquantity::-webkit-outer-spin-button,
@@ -138,4 +161,18 @@ h6 {
 	margin-right: 5px;
 	position:relative;
 	top:-11px
+}
+
+.content-section {
+	background: #ffffff;
+	padding: 10px 20px;
+	border: 1px solid #dddddd;
+	border-radius: 3px;
+	margin-bottom: 20px;
+	width: 100%;
+  }
+
+.add-prod{
+	position: relative;
+	left: auto;
 }

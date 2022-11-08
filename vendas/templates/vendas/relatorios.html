@@ -1,10 +1,12 @@
 {% extends 'vendas/base.html' %}
 {% load static %}
 {% block content %}
+<div class="btn-group" role="group" aria-label="Basic example">
+    <button class="btn btn-secondary" data-action="dia">dia</button>
+    <button class="btn btn-secondary" data-action="mes">mes</button>
+    <button class="btn btn-secondary" data-action="ano">ano</button>
+</div>
 
-<button class="btn btn-secondary" data-action="dia">dia</button>
-<button class="btn btn-secondary" data-action="mes">mes</button>
-<button class="btn btn-secondary" data-action="ano">ano</button>
 
 <hr>
 <h6>Total vendido: {{ total }}</h6>

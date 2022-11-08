@@ -70,86 +70,82 @@
 
 <body>
   
-	<nav class="navbar navbar-expand-lg navbar-light navbar-light text-dark">
-		<a class="navbar-brand" href="{% url 'vendas-home' %}">UMBRELLA</a>
+	<nav class="navbar navbar-expand-lg navbar-light bg-dark">
+		<a class="navbar-brand" href="{% url 'vendas-home' %}"><img src="../../static/vendas/images/logo.png" alt="">UMBRELLA</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
 		aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Alterna navegação">
 		<span class="navbar-toggler-icon"></span>
 		</button>
+		<div class="nav-container">
 		{% if request.user.type == 'REVENDEDOR' or request.user.type == 'LOJA'%}
-			<div class="container">
-				<div class="collapse navbar-collapse" id="navbarNavDropdown">
-					<ul class="navbar-nav mr-auto">
-						<li class="nav-item active">
-							<a class="nav-link" href="{% url 'vendas-home' %}">Home<span class="sr-only">(Página atual)</span></a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'produtos' %}">Fazer Pedido</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'meus_pedidos' %}">Meus Pedidos</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'perfil' %}">Gerenciar Cadastro</a>
-						</li>
-					</ul>
-				</div>
+			<div class="collapse navbar-collapse" id="navbarNavDropdown">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active">
+						<a class="nav-link" href="{% url 'vendas-home' %}">Home<span class="sr-only">(Página atual)</span></a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'produtos' %}">Fazer Pedido</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'meus_pedidos' %}">Meus Pedidos</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'perfil' %}">Gerenciar Cadastro</a>
+					</li>
+				</ul>
 			</div>
 		{% elif request.user.type == 'FRANQUIA' %}
-			<div class="container">
-				<div class="collapse navbar-collapse" id="navbarNavDropdown">
-					<ul class="navbar-nav mr-auto">
-						<li class="nav-item active">
-							<a class="nav-link" href="{% url 'vendas-home' %}">Home<span class="sr-only">(Página atual)</span></a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'produtos' %}">Loja</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'usuarios' %}">Usuarios</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'cadastro_produtos' %}">Produtos</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'perfil' %}">Gerenciar Cadastro</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'metas' %}">Gerenciar Metas</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'relatorios' %}">Relatorios</a>
-						</li>
-					</ul>
-				</div>
+			<div class="collapse navbar-collapse" id="navbarNavDropdown">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active">
+						<a class="nav-link" href="{% url 'vendas-home' %}">Home<span class="sr-only">(Página atual)</span></a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'produtos' %}">Loja</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'usuarios' %}">Usuarios</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'cadastro_produtos' %}">Produtos</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'perfil' %}">Gerenciar Cadastro</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'metas' %}">Gerenciar Metas</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'relatorios' %}">Relatorios</a>
+					</li>
+				</ul>
 			</div>
 		{% elif request.user.type == 'SUPERVISOR' %}
-			<div class="container">
-				<div class="collapse navbar-collapse" id="navbarNavDropdown">
-					<ul class="navbar-nav mr-auto">
-						<li class="nav-item active">
-							<a class="nav-link" href="{% url 'vendas-home' %}">Home<span class="sr-only">(Página atual)</span></a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'produtos' %}">Loja</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'usuarios' %}">Usuarios</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{% url 'perfil' %}">Gerenciar Cadastro</a>
-						</li>
-						
-					</ul>
-				</div>
+			<div class="collapse navbar-collapse" id="navbarNavDropdown">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active">
+						<a class="nav-link" href="{% url 'vendas-home' %}">Home<span class="sr-only">(Página atual)</span></a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'produtos' %}">Loja</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'usuarios' %}">Usuarios</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'perfil' %}">Gerenciar Cadastro</a>
+					</li>
+					
+				</ul>
 			</div>
 		{% endif %}
+		</div>
 		
 		
 			
