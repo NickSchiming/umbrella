@@ -8,6 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class Franquia(models.Model):
     # um perfil de franquia deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de franquia
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -21,6 +22,7 @@ class Franquia(models.Model):
     def __str__(self):
         return self.razaosocial
 
+
 class Supervisor(models.Model):
     # um perfil de Supervisor deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de Supervisor
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -29,7 +31,8 @@ class Supervisor(models.Model):
     nome = models.CharField(_("nome"), max_length=100, blank=True)
     cpf = models.IntegerField(_("cpf"), unique=True, blank=True)
 
-    franquia = models.ForeignKey(Franquia, on_delete=models.SET_NULL, null=True)
+    franquia = models.ForeignKey(
+        Franquia, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.nome
@@ -81,6 +84,9 @@ class Revendedor(models.Model):
     supervisor = models.ForeignKey(Supervisor, verbose_name=_(
         "supervisor"), on_delete=models.SET_NULL, null=True, blank=True)
 
+    """ data_ingressao = models.DateTimeField(
+        _("Data de ingressão"), auto_now_add=True, blank=True) """
+
     meta = models.ForeignKey(
         Meta, on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -101,12 +107,6 @@ class Revendedor(models.Model):
         pedidos = self.pedido_set.all()
         total = sum([pedido.get_meta_total for pedido in pedidos])
         return total
-        
-
-
-
-
-
 
 
 class Loja(models.Model):

@@ -21,8 +21,7 @@ body {
 }
 
 .nav-container {
-	position: relative;
-	left: 240px;
+	margin: auto;
 }
 
 .navbar-brand {
@@ -173,6 +172,5 @@ h6 {
   }
 
 .add-prod{
-	position: relative;
-	left: auto;
+	float: right;
 }

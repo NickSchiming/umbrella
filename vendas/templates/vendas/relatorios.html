@@ -1,18 +1,25 @@
 {% extends 'vendas/base.html' %}
 {% load static %}
 {% block content %}
-<div class="btn-group" role="group" aria-label="Basic example">
-    <button class="btn btn-secondary" data-action="dia">dia</button>
-    <button class="btn btn-secondary" data-action="mes">mes</button>
-    <button class="btn btn-secondary" data-action="ano">ano</button>
+<div class="content-section">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button class="btn btn-secondary" data-action="dia">dia</button>
+        <button class="btn btn-secondary" data-action="mes">mes</button>
+        <button class="btn btn-secondary" data-action="ano">ano</button>
+    </div>
+
+
+    <hr>
+    <h5>Total vendido: R${{ total|floatformat:2 }}</h5>
+    <h5>Quantidade de pedidos: {{ qtde_pedidos }}</h5>
+    <h5>Quantidade de pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
+    <h5>Quantidade de pedidos enviados: {{ qtde_pedidos_enviados }}</h5>
+    <h5>Quantidade de pedidos finalizados: {{ qtde_pedidos_finalizados }}</h5>
+    <h5>Novos Revendedores: {{ revendedores }}</h5>
 </div>
 
 
-<hr>
-<h6>Total vendido: {{ total }}</h6>
-
-
-    <script>
+<script>
         var updateBtns = document.getElementsByClassName('btn-secondary')
 
         for (i = 0; i < updateBtns.length; i++) {
@@ -42,5 +49,4 @@
             });
         }
     </script>
-
 {% endblock content %}

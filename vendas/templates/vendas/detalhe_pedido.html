@@ -1,65 +1,72 @@
 {% extends "vendas/base.html" %}
 {% block content %}
-  <article class="media content-section">
-    <div class="media-body">
-      <div class="article-metadata">
-        <h2>Código do pedido: {{ pedido.cod_pedido }}</h2>
-        <h2>ID: {{ pedido.id }}</h2>
-        <h6 class="text-muted">Data: {{ pedido.data}}</h6>
-        {% if pedido.revendedor %}
-          <h6>Revendedor: {{ pedido.revendedor }}</h6>
-				{% elif pedido.loja %}
-        <h6>Loja: {{ pedido.loja }}</h6>
-				  {% endif %}
-        <h2>Total: ${{ pedido.get_carrinho_total }}</h2>
-        <div class="box-element">
-          <div class="carrinho-row">
-            <div style="flex:2"></div>
-            <div style="flex:2"><strong>Item</strong></div>
-            <div style="flex:1"><strong>Preço</strong></div>
-            <div style="flex:1"><strong>Quantidade</strong></div>
-            <div style="flex:1"><strong>Total</strong></div>
-          </div>
-          {% for item in itens %}
-            <div class="carrinho-row">
-              <div style="flex:2"><img class="row-image" src="{{item.produto.imageURL}}"></div>
-              <div style="flex:2"><p>{{item.produto.nome}}</p></div>
-              <div style="flex:1"><p>${{item.produto.preco|floatformat:2}}</p></div>
-              <div style="flex:1">
-                <p class="quantity">{{item.quantidade}}</p>
-              </div>
-              <div style="flex:1"><p>${{item.get_total|floatformat:2}}</p></div>
-            </div>
-          {% endfor %}
+<article class="media content-section">
+  <div class="media-body">
+    <div class="article-metadata">
+      <h2>Código do pedido: {{ pedido.cod_pedido }}</h2>
+      <h2>ID: {{ pedido.id }}</h2>
+      <h6 class="text-muted">Data: {{ pedido.data}}</h6>
+      {% if pedido.revendedor %}
+      <h6>Revendedor: {{ pedido.revendedor }}</h6>
+      {% elif pedido.loja %}
+      <h6>Loja: {{ pedido.loja }}</h6>
+      {% endif %}
+      <h2>Total: ${{ pedido.get_carrinho_total }}</h2>
+      <div class="box-element">
+        <div class="carrinho-row">
+          <div style="flex:2"></div>
+          <div style="flex:2"><strong>Item</strong></div>
+          <div style="flex:1"><strong>Preço</strong></div>
+          <div style="flex:1"><strong>Quantidade</strong></div>
+          <div style="flex:1"><strong>Total</strong></div>
         </div>
-        
-        {% if pedido.revendedor.user == user or pedido.loja.user == user %}
-          <div>
-            <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
-            <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>
-            {% if pedido.status == 'FINALIZADO' %}
-            <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'confirmar_pedido' pedido.id %}">Confirmar recebimento</a>
-            {% endif %}
+        {% for item in itens %}
+        <div class="carrinho-row">
+          <div style="flex:2"><img class="row-image"
+              src="{{item.produto.imageURL}}"></div>
+          <div style="flex:2"><p>{{item.produto.nome}}</p></div>
+          <div style="flex:1"><p>${{item.produto.preco|floatformat:2}}</p></div>
+          <div style="flex:1">
+            <p class="quantity">{{item.quantidade}}</p>
           </div>
-        {% elif user.type == 'FRANQUIA' %}
-          <div>
-            <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
-            <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>
-            {% if pedido.status == 'APROVADO' %}
-            <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'enviar_pedido' pedido.id %}">Enviar</a>
-            {% endif %}
-          </div>
-        {% elif user.type == 'SUPERVISOR'%}
-        <div>
-          <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
-          <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>
-          {% if pedido.status == 'APROV_PEND' %}
-          <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'aprovar_pedido' pedido.id %}">Aprovar</a>
-          {% endif %}
+          <div style="flex:1"><p>${{item.get_total|floatformat:2}}</p></div>
         </div>
+        {% endfor %}
+      </div>
+
+      {% if pedido.revendedor.user == user or pedido.loja.user == user %}
+      <div>
+        <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url
+          'atualizar_pedido' pedido.id %}">Alterar</a>
+        <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido'
+          pedido.id %}">Deletar</a>
+        {% if pedido.status == 'Finalizado' %}
+        <a class="btn btn-success btn-me mt-1 mb-1" href="{% url
+          'confirmar_pedido' pedido.id %}">Confirmar recebimento</a>
         {% endif %}
       </div>
-      
+      {% elif user.type == 'FRANQUIA' %}
+      <div>
+        <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url
+          'atualizar_pedido' pedido.id %}">Alterar</a>
+        <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido'
+          pedido.id %}">Deletar</a>
+        {% if pedido.status == 'APROVADO' %}
+        <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'enviar_pedido'
+          pedido.id %}">Enviar</a>
+        {% endif %}
+      </div>
+      {% elif user.type == 'SUPERVISOR'%}
+      <div>
+        <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
+        <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>
+        {% if pedido.status == 'Aprovação pendente' %}
+        <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'aprovar_pedido' pedido.id %}">Aprovar</a>
+        {% endif %}
+      </div>
+      {% endif %}
     </div>
-  </article>
+
+  </div>
+</article>
 {% endblock content %}

@@ -24,8 +24,8 @@
     {% csrf_token %}
     <fieldset class="form-group">
       <legend class="border-bottom mb-4">Perfil</legend>
-      {{ u_form.as_p}}
-      {{ p_form.as_p }}
+      {{ u_form|crispy}}
+      {{ p_form|crispy }}
     </fieldset>
     <div class="form-group">
       <button id=btn class="btn btn-outline-info">Update</button>
