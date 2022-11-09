@@ -15,7 +15,7 @@ class PerfilRevendedor(forms.ModelForm):
     class Meta:
         model = Revendedor
         fields = ['nome', 'cpf', 'telefone','cep',
-                  'endereco', 'datanasc', 'is_aprovado']
+                  'endereco', 'datanasc', 'is_aprovado', 'meta']
 
 class PerfilFranquia(forms.ModelForm):
     class Meta:

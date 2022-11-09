@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -58,15 +59,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=True,
     )
 
-    """criado = models.DateTimeField(
+    criado = models.DateTimeField(
         _('criado'),
         default=timezone.now,
     )
-    
-    atualizado = models.DateTimeField(
-        _('atualizado'),
-        default=timezone.now,
-    ) """
 
     # lista de tipos para dar permissoes especiais
     class Types(models.TextChoices):

@@ -52,17 +52,22 @@ def franquia_check(user):
 
 @login_required
 def home(request):
-    if request.user.is_authenticated:
-        return render(request, 'vendas/home.html')
-    else:
-        sweetify.error(
-            request, 'É necessário fazer login para acessar essa pagina!')
-        return redirect('login')
+    now = datetime.datetime.now()
+    user = request.user
+
+    if request.user.type == "REVENDEDOR":
+        pedidos = request.user.revendedor.pedido_set.filter(data__month=now.month)
+        width = str((request.user.revendedor.total_comprado / request.user.revendedor.get_proxima_meta.valor ) * 100) + '%'
+    
+    total = sum([pedido.get_meta_total for pedido in pedidos])
+
+    return render(request, 'vendas/home.html', {'user': user, 'width': width, 'total': total})
 
 
 @login_required
 def perfil(request):
     if request.user.type == 'REVENDEDOR':
+        iniciante = Meta.objects.get(nivel='Iniciante')
         if request.method == 'POST':
             u_form = UserUpdateForm(request.POST, instance=request.user)
             if not request.user.type == 'FRANQUIA':
@@ -75,6 +80,7 @@ def perfil(request):
 
             if not request.user.type == 'FRANQUIA' or not request.user.type == 'SUPERVISOR':
                 p_form.fields.pop('is_aprovado')
+                p_form.fields.pop('meta')
 
             if u_form.is_valid() and p_form.is_valid():
                 if temNone(p_form):
@@ -84,6 +90,8 @@ def perfil(request):
                     u_form.save()
                     form = p_form.save(commit=False)
                     form.user = request.user
+                    if not form.meta:
+                        form.meta = iniciante
                     p_form.save()
                     sweetify.success(request, 'Seus dados foram atualizados')
                     return redirect('perfil')
@@ -102,6 +110,8 @@ def perfil(request):
                 p_form = PerfilRevendedor()
             if not request.user.type == 'FRANQUIA' or not request.user.type == 'SUPERVISOR':
                 p_form.fields.pop('is_aprovado')
+                p_form.fields.pop('meta')
+
     elif request.user.type == 'LOJA':
         if request.method == 'POST':
             u_form = UserUpdateForm(request.POST, instance=request.user)
@@ -549,7 +559,7 @@ def atualizarProduto(request, pk):
     produto = Produto.objects.get(id=pk)
 
     if request.method == 'POST':
-        form = FormProduto(request.POST, instance=produto)
+        form = FormProduto(request.POST,request.FILES, instance=produto)
         if form.is_valid():
             form.save()
             sweetify.success(request, 'Produto atualizados')
@@ -566,7 +576,7 @@ def atualizarProduto(request, pk):
 def adicionarProduto(request):
 
     if request.method == 'POST':
-        form = FormProduto(request.POST)
+        form = FormProduto(request.POST,request.FILES)
         if form.is_valid():
             form.save()
             sweetify.success(request, 'Produto adicionado')
@@ -704,17 +714,20 @@ def atualizarMeta(request, pk):
 def atualizarMetasRevendedores(request):
 
     revendedores = Revendedor.objects.all()
-    bronze, prata, ouro, diamante = Meta.objects.all()
+    iniciante, bronze, prata, ouro, diamante = Meta.objects.all()
+    print(Meta.objects.all())
 
     for revendedor in revendedores:
-        if revendedor.total_comprado <= bronze.valor:
+        if revendedor.total_comprado >= bronze.valor:
             revendedor.meta = bronze
-        elif revendedor.total_comprado <= prata.valor:
+        elif revendedor.total_comprado >= prata.valor:
             revendedor.meta = prata
-        elif revendedor.total_comprado <= ouro.valor:
+        elif revendedor.total_comprado >= ouro.valor:
             revendedor.meta = ouro
-        else:
+        elif revendedor.total_comprado >= diamante.valor:
             revendedor.meta = diamante
+        else:
+            revendedor.meta = iniciante
         revendedor.save()
 
     return redirect('metas')

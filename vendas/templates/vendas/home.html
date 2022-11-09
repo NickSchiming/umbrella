@@ -1,10 +1,35 @@
 {% extends "vendas/base.html" %}
 {% block content %}
-    <p>home</p>
-    <p></p>
+<div class="content-section">
+
+    <h2>Bem vindo {{user.revendedor.nome}}!</h2>
+    <hr>
+
     {% if user.revendedor.is_aprovado %}
         <p>Status de cadastro: Aprovado</p>
     {% else %}
         <p>Status de cadastro: Pendente</p>
     {% endif %}
+
+    <p>Total comprado mensal: R${{total|floatformat:2}}</p>
+
+    <div class="container-barra">
+        <p>Meta atual: {{user.revendedor.meta.nivel}}</p>
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:{{width}}"></div>
+        </div>
+        <p>Proxima meta: {{user.revendedor.get_proxima_meta.nivel}}</p>
+        
+    </div>
+    
+    <p>Total necessário para proxima meta: R${{user.revendedor.get_proxima_meta.valor|floatformat:2}}</p>
+
+    <br>
+
+    <p>Pedidos pendentes:</p>
+    <p>Pedidos aprovados:</p>
+    <p>Pedidos enviados:</p>
+    <p>Pedidos completos:</p>
+
+</div>
 {% endblock content %}

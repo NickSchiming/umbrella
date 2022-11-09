@@ -40,12 +40,14 @@ class Supervisor(models.Model):
 
 class Meta(models.Model):
 
+    INICIANTE = "Iniciante"
     BRONZE = "Bronze"
     PRATA = "Prata"
     OURO = "Ouro"
     DIAMANTE = "Diamante"
 
     opcoes_nivel = [
+        (INICIANTE, "iniciante"),
         (BRONZE, "bronze"),
         (PRATA, "prata"),
         (OURO, "ouro"),
@@ -63,6 +65,8 @@ class Meta(models.Model):
     @property
     def descontocalc(self):
         return self.desconto / 100
+
+    
 
 
 class Revendedor(models.Model):
@@ -104,9 +108,18 @@ class Revendedor(models.Model):
 
     @property
     def total_comprado(self):
-        pedidos = self.pedido_set.all()
+        pedidos = self.pedido_set.filter(completo=True)
         total = sum([pedido.get_meta_total for pedido in pedidos])
         return total
+    
+    @property
+    def get_proxima_meta(self):
+        
+        metas = Meta.objects.filter(valor__gt=self.meta.valor).order_by('valor')
+        if not metas:
+            metas = Meta.objects.get(nivel='Diamante')
+
+        return  metas[0]
 
 
 class Loja(models.Model):
@@ -231,7 +244,7 @@ class Pedido(models.Model):
 
     @property
     def get_carrinho_total(self):
-        itenspedido = self.itempedido_set.all()
+        itenspedido = self.itempedido_set.filter()
         total = sum([item.get_total for item in itenspedido])
         return total
 

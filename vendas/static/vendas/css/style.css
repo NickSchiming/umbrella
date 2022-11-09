@@ -154,6 +154,22 @@ h6 {
   margin: 0;
 }
 
+.progress {
+	width: 25%;
+}
+
+.container-barra {
+	display: flex;
+}
+
+
+
+.progress{
+	margin: 0 10px 0 10px;
+	position: relative;
+	top: 3px;
+}
+
 
 .inputquantity {
 	width: 35px;
