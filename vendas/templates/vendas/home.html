@@ -1,39 +1,95 @@
 {% extends "vendas/base.html" %}
 {% block content %}
 <div class="content-section">
+    {% if user.type == "REVENDEDOR" %}
+        <h2>Bem vindo {{user.revendedor.nome}}!</h2>
+        <hr>
 
-    <h2>Bem vindo {{user.revendedor.nome}}!</h2>
-    <hr>
+        {% if user.revendedor.is_aprovado %}
+            <p>Status de cadastro: Aprovado</p>
+        {% else %}
+            <p>Status de cadastro: Pendente</p>
+        {% endif %}
 
-    {% if user.revendedor.is_aprovado %}
-        <p>Status de cadastro: Aprovado</p>
-    {% else %}
-        <p>Status de cadastro: Pendente</p>
+        <h4>Resumo do mês</h4>
+
+        <p>Total comprado: R${{subtotal|floatformat:2}}</p>
+
+        <p>Total comprado com desconto: R${{total|floatformat:2}}</p>
+
+        <div class="container-barra">
+            <p>Meta atual: {{user.revendedor.meta.nivel}}</p>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:{{width}}"></div>
+            </div>
+            <p>Proxima meta: {{user.revendedor.get_proxima_meta.nivel}}</p>
+            
+        </div>
+        
+        <p>Total necessário para proxima meta: R${{user.revendedor.get_proxima_meta.valor|floatformat:2}}</p>
+
+        <br>
+
+        <p>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</p>
+        <p>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</p>
+        <p>Pedidos enviados: {{ qtde_pedidos_enviados }}</p>
+        <p>Pedidos completos: {{ qtde_pedidos_finalizados }}</p>
+
+    {% elif user.type == "FRANQUIA" %}
+
+        <h2>Bem vindo {{user.franquia.razaosocial}}!</h2>
+        <hr>
+
+        <h4>Resumo do dia</h4>
+
+        <p>Total comprado: R${{subtotal|floatformat:2}}</p>
+
+        <p>Total comprado com desconto: R${{total|floatformat:2}}</p>
+
+        <br>
+
+        <p>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</p>
+        <p>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</p>
+        <p>Pedidos enviados: {{ qtde_pedidos_enviados }}</p>
+        <p>Pedidos completos: {{ qtde_pedidos_finalizados }}</p>
+
+    {% elif user.type == "LOJA" %}
+
+        <h2>Bem vindo {{user.loja.razaosocial}}!</h2>
+        <hr>
+
+        <h4>Resumo do mês</h4>
+
+        <p>Total comprado: R${{subtotal|floatformat:2}}</p>
+
+        <p>Total comprado com desconto: R${{total|floatformat:2}}</p>
+
+        <br>
+
+        <p>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</p>
+        <p>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</p>
+        <p>Pedidos enviados: {{ qtde_pedidos_enviados }}</p>
+        <p>Pedidos completos: {{ qtde_pedidos_finalizados }}</p>
+    
+    {% elif user.type == "SUPERVISOR" %}
+
+        <h2>Bem vindo {{user.sueprvisor.razaosocial}}!</h2>
+        <hr>
+
+        <h4>Resumo do dia</h4>
+
+        <p>Total comprado: R${{subtotal|floatformat:2}}</p>
+
+        <p>Total comprado com desconto: R${{total|floatformat:2}}</p>
+
+        <br>
+
+        <p>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</p>
+        <p>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</p>
+
     {% endif %}
 
-    <h4>Resumo do mês</h4>
-
-    <p>Total comprado: R${{subtotal|floatformat:2}}</p>
-
-    <p>Total comprado com desconto: R${{total|floatformat:2}}</p>
-
-    <div class="container-barra">
-        <p>Meta atual: {{user.revendedor.meta.nivel}}</p>
-        <div class="progress">
-            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:{{width}}"></div>
-        </div>
-        <p>Proxima meta: {{user.revendedor.get_proxima_meta.nivel}}</p>
-        
-    </div>
     
-    <p>Total necessário para proxima meta: R${{user.revendedor.get_proxima_meta.valor|floatformat:2}}</p>
-
-    <br>
-
-    <p>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</p>
-    <p>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</p>
-    <p>Pedidos enviados: {{ qtde_pedidos_enviados }}</p>
-    <p>Pedidos completos: {{ qtde_pedidos_finalizados }}</p>
 
 </div>
 {% endblock content %}

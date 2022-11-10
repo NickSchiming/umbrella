@@ -56,11 +56,11 @@ def home(request):
     user = request.user
     context = {'user': user}
 
-    if request.user.type == "REVENDEDOR":
-        pedidos = request.user.revendedor.pedido_set.filter(
+    if hasattr(user, 'revendedor'):
+        pedidos = user.revendedor.pedido_set.filter(completo = True,
             data__month=now.month)
-        width = str((request.user.revendedor.total_comprado /
-                    request.user.revendedor.get_proxima_meta.valor) * 100) + '%'
+        width = str((user.revendedor.total_comprado /
+                    user.revendedor.get_proxima_meta.valor) * 100) + '%'
 
         total = sum([pedido.get_meta_total for pedido in pedidos])
         subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
@@ -81,6 +81,79 @@ def home(request):
             'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
 
         }
+
+    elif hasattr(user, 'franquia'):
+        pedidos = user.franquia.pedido_set.filter(completo = True,
+            data__month=now.month)
+
+        total = sum([pedido.get_meta_total for pedido in pedidos])
+        subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
+        qtde_pedidos_pendentes = pedidos.filter(status='Aprovação pendente').count()
+        qtde_pedidos_aprovados = pedidos.filter(status='APROVADO').count()
+        qtde_pedidos_enviados = pedidos.filter(status='Enviado').count()
+        qtde_pedidos_finalizados = pedidos.filter(status='Finalizado').count()
+
+        context = {
+            'user': user,
+            'total': total,
+            'subtotal': subtotal,
+            'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
+            'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
+            'qtde_pedidos_enviados': qtde_pedidos_enviados,
+            'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
+
+        }
+    
+    elif hasattr(user, 'loja'):
+        pedidos = user.loja.pedido_set.filter(completo = True,
+            data__month=now.month)
+
+        total = sum([pedido.get_meta_total for pedido in pedidos])
+        subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
+        qtde_pedidos_pendentes = pedidos.filter(status='Aprovação pendente').count()
+        qtde_pedidos_aprovados = pedidos.filter(status='APROVADO').count()
+        qtde_pedidos_enviados = pedidos.filter(status='Enviado').count()
+        qtde_pedidos_finalizados = pedidos.filter(status='Finalizado').count()
+
+        context = {
+            'user': user,
+            'total': total,
+            'subtotal': subtotal,
+            'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
+            'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
+            'qtde_pedidos_enviados': qtde_pedidos_enviados,
+            'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
+
+        }
+    elif hasattr(user, 'supervisor'):
+        set = Pedido.objects.none()
+        revendedores = user.supervisor.revendedor_set.all()
+        for revendedor in revendedores:
+            pedidos = set = set | revendedor.pedido_set.filter( completo = True,
+                data__month=now.month)
+
+        total = sum([pedido.get_meta_total for pedido in pedidos])
+        subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
+        qtde_pedidos_pendentes = pedidos.filter(status='Aprovação pendente').count()
+        qtde_pedidos_aprovados = pedidos.filter(status='APROVADO').count()
+        qtde_pedidos_enviados = pedidos.filter(status='Enviado').count()
+        qtde_pedidos_finalizados = pedidos.filter(status='Finalizado').count()
+
+        context = {
+            'user': user,
+            'total': total,
+            'subtotal': subtotal,
+            'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
+            'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
+            'qtde_pedidos_enviados': qtde_pedidos_enviados,
+            'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
+
+        }
+    elif user.type == 'REVENDEDOR':
+        sweetify.info(request, 'Por favor, finalize seu cadastro!')
+        return redirect('perfil')
+    else:
+        sweetify.info(request, 'Por favor, aguarde a configuração da sua conta!')
 
     return render(request, 'vendas/home.html', context)
 
