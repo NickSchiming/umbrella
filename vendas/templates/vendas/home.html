@@ -11,7 +11,11 @@
         <p>Status de cadastro: Pendente</p>
     {% endif %}
 
-    <p>Total comprado mensal: R${{total|floatformat:2}}</p>
+    <h4>Resumo do mês</h4>
+
+    <p>Total comprado: R${{subtotal|floatformat:2}}</p>
+
+    <p>Total comprado com desconto: R${{total|floatformat:2}}</p>
 
     <div class="container-barra">
         <p>Meta atual: {{user.revendedor.meta.nivel}}</p>
@@ -26,10 +30,10 @@
 
     <br>
 
-    <p>Pedidos pendentes:</p>
-    <p>Pedidos aprovados:</p>
-    <p>Pedidos enviados:</p>
-    <p>Pedidos completos:</p>
+    <p>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</p>
+    <p>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</p>
+    <p>Pedidos enviados: {{ qtde_pedidos_enviados }}</p>
+    <p>Pedidos completos: {{ qtde_pedidos_finalizados }}</p>
 
 </div>
 {% endblock content %}

@@ -54,14 +54,35 @@ def franquia_check(user):
 def home(request):
     now = datetime.datetime.now()
     user = request.user
+    context = {'user': user}
 
     if request.user.type == "REVENDEDOR":
-        pedidos = request.user.revendedor.pedido_set.filter(data__month=now.month)
-        width = str((request.user.revendedor.total_comprado / request.user.revendedor.get_proxima_meta.valor ) * 100) + '%'
-    
-    total = sum([pedido.get_meta_total for pedido in pedidos])
+        pedidos = request.user.revendedor.pedido_set.filter(
+            data__month=now.month)
+        width = str((request.user.revendedor.total_comprado /
+                    request.user.revendedor.get_proxima_meta.valor) * 100) + '%'
 
-    return render(request, 'vendas/home.html', {'user': user, 'width': width, 'total': total})
+        total = sum([pedido.get_meta_total for pedido in pedidos])
+        subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
+        qtde_pedidos_pendentes = pedidos.filter(
+            status='Aprovação pendente').count()
+        qtde_pedidos_aprovados = pedidos.filter(status='APROVADO').count()
+        qtde_pedidos_enviados = pedidos.filter(status='Enviado').count()
+        qtde_pedidos_finalizados = pedidos.filter(status='Finalizado').count()
+
+        context = {
+            'user': user,
+            'width': width,
+            'total': total,
+            'subtotal': subtotal,
+            'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
+            'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
+            'qtde_pedidos_enviados': qtde_pedidos_enviados,
+            'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
+
+        }
+
+    return render(request, 'vendas/home.html', context)
 
 
 @login_required
@@ -429,9 +450,13 @@ def detalhePedido(request, pk):
 def atualizarPedido(request, pk):
     if request.user.type == "REVENDEDOR":
         pedido = Pedido.objects.get(id=pk)
-        pedido_ex = Pedido.objects.get(
-            revendedor=request.user.revendedor, completo=False)
-        pedido_ex.delete()
+        try:
+            pedido_ex = Pedido.objects.get(
+                revendedor=request.user.revendedor, completo=False)
+        except:
+            pedido_ex = False
+        if pedido_ex:
+            pedido_ex.delete()
         pedido.completo = False
         pedido.devolve_produtos()
         pedido.save()
@@ -559,7 +584,7 @@ def atualizarProduto(request, pk):
     produto = Produto.objects.get(id=pk)
 
     if request.method == 'POST':
-        form = FormProduto(request.POST,request.FILES, instance=produto)
+        form = FormProduto(request.POST, request.FILES, instance=produto)
         if form.is_valid():
             form.save()
             sweetify.success(request, 'Produto atualizados')
@@ -576,7 +601,7 @@ def atualizarProduto(request, pk):
 def adicionarProduto(request):
 
     if request.method == 'POST':
-        form = FormProduto(request.POST,request.FILES)
+        form = FormProduto(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             sweetify.success(request, 'Produto adicionado')
@@ -714,7 +739,7 @@ def atualizarMeta(request, pk):
 def atualizarMetasRevendedores(request):
 
     revendedores = Revendedor.objects.all()
-    iniciante, bronze, prata, ouro, diamante = Meta.objects.all()
+    bronze, prata, ouro, diamante, iniciante = Meta.objects.all()
     print(Meta.objects.all())
 
     for revendedor in revendedores:
@@ -730,6 +755,7 @@ def atualizarMetasRevendedores(request):
             revendedor.meta = iniciante
         revendedor.save()
 
+    sweetify.success(request, 'Metas atualizadas com sucesso')
     return redirect('metas')
 
 

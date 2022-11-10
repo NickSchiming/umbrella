@@ -4,13 +4,13 @@
   <div class="media-body">
     <div class="article-metadata">
       <h2>Código do pedido: {{ pedido.cod_pedido }}</h2>
-      <h2>ID: {{ pedido.id }}</h2>
       <h6 class="text-muted">Data: {{ pedido.data}}</h6>
       {% if pedido.revendedor %}
       <h6>Revendedor: {{ pedido.revendedor }}</h6>
       {% elif pedido.loja %}
       <h6>Loja: {{ pedido.loja }}</h6>
       {% endif %}
+      <h4>Forma de pagamento: {{pedido.metodo_de_pagamento}}</h4>
       <h2>Total: ${{ pedido.get_carrinho_total }}</h2>
       <div class="box-element">
         <div class="carrinho-row">
@@ -36,24 +36,18 @@
 
       {% if pedido.revendedor.user == user or pedido.loja.user == user %}
       <div>
-        <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url
-          'atualizar_pedido' pedido.id %}">Alterar</a>
-        <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido'
-          pedido.id %}">Deletar</a>
+        <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
+        <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>
         {% if pedido.status == 'Finalizado' %}
-        <a class="btn btn-success btn-me mt-1 mb-1" href="{% url
-          'confirmar_pedido' pedido.id %}">Confirmar recebimento</a>
+        <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'confirmar_pedido' pedido.id %}">Confirmar recebimento</a>
         {% endif %}
       </div>
       {% elif user.type == 'FRANQUIA' %}
       <div>
-        <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url
-          'atualizar_pedido' pedido.id %}">Alterar</a>
-        <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido'
-          pedido.id %}">Deletar</a>
+        <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
+        <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>
         {% if pedido.status == 'APROVADO' %}
-        <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'enviar_pedido'
-          pedido.id %}">Enviar</a>
+        <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'enviar_pedido' pedido.id %}">Enviar</a>
         {% endif %}
       </div>
       {% elif user.type == 'SUPERVISOR'%}
