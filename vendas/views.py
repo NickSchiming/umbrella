@@ -57,18 +57,18 @@ def home(request):
     context = {'user': user}
 
     if hasattr(user, 'revendedor'):
-        pedidos = user.revendedor.pedido_set.filter(completo = True,
-            data__month=now.month)
+        pedidos = user.revendedor.pedido_set.filter(completo=True,
+                                                    data__month=now.month)
         width = str((user.revendedor.total_comprado /
                     user.revendedor.get_proxima_meta.valor) * 100) + '%'
 
         total = sum([pedido.get_meta_total for pedido in pedidos])
         subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
         qtde_pedidos_pendentes = pedidos.filter(
-            status='Aprovação pendente').count()
-        qtde_pedidos_aprovados = pedidos.filter(status='APROVADO').count()
-        qtde_pedidos_enviados = pedidos.filter(status='Enviado').count()
-        qtde_pedidos_finalizados = pedidos.filter(status='Finalizado').count()
+            status='aprovacao_pendente').count()
+        qtde_pedidos_aprovados = pedidos.filter(status='aprovado').count()
+        qtde_pedidos_enviados = pedidos.filter(status='enviado').count()
+        qtde_pedidos_finalizados = pedidos.filter(status='finalizado').count()
 
         context = {
             'user': user,
@@ -83,13 +83,14 @@ def home(request):
         }
 
     elif hasattr(user, 'franquia'):
-        pedidos = user.franquia.pedido_set.filter(completo = True,
-            data__month=now.month)
+        pedidos = user.franquia.pedido_set.filter(completo=True,
+                                                  data__month=now.month)
 
         total = sum([pedido.get_meta_total for pedido in pedidos])
         subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
-        qtde_pedidos_pendentes = pedidos.filter(status='Aprovação pendente').count()
-        qtde_pedidos_aprovados = pedidos.filter(status='APROVADO').count()
+        qtde_pedidos_pendentes = pedidos.filter(
+            status='Aprovação pendente').count()
+        qtde_pedidos_aprovados = pedidos.filter(status='Aprovado').count()
         qtde_pedidos_enviados = pedidos.filter(status='Enviado').count()
         qtde_pedidos_finalizados = pedidos.filter(status='Finalizado').count()
 
@@ -103,15 +104,14 @@ def home(request):
             'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
 
         }
-    
+
     elif hasattr(user, 'loja'):
-        pedidos = user.loja.pedido_set.filter(completo = True,
-            data__month=now.month)
+        pedidos = user.loja.pedido_set.filter(completo=True,
+                                              data__month=now.month)
 
         total = sum([pedido.get_meta_total for pedido in pedidos])
         subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
-        qtde_pedidos_pendentes = pedidos.filter(status='Aprovação pendente').count()
-        qtde_pedidos_aprovados = pedidos.filter(status='APROVADO').count()
+        qtde_pedidos_aprovados = pedidos.filter(status='Aprovado').count()
         qtde_pedidos_enviados = pedidos.filter(status='Enviado').count()
         qtde_pedidos_finalizados = pedidos.filter(status='Finalizado').count()
 
@@ -119,7 +119,6 @@ def home(request):
             'user': user,
             'total': total,
             'subtotal': subtotal,
-            'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
             'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
             'qtde_pedidos_enviados': qtde_pedidos_enviados,
             'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
@@ -129,13 +128,14 @@ def home(request):
         set = Pedido.objects.none()
         revendedores = user.supervisor.revendedor_set.all()
         for revendedor in revendedores:
-            pedidos = set = set | revendedor.pedido_set.filter( completo = True,
-                data__month=now.month)
+            pedidos = set = set | revendedor.pedido_set.filter(completo=True,
+                                                               data__month=now.month)
 
         total = sum([pedido.get_meta_total for pedido in pedidos])
         subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
-        qtde_pedidos_pendentes = pedidos.filter(status='Aprovação pendente').count()
-        qtde_pedidos_aprovados = pedidos.filter(status='APROVADO').count()
+        qtde_pedidos_pendentes = pedidos.filter(
+            status='Aprovação pendente').count()
+        qtde_pedidos_aprovados = pedidos.filter(status='Aprovado').count()
         qtde_pedidos_enviados = pedidos.filter(status='Enviado').count()
         qtde_pedidos_finalizados = pedidos.filter(status='Finalizado').count()
 
@@ -153,7 +153,8 @@ def home(request):
         sweetify.info(request, 'Por favor, finalize seu cadastro!')
         return redirect('perfil')
     else:
-        sweetify.info(request, 'Por favor, aguarde a configuração da sua conta!')
+        sweetify.info(
+            request, 'Por favor, aguarde a configuração da sua conta!')
 
     return render(request, 'vendas/home.html', context)
 
@@ -604,7 +605,7 @@ def deletarPedido(request, pk):
     pedido.devolve_produtos()
     pedido.delete()
     sweetify.success(request, 'Pedido excluido com sucesso')
-    return redirect('pedidos')
+    return redirect('meus_pedidos')
 
 
 @login_required
@@ -697,7 +698,7 @@ def deletarProduto(request, pk):
 @user_passes_test(supervisor_check)
 def aprovarPedido(request, pk):
     pedido = Pedido.objects.get(id=pk)
-    pedido.status = 'APROVADO'
+    pedido.status = pedido.APROVADO
     pedido.save()
     sweetify.success(request, 'Pedido aprovado!')
     return redirect('pedidos')
@@ -706,21 +707,20 @@ def aprovarPedido(request, pk):
 @login_required
 @user_passes_test(franquia_check)
 def enviarPedido(request, pk):
+    pedido = Pedido.objects.get(id=pk)
     if pedido.status == 'APROVADO':
         pedido = Pedido.objects.get(id=pk)
-        pedido.status = 'ENVIADO'
+        pedido.status = pedido.ENVIADO
         pedido.save()
         sweetify.success(request, 'Pedido enviado!')
         return redirect('pedidos')
-    else:
-        sweetify.error(request, 'O pedido ainda não foi aprovado!')
 
 
 @login_required
 def confirmarPedido(request, pk):
-    if pedido.status == 'ENVIADO':
+    if pedido.status == 'Enviado':
         pedido = Pedido.objects.get(id=pk)
-        pedido.status = 'FINALIZADO'
+        pedido.status = pedido.FINALIZADO
         pedido.save()
         sweetify.success(request, 'Pedido finalizado!')
         return redirect('pedidos')
@@ -859,11 +859,11 @@ def relatorios(request):
         """ for supervisor in supervisores:
             soma += supervisor.revendedor_set.filter(data__day=now.day).count() """
         qtde_pedidos_aprovados = pedidos.filter(
-            status='APROVADO', data__day=now.day).count()
+            status='Aprovado', data__day=now.day).count()
         qtde_pedidos_enviados = pedidos.filter(
-            status='ENVIADOS', data__day=now.day).count()
+            status='Enviado', data__day=now.day).count()
         qtde_pedidos_finalizados = pedidos.filter(
-            status='FINALIZADOS', data__day=now.day).count()
+            status='Finalizado', data__day=now.day).count()
     elif acao == 'mes':
         pedidos = request.user.franquia.pedido_set.filter(
             data__month=now.month)
@@ -872,11 +872,11 @@ def relatorios(request):
             soma += supervisor.revendedor_set.filter(
                 data__month=now.month).count() """
         qtde_pedidos_aprovados = pedidos.filter(
-            status='APROVADO', data__month=now.month).count()
+            status='Aprovado', data__month=now.month).count()
         qtde_pedidos_enviados = pedidos.filter(
-            status='ENVIADOS', data__month=now.month).count()
+            status='Enviado', data__month=now.month).count()
         qtde_pedidos_finalizados = pedidos.filter(
-            status='FINALIZADOS', data__month=now.month).count()
+            status='Finalizado', data__month=now.month).count()
     elif acao == 'ano':
         pedidos = request.user.franquia.pedido_set.filter(data__year=now.year)
         supervisores = request.user.franquia.supervisor_set.all()
@@ -884,17 +884,17 @@ def relatorios(request):
             soma += supervisor.revendedor_set.filter(
                 data__year=now.year).count() """
         qtde_pedidos_aprovados = pedidos.filter(
-            status='APROVADO', data__year=now.year).count()
+            status='Aprovado', data__year=now.year).count()
         qtde_pedidos_enviados = pedidos.filter(
-            status='ENVIADOS', data__year=now.year).count()
+            status='Enviado', data__year=now.year).count()
         qtde_pedidos_finalizados = pedidos.filter(
-            status='FINALIZADOS', data__year=now.year).count()
+            status='Finalizado', data__year=now.year).count()
 
     total = sum([pedido.get_meta_total for pedido in pedidos])
     qtde_pedidos = pedidos.count()
     qtde_pedidos_aprovados = pedidos.filter(status='APROVADO').count()
-    qtde_pedidos_enviados = pedidos.filter(status='ENVIADOS').count()
-    qtde_pedidos_finalizados = pedidos.filter(status='FINALIZADOS').count()
+    qtde_pedidos_enviados = pedidos.filter(status='Enviado').count()
+    qtde_pedidos_finalizados = pedidos.filter(status='Finalizado').count()
 
     context = {'total': total,
                'revendedores': soma,

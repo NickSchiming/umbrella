@@ -66,8 +66,6 @@ class Meta(models.Model):
     def descontocalc(self):
         return self.desconto / 100
 
-    
-
 
 class Revendedor(models.Model):
     # um perfil de Revendedor deve ser de apenas um usuario, e um usuario pode ter apenas um perfil de Revendedor
@@ -111,15 +109,16 @@ class Revendedor(models.Model):
         pedidos = self.pedido_set.filter(completo=True)
         total = sum([pedido.get_meta_total for pedido in pedidos])
         return total
-    
+
     @property
     def get_proxima_meta(self):
-        
-        metas = Meta.objects.filter(valor__gt=self.meta.valor).order_by('valor')
+
+        metas = Meta.objects.filter(
+            valor__gt=self.meta.valor).order_by('valor')
         if not metas:
             metas = Meta.objects.get(nivel='Diamante')
 
-        return  metas[0]
+        return metas[0]
 
 
 class Loja(models.Model):
@@ -171,16 +170,16 @@ class Pedido(models.Model):
         _("código do pedido"), max_length=100, null=True)
 
     # lista de opções para status do ppedido
-    APROV_PEND = "Aprovação pendente"
-    APROVADO = "Aprovado"
-    ENVIADO = "Enviado"
-    FINALIZADO = "Finalizado"
+    APROV_PEND = "aprovacao_pendente"
+    APROVADO = "aprovado"
+    ENVIADO = "enviado"
+    FINALIZADO = "finalizado"
 
     opcoes_status = [
-        (APROV_PEND, "Aprovacao_pendente"),
-        (APROVADO, "aprovado"),
-        (ENVIADO, "enviado"),
-        (FINALIZADO, "finalizado"),
+        (APROV_PEND, "Aprovação pendente"),
+        (APROVADO, "Aprovado"),
+        (ENVIADO, "Enviado"),
+        (FINALIZADO, "Finalizado"),
     ]
 
     status = models.CharField(choices=opcoes_status,

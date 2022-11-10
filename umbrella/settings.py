@@ -34,7 +34,6 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'vendas.apps.VendasConfig',
-    "phonenumber_field",
     'sweetify',
     'crispy_forms',
     'django.contrib.admin',
@@ -127,8 +126,6 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-PHONENUMBER_DEFAULT_REGION = 'BR'
 
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 
