@@ -57,4 +57,7 @@ urlpatterns = [
     path('atualizar_relatorio/', views.atualizarRelatorio,
          name='atualizar_relatorio'),
     path('relatorios/', views.relatorios, name='relatorios'),
+    path('grafico_produtos/', views.graficoProdutos, name='grafico_produtos'),
+    
+
 ]

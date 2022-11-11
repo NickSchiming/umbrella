@@ -94,9 +94,6 @@ class Revendedor(models.Model):
 
     is_aprovado = models.BooleanField(_('Aprovado'), default=False)
 
-    # def save(self, *args, **kwargs):
-    #     super().save(*args, **kwargs)
-
     class Meta:
         verbose_name = "Revendedor"
         verbose_name_plural = "Revendedores"
@@ -229,8 +226,13 @@ class Pedido(models.Model):
     revendedor = models.ForeignKey(Revendedor, verbose_name=_(
         "revendedor"), on_delete=models.SET_NULL, null=True, blank=True)
 
-    # def __str__(self):
-    # return self.cod_pedido
+    def __str__(self):
+        if self.cod_pedido != None:
+            return self.cod_pedido
+        elif self.revendedor == None:
+            return str(self.loja) + ' - Temporário'
+        else:
+            return str(self.revendedor) + ' - Temporário'
 
     @property
     def get_meta_total(self):
@@ -277,8 +279,6 @@ class Pedido(models.Model):
         if not self.pk:
             self.status = self.APROV_PEND
 
-        # if Item_pedido.objects.get(pedido=self):
-        #     Pedido.calcula_total(self)
         return super().save(*args, **kwargs)
 
 
@@ -294,16 +294,8 @@ class ItemPedido(models.Model):
         _("quantidade"), default=0, null=True, blank=True)
     data_adicionado = models.DateTimeField(auto_now_add=True)
 
-    # def save(self, *args, **kwargs):
-    #     if self.produto.qtde_estoque < self.quantidade:
-    #         DatabaseError('Quantidade em estoque insuficiente')
-    #     else:
-    #         self.subtotal = self.quantidade * self.produto.valor
-    #         self.produto.qtde_estoque -= self.quantidade
-    #     super().save(*args, **kwargs)
-
     def __str__(self):
-        return self.pedido.cod_pedido
+        return self.pedido.cod_pedido + ' - ' + self.produto.nome
 
     @property
     def get_total(self):
