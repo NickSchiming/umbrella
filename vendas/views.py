@@ -748,21 +748,18 @@ class pesquisaPedidos(LoginRequiredMixin, ListView):
             object_list = Pedido.objects.filter(Q(revendedor=self.request.user.revendedor),
                                                 Q(cod_pedido__icontains=query) | Q(
                                                     status__icontains=query)
-                                                | Q(metodo_de_pagamento__icontains=query) | Q(data__year=query)
-                                                | Q(data__month=query) | Q(data__day=query)
+                                                | Q(metodo_de_pagamento__icontains=query)
                                                 )
         elif self.request.user.type == 'LOJA':
             object_list = Pedido.objects.filter(Q(loja=self.request.user.loja),
                                                 Q(cod_pedido__icontains=query) | Q(
                                                     status__icontains=query)
-                                                | Q(metodo_de_pagamento__icontains=query) | Q(data__year=query)
-                                                | Q(data__month=query) | Q(data__day=query)
+                                                | Q(metodo_de_pagamento__icontains=query)
                                                 )
         else:
             object_list = Pedido.objects.filter(
-                Q(cod_pedido__icontains=query) | Q(status__icontains=query)
-                | Q(metodo_de_pagamento__icontains=query) | Q(data__year=query)
-                | Q(data__month=query) | Q(data__day=query)
+                Q(status__icontains=query) | Q(cod_pedido__icontains=query)
+                | Q(metodo_de_pagamento__icontains=query)
             )
         return object_list
 
