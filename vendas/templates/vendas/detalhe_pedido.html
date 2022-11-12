@@ -11,7 +11,7 @@
       <h6>Loja: {{ pedido.loja }}</h6>
       {% endif %}
       <h4>Forma de pagamento: {{pedido.metodo_de_pagamento}}</h4>
-      <h2>Total: ${{ pedido.get_carrinho_total }}</h2>
+      <h2>Total: ${{ pedido.get_carrinho_total|floatformat:2 }}</h2>
       <div class="box-element">
         <div class="carrinho-row">
           <div style="flex:2"></div>

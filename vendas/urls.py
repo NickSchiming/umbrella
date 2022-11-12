@@ -12,13 +12,11 @@ urlpatterns = [
 
     path('meus_pedidos/', views.mostrarPedidos, name='meus_pedidos'),
     path('detalhe_pedido/<int:pk>/', views.detalhePedido, name='detalhe_pedido'),
-    path('atualizar_pedido/<int:pk>/',
-         views.atualizarPedido, name='atualizar_pedido'),
+    path('atualizar_pedido/<int:pk>/',views.atualizarPedido, name='atualizar_pedido'),
     path('deletar_pedido/<int:pk>/', views.deletarPedido, name='deletar_pedido'),
     path('aprovar_pedido/<int:pk>/', views.aprovarPedido, name='aprovar_pedido'),
     path('enviar_pedido/<int:pk>/', views.enviarPedido, name='enviar_pedido'),
-    path('confirmar_pedido/<int:pk>/',
-         views.confirmarPedido, name='confirmar_pedido'),
+    path('confirmar_pedido/<int:pk>/',views.confirmarPedido, name='confirmar_pedido'),
 
     path('produtos/', views.produtos, name="produtos"),
     path('carrinho/', views.carrinho, name="carrinho"),
