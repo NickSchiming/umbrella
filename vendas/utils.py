@@ -159,3 +159,65 @@ def temNone(p_form):
             x = True
 
     return x
+
+
+def formPerfil(request, tipo):
+    ldict = {'request': request}
+    
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        if not request.user.type == 'FRANQUIA':
+            u_form.fields.pop('type')
+        try:
+            exec('p_form = Perfil' + tipo + '(request.POST, instance=request.user.' + tipo.lower() + ')',globals(),ldict)
+        except:
+            exec('p_form = Perfil' + tipo + '(request.POST)',globals(),ldict)
+        
+        p_form = ldict['p_form']
+
+        if tipo == 'Revendedor':
+            if not request.user.type == 'FRANQUIA' or not request.user.type == 'SUPERVISOR':
+                p_form.fields.pop('is_aprovado')
+                p_form.fields.pop('meta')
+
+        if u_form.is_valid() and p_form.is_valid():
+            if temNone(p_form):
+                sweetify.warning(
+                    request, 'Preencha todos os campos para continuar')
+            else:
+                u_form.save()
+                form = p_form.save(commit=False)
+                form.user = request.user
+                if not form.meta:
+                    form.meta = Meta.objects.get(nivel=Meta.INICIANTE)
+                p_form.save()
+                sweetify.success(request, 'Seus dados foram atualizados')
+        else:
+            sweetify.error(
+                request, 'Houve um erro na atualização dos dados')
+
+    else:
+
+
+        u_form = UserUpdateForm(instance=request.user)
+        if not request.user.type == 'FRANQUIA':
+            u_form.fields.pop('type')
+        try:
+            exec('p_form = Perfil' + tipo + '(instance=request.user.' + tipo.lower() + ')',globals(),ldict)
+        except:
+            exec('p_form = Perfil' + tipo + '()',globals(),ldict)
+            
+        p_form = ldict['p_form']
+
+        if tipo == 'Revendedor':
+            if not request.user.type == 'FRANQUIA' or not request.user.type == 'SUPERVISOR':
+                p_form.fields.pop('is_aprovado')
+                p_form.fields.pop('meta')
+
+    context = {
+        'u_form': u_form,
+        'p_form': p_form
+    }
+
+    return context
+    

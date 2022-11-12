@@ -5,7 +5,7 @@ import sweetify
 from django.http import JsonResponse
 import json
 from .models import *
-from .utils import dadosCarrinho, renderForm, temNone
+from .utils import dadosCarrinho, formPerfil, renderForm, temNone
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -159,161 +159,18 @@ def home(request):
 
 @login_required
 def perfil(request):
-    if request.user.type == 'REVENDEDOR':
-        iniciante = Meta.objects.get(nivel='Iniciante')
-        if request.method == 'POST':
-            u_form = UserUpdateForm(request.POST, instance=request.user)
-            if not request.user.type == 'FRANQUIA':
-                u_form.fields.pop('type')
-            try:
-                p_form = PerfilRevendedor(
-                    request.POST, instance=request.user.revendedor)
-            except:
-                p_form = PerfilRevendedor(request.POST)
+    tipo = request.user.type
+    if tipo == 'REVENDEDOR':
+         context = formPerfil(request, tipo.capitalize())
 
-            if not request.user.type == 'FRANQUIA' or not request.user.type == 'SUPERVISOR':
-                p_form.fields.pop('is_aprovado')
-                p_form.fields.pop('meta')
+    elif tipo == 'LOJA':
+        context = formPerfil(request, tipo.capitalize())
+        
+    elif tipo == 'SUPERVISOR':
+        context = formPerfil(request, tipo.capitalize())
 
-            if u_form.is_valid() and p_form.is_valid():
-                if temNone(p_form):
-                    sweetify.warning(
-                        request, 'Preencha todos os campos para continuar')
-                else:
-                    u_form.save()
-                    form = p_form.save(commit=False)
-                    form.user = request.user
-                    if not form.meta:
-                        form.meta = iniciante
-                    p_form.save()
-                    sweetify.success(request, 'Seus dados foram atualizados')
-                    return redirect('perfil')
-            else:
-                sweetify.error(
-                    request, 'Houve um erro na atualização dos dados')
-                return redirect('perfil')
-
-        else:
-            u_form = UserUpdateForm(instance=request.user)
-            if not request.user.type == 'FRANQUIA':
-                u_form.fields.pop('type')
-            try:
-                p_form = PerfilRevendedor(instance=request.user.revendedor)
-            except:
-                p_form = PerfilRevendedor()
-            if not request.user.type == 'FRANQUIA' or not request.user.type == 'SUPERVISOR':
-                p_form.fields.pop('is_aprovado')
-                p_form.fields.pop('meta')
-
-    elif request.user.type == 'LOJA':
-        if request.method == 'POST':
-            u_form = UserUpdateForm(request.POST, instance=request.user)
-            if not request.user.type == 'FRANQUIA':
-                u_form.fields.pop('type')
-            try:
-                p_form = PerfilLoja(
-                    request.POST, instance=request.user.revendedor)
-            except:
-                p_form = PerfilLoja(request.POST)
-
-            if u_form.is_valid() and p_form.is_valid():
-                if temNone(p_form):
-                    sweetify.warning(
-                        request, 'Preencha todos os campos para continuar')
-                else:
-                    u_form.save()
-                    form = p_form.save(commit=False)
-                    form.user = request.user
-                    p_form.save()
-                    sweetify.success(request, 'Seus dados foram atualizados')
-                    return redirect('perfil')
-            else:
-                sweetify.error(
-                    request, 'Houve um erro na atualização dos dados')
-                return redirect('perfil')
-
-        else:
-            u_form = UserUpdateForm(instance=request.user)
-            if not request.user.type == 'FRANQUIA':
-                u_form.fields.pop('type')
-            try:
-                p_form = PerfilLoja(instance=request.user.loja)
-            except:
-                p_form = PerfilLoja()
-
-    elif request.user.type == 'SUPERVISOR':
-        if request.method == 'POST':
-            u_form = UserUpdateForm(request.POST, instance=request.user)
-            if not request.user.type == 'FRANQUIA':
-                u_form.fields.pop('type')
-            try:
-                p_form = PerfilSupervisor(
-                    request.POST, instance=request.user.revendedor)
-            except:
-                p_form = PerfilSupervisor(request.POST)
-
-            if u_form.is_valid() and p_form.is_valid():
-                if temNone(p_form):
-                    sweetify.warning(
-                        request, 'Preencha todos os campos para continuar')
-                else:
-                    u_form.save()
-                    form = p_form.save(commit=False)
-                    form.user = request.user
-                    p_form.save()
-                    sweetify.success(request, 'Seus dados foram atualizados')
-                    return redirect('perfil')
-            else:
-                sweetify.error(
-                    request, 'Houve um erro na atualização dos dados')
-                return redirect('perfil')
-
-        else:
-            u_form = UserUpdateForm(instance=request.user)
-            if not request.user.type == 'FRANQUIA':
-                u_form.fields.pop('type')
-            try:
-                p_form = PerfilSupervisor(instance=request.user.supervisor)
-            except:
-                p_form = PerfilSupervisor()
-    elif request.user.type == 'FRANQUIA':
-        if request.method == 'POST':
-            u_form = UserUpdateForm(request.POST, instance=request.user)
-            if not request.user.type == 'FRANQUIA':
-                u_form.fields.pop('type')
-            try:
-                p_form = PerfilFranquia(
-                    request.POST, instance=request.user.revendedor)
-            except:
-                p_form = PerfilFranquia(request.POST)
-
-            if u_form.is_valid() and p_form.is_valid():
-                if temNone(p_form):
-                    sweetify.warning(
-                        request, 'Preencha todos os campos para continuar')
-                else:
-                    u_form.save()
-                    form = p_form.save(commit=False)
-                    form.user = request.user
-                    p_form.save()
-                    sweetify.success(request, 'Seus dados foram atualizados')
-                    return redirect('perfil')
-            else:
-                sweetify.error(
-                    request, 'Houve um erro na atualização dos dados')
-                return redirect('perfil')
-
-        else:
-            u_form = UserUpdateForm(instance=request.user)
-            try:
-                p_form = PerfilFranquia(instance=request.user.franquia)
-            except:
-                p_form = PerfilFranquia()
-
-    context = {
-        'u_form': u_form,
-        'p_form': p_form
-    }
+    elif tipo == 'FRANQUIA':
+        context = formPerfil(request, tipo.capitalize())
 
     return render(request, 'vendas/perfil.html', context)
 
