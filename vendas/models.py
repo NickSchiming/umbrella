@@ -136,6 +136,12 @@ class Loja(models.Model):
     def __str__(self):
         return self.razaosocial
 
+    @property
+    def total_comprado(self):
+        pedidos = self.pedido_set.filter(completo=True)
+        total = sum([pedido.get_meta_total for pedido in pedidos])
+        return total
+
 
 class Produto(models.Model):
     codigo = models.IntegerField(

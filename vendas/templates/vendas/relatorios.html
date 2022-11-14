@@ -5,7 +5,7 @@
     <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
 
     <div class="content-section">
-        <div class="btn-group" role="group" aria-label="Basic example">
+        <div class="btn-group" role="group">
             <button class="btn btn-secondary" data-action="day">dia</button>
             <button class="btn btn-secondary" data-action="month">mes</button>
             <button class="btn btn-secondary" data-action="year">ano</button>
@@ -16,15 +16,24 @@
 
         <hr>
         <h5>Total vendido: R${{ total|floatformat:2 }}</h5>
+        <br>
         <h5>Quantidade de pedidos: {{ qtde_pedidos }}</h5>
         <h5>Quantidade de pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
         <h5>Quantidade de pedidos enviados: {{ qtde_pedidos_enviados }}</h5>
         <h5>Quantidade de pedidos finalizados: {{ qtde_pedidos_finalizados }}</h5>
-        <h5>Novos Revendedores: {{ revendedores }}</h5>
+        <br>
+        <h5>Novos Revendedores: {{ novos_revendedores }}</h5>
 
         <hr>
-        <h4 style="text-align:center;">Produtos mais vendidos</h4>
-        <div id="myChart"></div>
+
+        <div class="btn-group" role="group">
+            <button class="btn btn-info" data-url="/grafico_produtos/" >Produtos mais vendidos</button>
+            <button class="btn btn-info" data-url="/grafico_revendedores/">Revendedores que mais venderam</button>
+            <button class="btn btn-info" data-url="/grafico_lojas/">Lojas que mais venderam</button>
+        </div>
+
+        <br><br>
+        <div id="grafico"></div>
     </div>
 
 
@@ -32,6 +41,7 @@
 
     <script>
         var updateBtns = document.getElementsByClassName('btn-secondary')
+        var graficoBtns = document.getElementsByClassName('btn-info')
 
         for (i = 0; i < updateBtns.length; i++) {
             updateBtns[i].addEventListener('click', function () {
@@ -41,10 +51,18 @@
             })
         }
 
-        function carregaDados(action) {
-        var url = '/atualizar_relatorio/'
+        for (i = 0; i < updateBtns.length; i++) {
+            graficoBtns[i].addEventListener('click', function () {
+                var url = this.dataset.url
+                chamaDadosGrafico(url)
+                
+            })
+        }
 
-        fetch(url, {
+        function carregaDados(action) {
+        var urlRelatorio = '/atualizar_relatorio/'
+
+        fetch(urlRelatorio, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -61,45 +79,59 @@
         }
 
 
-        var state ={	
-            'items':[],
-            'values':[],
-        }
-    
-        var dataURL = `/grafico_produtos/`
-        $.ajax({
-            method:'GET',
-            url:dataURL,
-            success:function(response){
-                console.log('RESPONSE:', response)
+        
 
-                for (const [key, value] of Object.entries(response)) {
-                    state.items.push(key)
-                    state.values.push(value)
-                  }
+        function chamaDadosGrafico(url){
+            
+            $.ajax({
+                method:'GET',
+                url:url,
+                success:function(response){
+                    var dados ={	
+                        'items':[],
+                        'values':[],
+                    }
+                    console.log('RESPONSE:', response)
 
-                console.log('STATE:', state)
-                buildChart()
+                    for (const [key, value] of Object.entries(response)) {
+                        dados.items.push(key)
+                        dados.values.push(value)
+                    }
+
+                    buildProdutosChart(dados,url)
+        
+                }
+            })
+        }   
     
+        function buildProdutosChart(dados,url){
+  
+            if(url == "/grafico_produtos/"){
+                texto = "Produtos mais vendidos";
             }
-        })
-    
-        function buildChart(){
-                var chartData = {
+            else if (url == "/grafico_revendedores/"){
+                texto = "Revendedores que mais venderam";
+            }
+            else if (url == "/grafico_lojas/"){
+                texto = "Lojas que mais venderam";
+            }
+            var chartData = {
                 "type":"bar",
                 "scale-x":{
-                    "values":state.items
+                    "values":dados.items
                 },
                 "series":[
                     {
-                        "values":state.values
+                        "values":dados.values
                     }
-                ]
+                ],
+                "title": {
+                    text: texto
+                  }
             }
-    
-    
+
             zingchart.render({
-              id: "myChart",
+              id: "grafico",
               data: chartData,
             });
         }

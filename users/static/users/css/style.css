@@ -112,10 +112,21 @@ body {
     box-sizing: border-box;
 }
 
+p {
+    margin: auto;
+    font-size: 20px;
+}
+
+.reset {
+    color: #f0ffffde;
+    margin: 10px 0px;
+    font-size: 20px;
+}
 
 .textfield>label {
     color: #f0ffffde;
     margin: 10px 0px;
+    font-size: 20px;
 }
 
 .textfield>span {
@@ -169,9 +180,10 @@ a.btn-login {
     box-shadow: 0px 0px 0px 3px #fff;
 }
 
-p {
+.senha {
     margin: auto;
     font-size: 20px;
+    color: white;
 }
 
 .buttons {

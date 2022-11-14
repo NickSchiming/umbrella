@@ -56,6 +56,7 @@ urlpatterns = [
          name='atualizar_relatorio'),
     path('relatorios/', views.relatorios, name='relatorios'),
     path('grafico_produtos/', views.graficoProdutos, name='grafico_produtos'),
-    
+    path('grafico_revendedores/', views.graficoRevendedores, name='grafico_revendedores'),
+    path('grafico_lojas/', views.graficoLojas, name='grafico_lojas'),
 
 ]

@@ -13,7 +13,6 @@
                     <div class="box-element product">
                         <h6><strong>{{produto.nome}}</strong></h6>
                         <hr>
-                        <h6><strong>{{produto.qtde_estoque}}</strong></h6>
                         <button data-produto="{{produto.id}}" data-action="add" class="btn
                             btn-outline-secondary add-btn update-carrinho">Adicionar ao carrinho</button>
                         <h4 tyle="display: inline-block; float: right"><strong>${{produto.preco|floatformat:2}}</strong></h4>
@@ -29,7 +28,6 @@
                     <div class="box-element product">
                         <h6><strong>{{produto.nome}}</strong></h6>
                         <hr>
-                        <h6><strong>{{produto.qtde_estoque}}</strong></h6>
                         <h4 tyle="display: inline-block; float: right"><strong>${{produto.preco|floatformat:2}}</strong></h4>
                         <div>
                             <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_produto' produto.id %}">Atualizar</a>

@@ -146,8 +146,11 @@ def salvaForm(request, user, p_form, u_form):
         user.revendedor.save()
     
     if request.user.type == 'FRANQUIA' and user.type == 'SUPERVISOR':
-        user.supervisor.franquia = request.user.franquia
-        user.supervisor.save()
+        try:
+            user.supervisor.franquia = request.user.franquia
+            user.supervisor.save()
+        except:
+            pass
 
     return True
 
@@ -188,8 +191,11 @@ def formPerfil(request, tipo):
                 u_form.save()
                 form = p_form.save(commit=False)
                 form.user = request.user
-                if not form.meta:
-                    form.meta = Meta.objects.get(nivel=Meta.INICIANTE)
+                try:
+                    if form.meta == None:
+                        form.meta = Meta.objects.get(nivel=Meta.INICIANTE)
+                except:
+                    pass
                 p_form.save()
                 sweetify.success(request, 'Seus dados foram atualizados')
         else:
@@ -221,3 +227,28 @@ def formPerfil(request, tipo):
 
     return context
     
+
+# def infoHome(request):
+#     pedidos = user.revendedor.pedido_set.filter(completo = True,
+#             data__month=now.month)
+#     width = str((user.revendedor.total_comprado /
+#                 user.revendedor.get_proxima_meta.valor) * 100) + '%'
+
+#     total = sum([pedido.get_meta_total for pedido in pedidos])
+#     subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
+#     qtde_pedidos_pendentes = pedidos.filter(completo=True, status=Pedido.APROV_PEND).count()
+#     qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
+#     qtde_pedidos_enviados = pedidos.filter(status=Pedido.ENVIADO).count()
+#     qtde_pedidos_finalizados = pedidos.filter(status=Pedido.FINALIZADO).count()
+
+#     context = {
+#         'user': user,
+#         'width': width,
+#         'total': total,
+#         'subtotal': subtotal,
+#         'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
+#         'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
+#         'qtde_pedidos_enviados': qtde_pedidos_enviados,
+#         'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
+
+#     }

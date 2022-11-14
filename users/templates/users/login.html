@@ -9,7 +9,7 @@
     <button class="btn-cadastrar" type="submit"> Login </button>
 </form>
 <div class="buttons">
-    <p>Não é cadastrado?</p>
+    <a class="senha" href="{% url 'password_reset' %}">Esqueçeu sua senha?</a>
     <a class="btn-login" href="{% url 'register' %}"> Cadastrar </a>
 </div>
 {% endblock conteudo %}

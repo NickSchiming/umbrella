@@ -190,3 +190,12 @@ h6 {
 .add-prod{
 	float: right;
 }
+
+.perfil {
+	display: flex;
+	justify-content: space-between;
+}
+
+.form-perfil{
+	margin-right: 0;
+}

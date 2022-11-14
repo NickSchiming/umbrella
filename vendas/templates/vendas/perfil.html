@@ -1,36 +1,51 @@
 {% extends "vendas/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-<div class="content-section">
-  <div class="media">
-    {% if user %}
-      <div class="media-body">
-        <h2 class="account-heading">{{ user.revendedor.nome }}</h2>
-        <h2 class="account-heading">{{ user.supervisor.nome }}</h2>
-        <p class="text-secondary">{{ user.email }}</p>
-        <p class="text-secondary">{{ user.revendedor.supervisor }}</p>
-        <p class="text-secondary">{{ user.supervisor.franquia }}</p>
+
+<div class="content-section">  
+    <form id="form" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+        {% if user %}
+          <div>
+            <h2 class="account-heading">{{ user.revendedor.nome }}</h2>
+            <h2 class="account-heading">{{ user.supervisor.nome }}</h2>
+            <h2 class="account-heading">{{ user.loja.razaosocial }}</h2>
+            <h2 class="account-heading">{{ user.franquia.razaosocial }}</h2>
+            <h5 class="text-secondary">{{ user.email }}</h5>
+            {% if  user.revendedor.supervisor %}
+              <p class="text-secondary">Supervisor:{{ user.revendedor.supervisor }}</p>
+            {% endif %}
+            {% if user.supervisor.franquia %}
+              <p class="text-secondary">Franquia: {{ user.supervisor.franquia }}</p>
+            {% endif %}
+          </div>
+        {% else %} 
+            <h2 class="account-heading">{{ user.revendedor.nome }}</h2>
+            <h2 class="account-heading">{{ user.supervisor.nome }}</h2>
+            <h2 class="account-heading">{{ user.loja.razaosocial }}</h2>
+            <h2 class="account-heading">{{ user.franquia.razaosocial }}</h2>
+            <h5 class="text-secondary">{{ user.email }}</h5>
+            <p class="text-secondary">Supervisor: {{ request.user.revendedor.supervisor }}</p>
+        {% endif %}
+
+      <fieldset class="form-group">
+        <legend class="border-bottom col-4 mb-4">Perfil</legend>
+        {{ u_form|crispy }}
+        {{ p_form|crispy }}
+      </fieldset>
+      <div class="form-group">
+        <button id=btn class="btn btn-outline-info">Update</button>
       </div>
-    {% else %} 
-      <div class="media-body">
-        <h2 class="account-heading">{{ user.revendedor.nome }}</h2>
-        <h2 class="account-heading">{{ user.supervisor.nome }}</h2>
-        <p class="text-secondary">{{ user.email }}</p>
-        <p class="text-secondary">Supervisor: {{ request.user.revendedor.supervisor }}</p>
-      </div>
-    {% endif %}
-  </div>
-  <form id="form" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <fieldset class="form-group">
-      <legend class="border-bottom mb-4">Perfil</legend>
-      {{ u_form|crispy}}
-      {{ p_form|crispy }}
-    </fieldset>
-    <div class="form-group">
-      <button id=btn class="btn btn-outline-info">Update</button>
-    </div>
-  </form>
+    </form>
 </div>
+
+<style type="text/css">
+  .content-section {
+      background-image: url('../../static/vendas/images/umbrella-perfil.png');
+      background-position: right;
+      background-size: 700px;
+      background-repeat: no-repeat;
+  }
+  </style>
 
 {% endblock content %}

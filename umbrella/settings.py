@@ -127,6 +127,8 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 
 AUTH_USER_MODEL = 'users.User'
@@ -158,3 +160,23 @@ LOGGING = {
         'level': 'WARNING',
     },
 }
+
+classe = 'form-control mb-3 col-sm-4'
+
+CRISPY_CLASS_CONVERTERS = {
+    'textinput': classe,
+    'urlinput': classe,
+    'numberinput': classe,
+    'emailinput': classe,
+    'dateinput': classe,
+    'textarea': classe,
+    'passwordinput': classe,
+    'select': classe,
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')

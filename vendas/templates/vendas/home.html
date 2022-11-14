@@ -72,7 +72,7 @@
     
     {% elif user.type == "SUPERVISOR" %}
 
-        <h2>Bem vindo {{user.sueprvisor.razaosocial}}!</h2>
+        <h2>Bem vindo {{user.supervisor.nome}}!</h2>
         <hr>
 
         <h4>Resumo do dia</h4>
@@ -85,6 +85,8 @@
 
         <p>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</p>
         <p>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</p>
+        <br>
+        <p>Novos revendedores: {{ novos_revendedores }}</p>
 
     {% endif %}
 
