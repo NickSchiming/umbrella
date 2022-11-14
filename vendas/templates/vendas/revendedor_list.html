@@ -10,33 +10,29 @@
 		{% if not object_list %}
 		<h2><strong>Nenhum usuario encontrado</strong></h2>
 		{% else %}
-			{% for usuario in object_list %}
+			{% for revendedor in object_list %}
 				<div class="col-lg-4">
 					<div class="box-element product">
 						<h6><strong>Email:</strong></h6>
-						<h6>{{usuario.email}}</h6>
+						<h6>{{revendedor.user.email}}</h6>
 						<hr>
 						<div class="d-inline-flex w-50 flex-column">
 							<h6 ><strong>Tipo: </strong></h6>
-							<h6 >{{usuario.type}}</h6>
+							<h6 >{{revendedor.user.type}}</h6>
 						</div>
 						
-						{% if usuario.revendedor %}
-							<div class="d-inline-flex flex-column">
-								<h6><strong>Status: </strong></h6>
-								{% if usuario.revendedor.is_aprovado %}
-									<h6>Aprovado</h6>
-								{% else %}
-									<h6>Pendente</h6>
-								{% endif %}
-							</div>
-						{% endif %}
-
-
+                        <div class="d-inline-flex flex-column">
+                            <h6><strong>Status: </strong></h6>
+                            {% if revendedor.is_aprovado %}
+                                <h6>Aprovado</h6>
+                            {% else %}
+                                <h6>Pendente</h6>
+                            {% endif %}
+                        </div>
 
                         <div>
-                            <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_usuario' usuario.id %}">Atualizar</a>
-                            <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_usuario' usuario.id %}">Deletar</a>
+                            <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_usuario' revendedor.user.id %}">Atualizar</a>
+                            <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_usuario' revendedor.user.id %}">Deletar</a>
                         </div>
 					</div>
 				</div>

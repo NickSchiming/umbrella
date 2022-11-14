@@ -5,7 +5,7 @@ import sweetify
 from django.http import JsonResponse
 import json
 from .models import *
-from .utils import dadosCarrinho, formPerfil, renderForm, temNone
+from .utils import dadosCarrinho, formPerfil, infoHome, renderForm, temNone
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -57,118 +57,33 @@ def home(request):
     context = {'user': user}
 
     if hasattr(user, 'revendedor'):
-        pedidos = user.revendedor.pedido_set.filter(completo = True,
-            data__month=now.month)
+        pedidos = user.revendedor.pedido_set.filter(completo = True,data__month=now.month)
         width = str((user.revendedor.total_comprado /
-                    user.revendedor.get_proxima_meta.valor) * 100) + '%'
-
-        total = sum([pedido.get_meta_total for pedido in pedidos])
-        subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
-        qtde_pedidos_pendentes = pedidos.filter(completo=True, status=Pedido.APROV_PEND).count()
-        qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
-        qtde_pedidos_enviados = pedidos.filter(status=Pedido.ENVIADO).count()
-        qtde_pedidos_finalizados = pedidos.filter(status=Pedido.FINALIZADO).count()
-
-        context = {
-            'user': user,
-            'width': width,
-            'total': total,
-            'subtotal': subtotal,
-            'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
-            'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
-            'qtde_pedidos_enviados': qtde_pedidos_enviados,
-            'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
-
-        }
+                user.revendedor.get_proxima_meta.valor) * 100) + '%'
+        context = infoHome( user, pedidos)
+        context['width'] = width
 
     elif hasattr(user, 'franquia'):
         pedidos = user.franquia.pedido_set.filter(completo = True,
             data__month=now.month)
+        context = infoHome( user, pedidos)
 
-        print(pedidos)
-        try:
-            total = sum([pedido.get_meta_total for pedido in pedidos])
-            subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
-            qtde_pedidos_pendentes = pedidos.filter(completo=True, status=Pedido.APROV_PEND).count()
-            qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
-            qtde_pedidos_enviados = pedidos.filter(status=Pedido.ENVIADO).count()
-            qtde_pedidos_finalizados = pedidos.filter(status=Pedido.FINALIZADO).count()
-        except:
-            total = 0
-            subtotal = 0
-
-            qtde_pedidos_pendentes = 0
-            qtde_pedidos_aprovados = 0
-            qtde_pedidos_enviados = 0
-            qtde_pedidos_finalizados = 0
-
-        context = {
-            'user': user,
-            'total': total,
-            'subtotal': subtotal,
-            'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
-            'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
-            'qtde_pedidos_enviados': qtde_pedidos_enviados,
-            'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
-
-        }
     
     elif hasattr(user, 'loja'):
         pedidos = user.loja.pedido_set.filter(completo = True,
             data__month=now.month)
+        context = infoHome( user, pedidos)
 
-        total = sum([pedido.get_meta_total for pedido in pedidos])
-        subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
-        qtde_pedidos_pendentes = pedidos.filter(completo=True, status=Pedido.APROV_PEND).count()
-        qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
-        qtde_pedidos_enviados = pedidos.filter(status=Pedido.ENVIADO).count()
-        qtde_pedidos_finalizados = pedidos.filter(status=Pedido.FINALIZADO).count()
-
-        context = {
-            'user': user,
-            'total': total,
-            'subtotal': subtotal,
-            'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
-            'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
-            'qtde_pedidos_enviados': qtde_pedidos_enviados,
-            'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
-
-        }
     elif hasattr(user, 'supervisor'):
-        set = Pedido.objects.none()
+        pedidos = Pedido.objects.none()
         revendedores = user.supervisor.revendedor_set.all()
         users_rev = User.objects.filter(type='REVENDEDOR', criado__month=now.month).count()
         for revendedor in revendedores:
-            pedidos = set = set | revendedor.pedido_set.filter( completo = True,
+            pedidos = pedidos | revendedor.pedido_set.filter( completo = True,
                 data__month=now.month)
-
-        try:
-            total = sum([pedido.get_meta_total for pedido in pedidos])
-            subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
         
-            qtde_pedidos_pendentes = pedidos.filter(completo=True, status=Pedido.APROV_PEND).count()
-            qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
-            qtde_pedidos_enviados = pedidos.filter(status=Pedido.ENVIADO).count()
-            qtde_pedidos_finalizados = pedidos.filter(status=Pedido.FINALIZADO).count()
-        except:
-            total = 0
-            subtotal = 0
-
-            qtde_pedidos_pendentes = 0
-            qtde_pedidos_aprovados = 0
-            qtde_pedidos_enviados = 0
-            qtde_pedidos_finalizados = 0
-
-        context = {
-            'user': user,
-            'total': total,
-            'subtotal': subtotal,
-            'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
-            'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
-            'qtde_pedidos_enviados': qtde_pedidos_enviados,
-            'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
-            'novos_revendedores': users_rev,
-        }
+        context = infoHome( user, pedidos)
+        context['novos_revendedores'] = users_rev
 
     else:
         sweetify.info(request, 'Por favor, finalize seu cadastro!')
@@ -609,6 +524,13 @@ class pesquisaUsuarios(LoginRequiredMixin, ListView):
         )
         return object_list
 
+class pesquisaRevNovo(LoginRequiredMixin, ListView):
+    model = Revendedor
+
+    def get_queryset(self):
+        object_list = Revendedor.objects.filter(is_aprovado=False)
+        return object_list
+
 
 class pesquisaPedidos(LoginRequiredMixin, ListView):
     model = Pedido
@@ -720,6 +642,9 @@ def relatorios(request):
 
     soma = 0
     pedidos = request.user.franquia.pedido_set.filter(**{filtro: key})
+    pedidos_lojas = request.user.franquia.pedido_set.filter(revendedor=None,**{filtro: key})
+    print(pedidos_lojas)
+    pedidos_revendedores = request.user.franquia.pedido_set.filter(loja=None,**{filtro: key})
     supervisores = request.user.franquia.supervisor_set.all()
     users_rev = User.objects.filter(type='REVENDEDOR', **{filtro_user: key}).count()
     
@@ -730,10 +655,20 @@ def relatorios(request):
     qtde_pedidos_finalizados = pedidos.filter(status=Pedido.FINALIZADO).count()
 
     total = sum([pedido.get_meta_total for pedido in pedidos])
+    subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
+
+    total_lojas = sum([pedido.get_meta_total for pedido in pedidos_lojas])
+    total_revendedores = sum([pedido.get_meta_total for pedido in pedidos_revendedores])
+    subtotal_revendedores = sum([pedido.get_meta_total for pedido in pedidos_revendedores])
     
 
 
-    context = {'total': total,
+    context = { 
+                'total': total,
+                'subtotal': subtotal,
+                'total_lojas':total_lojas,
+                'total_revendedores':total_revendedores,
+                'subtotal_revendedores':subtotal_revendedores,
                 'revendedores': soma,
                 'qtde_pedidos': qtde_pedidos,
                 'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
@@ -772,9 +707,9 @@ def graficoProdutos(request):
         key = list(d.keys())[0]
         response[key] = response.get(key, 0) + d[key]
 
-    response = dict(itertools.islice(response.items(), 5))
-    
     sorted_response = dict(sorted(response.items(), key=lambda item: item[1], reverse=True))
+
+    sorted_response = dict(itertools.islice(sorted_response.items(), 10))
 
     return JsonResponse(sorted_response, safe=False)
 
@@ -803,10 +738,12 @@ def graficoRevendedores(request):
     for d in dados:
         key = list(d.keys())[0]
         response[key] = response.get(key, 0) + d[key]
-
-    response = dict(itertools.islice(response.items(), 5))
     
+    print(response)
+
     sorted_response = dict(sorted(response.items(), key=lambda item: item[1], reverse=True))
+
+    sorted_response = dict(itertools.islice(sorted_response.items(), 10))
 
     return JsonResponse(sorted_response, safe=False)
 
@@ -838,8 +775,43 @@ def graficoLojas(request):
         key = list(d.keys())[0]
         response[key] = response.get(key, 0) + d[key]
 
-    response = dict(itertools.islice(response.items(), 5))
-    
     sorted_response = dict(sorted(response.items(), key=lambda item: item[1], reverse=True))
 
+    sorted_response = dict(itertools.islice(sorted_response.items(), 10))
+    
     return JsonResponse(sorted_response, safe=False)
+
+
+def graficoTempo(request):
+    import itertools
+
+    print('foi')
+
+    now = datetime.datetime.now()
+    acao = request.session.get('acao')
+    if acao == None:
+        acao = 'month'
+    key =  getattr(now, acao)
+    filtro = 'data__' + acao
+    
+    dados = []
+    response = {}
+    
+
+    pedidos = Pedido.objects.filter(completo=True, **{filtro: key})
+
+    if acao == 'day': 
+        for pedido in pedidos:
+            dados.append({str(pedido.data.hour):1})
+    if acao == 'month': 
+        for pedido in pedidos:
+            dados.append({str(pedido.data.day):1})
+    if acao == 'year': 
+        for pedido in pedidos:
+            dados.append({str(pedido.data.month):1})
+
+    for d in dados:
+        key = list(d.keys())[0]
+        response[key] = response.get(key, 0) + d[key]
+
+    return JsonResponse(response, safe=False)

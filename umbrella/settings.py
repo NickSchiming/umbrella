@@ -161,7 +161,7 @@ LOGGING = {
     },
 }
 
-classe = 'form-control mb-3 col-sm-4'
+classe = 'form-control col-sm-4'
 
 CRISPY_CLASS_CONVERTERS = {
     'textinput': classe,

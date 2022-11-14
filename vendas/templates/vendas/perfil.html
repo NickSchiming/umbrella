@@ -18,13 +18,16 @@
             {% if user.supervisor.franquia %}
               <p class="text-secondary">Franquia: {{ user.supervisor.franquia }}</p>
             {% endif %}
+            {% if user.loja.franquia %}
+              <p class="text-secondary">Franquia: {{ user.loja.franquia }}</p>
+            {% endif %}
           </div>
         {% else %} 
-            <h2 class="account-heading">{{ user.revendedor.nome }}</h2>
-            <h2 class="account-heading">{{ user.supervisor.nome }}</h2>
-            <h2 class="account-heading">{{ user.loja.razaosocial }}</h2>
-            <h2 class="account-heading">{{ user.franquia.razaosocial }}</h2>
-            <h5 class="text-secondary">{{ user.email }}</h5>
+            <h2 class="account-heading">{{ request.user.revendedor.nome }}</h2>
+            <h2 class="account-heading">{{ request.user.supervisor.nome }}</h2>
+            <h2 class="account-heading">{{ request.user.loja.razaosocial }}</h2>
+            <h2 class="account-heading">{{ request.user.franquia.razaosocial }}</h2>
+            <h5 class="text-secondary">{{ request.user.email }}</h5>
             <p class="text-secondary">Supervisor: {{ request.user.revendedor.supervisor }}</p>
         {% endif %}
 

@@ -1,11 +1,13 @@
 {% extends 'vendas/base.html' %}
 {% load static %}
 {% block content %}
-
+	
 	<form class="form-inline" action="{% url 'pesquisa_usuarios' %}" method="get">
 		<input class="form-control mr-sm-2" name="q" type="search" placeholder="Pesquisar" aria-label="Pesquisar">
 		<button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Pesquisar</button>
-  	</form>
+		<a class="btn btn-success ml-auto mr-0" href="{% url 'pesquisa_rev_novo' %}">Revendedores com cadastro pendente</a>
+	</form>
+	
 	<div class="row">
 		{% if not usuarios %}
 		<h2><strong>Nenhum pedido encontrado</strong></h2>
@@ -16,8 +18,23 @@
 						<h6><strong>Email:</strong></h6>
 						<h6>{{usuario.email}}</h6>
 						<hr>
-						<h6><strong>Tipo:</strong></h6>
-						<h6>{{usuario.type}}</h6>
+						<div class="d-inline-flex w-50 flex-column">
+							<h6 ><strong>Tipo: </strong></h6>
+							<h6 >{{usuario.type}}</h6>
+						</div>
+						
+						{% if usuario.revendedor %}
+							<div class="d-inline-flex flex-column">
+								<h6><strong>Status: </strong></h6>
+								{% if usuario.revendedor.is_aprovado %}
+									<h6>Aprovado</h6>
+								{% else %}
+									<h6>Pendente</h6>
+								{% endif %}
+							</div>
+						{% endif %}
+
+						
 
                         <div>
                             <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_usuario' usuario.id %}">Atualizar</a>

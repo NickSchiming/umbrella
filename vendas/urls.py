@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from .views import (
     pesquisaProdutos,
+    pesquisaRevNovo,
     pesquisaUsuarios,
     pesquisaPedidos,
 )
@@ -41,8 +42,10 @@ urlpatterns = [
     path('deletar_produto/<int:pk>/',
          views.deletarProduto, name='deletar_produto'),
 
-    path('pesquisa_usuarios/', pesquisaUsuarios.as_view(),
+     path('pesquisa_usuarios/', pesquisaUsuarios.as_view(),
          name='pesquisa_usuarios'),
+     path('pesquisa_rev_novo/', pesquisaRevNovo.as_view(),
+         name='pesquisa_rev_novo'),
     path('pesquisa_pedidos/', pesquisaPedidos.as_view(), name='pesquisa_pedidos'),
     path('pesquisa_produtos/', pesquisaProdutos.as_view(),
          name='pesquisa_produtos'),
@@ -58,5 +61,6 @@ urlpatterns = [
     path('grafico_produtos/', views.graficoProdutos, name='grafico_produtos'),
     path('grafico_revendedores/', views.graficoRevendedores, name='grafico_revendedores'),
     path('grafico_lojas/', views.graficoLojas, name='grafico_lojas'),
+    path('grafico_tempo/', views.graficoTempo, name='grafico_tempo'),
 
 ]

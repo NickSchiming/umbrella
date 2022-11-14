@@ -11,11 +11,14 @@
             <button class="btn btn-secondary" data-action="year">ano</button>
         </div>
 
-        <!-- <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'grafico_produtos' %}">Relatoio de produtos</a> -->
-
-
         <hr>
-        <h5>Total vendido: R${{ total|floatformat:2 }}</h5>
+        <h5>Total vendido: R${{subtotal|floatformat:2}}</h5>
+        <h5>Total vendido com desconto: R${{total|floatformat:2}}</h5>
+        <h5>Total vendido por lojas: R${{total_lojas|floatformat:2}}</h5>
+        <h5>Total vendido por revendedores: R${{subtotal_revendedores|floatformat:2}}</h5>
+        <h5>Total vendido com desconto por revendedores: R${{total_revendedores|floatformat:2}}</h5>
+        
+
         <br>
         <h5>Quantidade de pedidos: {{ qtde_pedidos }}</h5>
         <h5>Quantidade de pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
@@ -31,9 +34,12 @@
             <button class="btn btn-info" data-url="/grafico_revendedores/">Revendedores que mais venderam</button>
             <button class="btn btn-info" data-url="/grafico_lojas/">Lojas que mais venderam</button>
         </div>
+        <button class="btn btn-info" data-url="/grafico_tempo/" >Estatísticas de vendas por tempo</button>
+        
 
         <br><br>
         <div id="grafico"></div>
+
     </div>
 
 
@@ -51,38 +57,37 @@
             })
         }
 
-        for (i = 0; i < updateBtns.length; i++) {
+        for (i = 0; i < graficoBtns.length; i++) {
             graficoBtns[i].addEventListener('click', function () {
                 var url = this.dataset.url
-                chamaDadosGrafico(url)
+                chamaDadosGrafico(url) 
                 
             })
         }
 
         function carregaDados(action) {
-        var urlRelatorio = '/atualizar_relatorio/'
+            var urlRelatorio = '/atualizar_relatorio/'
 
-        fetch(urlRelatorio, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken,
-            },
-            body: JSON.stringify({ 'action': action, })
-        })
-            .then((response) => {
-                return response.json();
+            fetch(urlRelatorio, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify({ 'action': action, })
             })
-            .then((dados) => {
-                location.reload()
-            });
+                .then((response) => {
+                    return response.json();
+                })
+                .then((dados) => {
+                    location.reload()
+                });
         }
 
 
         
 
         function chamaDadosGrafico(url){
-            
             $.ajax({
                 method:'GET',
                 url:url,
@@ -114,6 +119,9 @@
             }
             else if (url == "/grafico_lojas/"){
                 texto = "Lojas que mais venderam";
+            }
+            else if (url == "/grafico_tempo/"){
+                texto = "Vendas por tempo";
             }
             var chartData = {
                 "type":"bar",

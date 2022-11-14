@@ -142,13 +142,23 @@ def salvaForm(request, user, p_form, u_form):
             sweetify.success(request, 'Seus dados foram atualizados')
 
     if request.user.type == 'SUPERVISOR' and user.type == 'REVENDEDOR':
-        user.revendedor.supervisor = request.user.supervisor
-        user.revendedor.save()
+        try:
+            user.revendedor.supervisor = request.user.supervisor
+            user.revendedor.save()
+        except:
+            pass
     
     if request.user.type == 'FRANQUIA' and user.type == 'SUPERVISOR':
         try:
             user.supervisor.franquia = request.user.franquia
             user.supervisor.save()
+        except:
+            pass
+    
+    if request.user.type == 'FRANQUIA' and user.type == 'LOJA':
+        try:
+            user.loja.franquia = request.user.franquia
+            user.loja.save()
         except:
             pass
 
@@ -228,27 +238,31 @@ def formPerfil(request, tipo):
     return context
     
 
-# def infoHome(request):
-#     pedidos = user.revendedor.pedido_set.filter(completo = True,
-#             data__month=now.month)
-#     width = str((user.revendedor.total_comprado /
-#                 user.revendedor.get_proxima_meta.valor) * 100) + '%'
+def infoHome(user, pedidos):
 
-#     total = sum([pedido.get_meta_total for pedido in pedidos])
-#     subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
-#     qtde_pedidos_pendentes = pedidos.filter(completo=True, status=Pedido.APROV_PEND).count()
-#     qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
-#     qtde_pedidos_enviados = pedidos.filter(status=Pedido.ENVIADO).count()
-#     qtde_pedidos_finalizados = pedidos.filter(status=Pedido.FINALIZADO).count()
+    try:
+        total = sum([pedido.get_meta_total for pedido in pedidos])
+        subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
+        qtde_pedidos_pendentes = pedidos.filter(completo=True, status=Pedido.APROV_PEND).count()
+        qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
+        qtde_pedidos_enviados = pedidos.filter(status=Pedido.ENVIADO).count()
+        qtde_pedidos_finalizados = pedidos.filter(status=Pedido.FINALIZADO).count()
+    except:
+        total = 0
+        subtotal = 0
 
-#     context = {
-#         'user': user,
-#         'width': width,
-#         'total': total,
-#         'subtotal': subtotal,
-#         'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
-#         'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
-#         'qtde_pedidos_enviados': qtde_pedidos_enviados,
-#         'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
+        qtde_pedidos_pendentes = 0
+        qtde_pedidos_aprovados = 0
+        qtde_pedidos_enviados = 0
+        qtde_pedidos_finalizados = 0
 
-#     }
+    context = {
+        'user': user,
+        'total': total,
+        'subtotal': subtotal,
+        'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
+        'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
+        'qtde_pedidos_enviados': qtde_pedidos_enviados,
+        'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
+    }
+    return context
