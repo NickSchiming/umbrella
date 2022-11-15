@@ -70,7 +70,7 @@
 		<span class="navbar-toggler-icon"></span>
 		</button>
 		<div class="nav-container">
-		{% if request.user.type == 'REVENDEDOR' or request.user.type == 'LOJA'%}
+		{% if request.user.tipo == 'revendedor' or request.user.tipo == 'loja'%}
 			<div class="collapse navbar-collapse" id="navbarNavDropdown">
 				<ul class="navbar-nav mr-auto">
 					<li class="nav-item active">
@@ -87,7 +87,7 @@
 					</li>
 				</ul>
 			</div>
-		{% elif request.user.type == 'FRANQUIA' %}
+		{% elif request.user.tipo == 'franquia' %}
 			<div class="collapse navbar-collapse" id="navbarNavDropdown">
 				<ul class="navbar-nav mr-auto">
 					<li class="nav-item active">
@@ -116,7 +116,7 @@
 					</li>
 				</ul>
 			</div>
-		{% elif request.user.type == 'SUPERVISOR' %}
+		{% elif request.user.tipo == 'supervisor' %}
 			<div class="collapse navbar-collapse" id="navbarNavDropdown">
 				<ul class="navbar-nav mr-auto">
 					<li class="nav-item active">

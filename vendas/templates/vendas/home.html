@@ -1,7 +1,7 @@
 {% extends "vendas/base.html" %}
 {% block content %}
 <div class="content-section">
-    {% if user.type == "REVENDEDOR" %}
+    {% if user.tipo == "revendedor" %}
         <h2>Bem vindo {{user.revendedor.nome}}!</h2>
         <hr>
 
@@ -35,9 +35,9 @@
         <p>Pedidos enviados: {{ qtde_pedidos_enviados }}</p>
         <p>Pedidos completos: {{ qtde_pedidos_finalizados }}</p>
 
-    {% elif user.type == "FRANQUIA" %}
+    {% elif user.tipo == "franquia" %}
 
-        <h2>Bem vindo {{user.franquia.razaosocial}}!</h2>
+        <h2>Bem vindo {{user.franquia.nome_fantasia}}!</h2>
         <hr>
 
         <h4>Resumo do dia</h4>
@@ -53,9 +53,9 @@
         <p>Pedidos enviados: {{ qtde_pedidos_enviados }}</p>
         <p>Pedidos completos: {{ qtde_pedidos_finalizados }}</p>
 
-    {% elif user.type == "LOJA" %}
+    {% elif user.tipo == "loja" %}
 
-        <h2>Bem vindo {{user.loja.razaosocial}}!</h2>
+        <h2>Bem vindo {{user.loja.nome_fantasia}}!</h2>
         <hr>
 
         <h4>Resumo do mês</h4>
@@ -70,7 +70,7 @@
         <p>Pedidos enviados: {{ qtde_pedidos_enviados }}</p>
         <p>Pedidos completos: {{ qtde_pedidos_finalizados }}</p>
     
-    {% elif user.type == "SUPERVISOR" %}
+    {% elif user.tipo == "supervisor" %}
 
         <h2>Bem vindo {{user.supervisor.nome}}!</h2>
         <hr>

@@ -9,14 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 def dadosCarrinho(request, revendedorPed):
-    if request.user.type == "REVENDEDOR":
+    if request.user.tipo == User.REVENDEDOR:
         revendedor = request.user.revendedor
         pedido, criado = Pedido.objects.get_or_create(
             revendedor=revendedor, completo=False)
         itens = pedido.itempedido_set.all()
         itensCarrinho = pedido.get_carrinho_itens
         return {'itensCarrinho': itensCarrinho, 'pedido': pedido, 'itens': itens}
-    elif request.user.type == "LOJA":
+    elif request.user.tipo == User.LOJA:
         loja = request.user.loja
         pedido, criado = Pedido.objects.get_or_create(
             loja=loja, completo=False)
@@ -40,7 +40,7 @@ def renderForm(request, user):
 
     reload = False
 
-    if user.type == 'REVENDEDOR':
+    if user.tipo == User.REVENDEDOR:
         if request.method == 'POST':
             u_form = UserUpdateForm(request.POST, instance=user)
             try:
@@ -58,7 +58,7 @@ def renderForm(request, user):
             except:
                 p_form = PerfilRevendedor()
 
-    elif user.type == 'FRANQUIA':
+    elif user.tipo == User.FRANQUIA:
         if request.method == 'POST':
             u_form = UserUpdateForm(request.POST, instance=user)
             try:
@@ -76,7 +76,7 @@ def renderForm(request, user):
             except:
                 p_form = PerfilFranquia()
 
-    elif user.type == 'LOJA':
+    elif user.tipo == User.LOJA:
         if request.method == 'POST':
             u_form = UserUpdateForm(request.POST, instance=user)
             try:
@@ -94,7 +94,7 @@ def renderForm(request, user):
             except:
                 p_form = PerfilLoja()
 
-    elif user.type == 'SUPERVISOR':
+    elif user.tipo == User.SUPERVISOR:
         if request.method == 'POST':
             u_form = UserUpdateForm(request.POST, instance=user)
             try:
@@ -141,21 +141,21 @@ def salvaForm(request, user, p_form, u_form):
             u_form.save()
             sweetify.success(request, 'Seus dados foram atualizados')
 
-    if request.user.type == 'SUPERVISOR' and user.type == 'REVENDEDOR':
+    if request.user.tipo == User.SUPERVISOR and user.tipo == User.REVENDEDOR:
         try:
             user.revendedor.supervisor = request.user.supervisor
             user.revendedor.save()
         except:
             pass
-    
-    if request.user.type == 'FRANQUIA' and user.type == 'SUPERVISOR':
+
+    if request.user.tipo == User.FRANQUIA and user.tipo == User.SUPERVISOR:
         try:
             user.supervisor.franquia = request.user.franquia
             user.supervisor.save()
         except:
             pass
-    
-    if request.user.type == 'FRANQUIA' and user.type == 'LOJA':
+
+    if request.user.tipo == User.FRANQUIA and user.tipo == 'LOJA':
         try:
             user.loja.franquia = request.user.franquia
             user.loja.save()
@@ -174,79 +174,17 @@ def temNone(p_form):
     return x
 
 
-def formPerfil(request, tipo):
-    ldict = {'request': request}
-    
-    if request.method == 'POST':
-        u_form = UserUpdateForm(request.POST, instance=request.user)
-        if not request.user.type == 'FRANQUIA':
-            u_form.fields.pop('type')
-        try:
-            exec('p_form = Perfil' + tipo + '(request.POST, instance=request.user.' + tipo.lower() + ')',globals(),ldict)
-        except:
-            exec('p_form = Perfil' + tipo + '(request.POST)',globals(),ldict)
-        
-        p_form = ldict['p_form']
-
-        if tipo == 'Revendedor':
-            if not request.user.type == 'FRANQUIA' or not request.user.type == 'SUPERVISOR':
-                p_form.fields.pop('is_aprovado')
-                p_form.fields.pop('meta')
-
-        if u_form.is_valid() and p_form.is_valid():
-            if temNone(p_form):
-                sweetify.warning(
-                    request, 'Preencha todos os campos para continuar')
-            else:
-                u_form.save()
-                form = p_form.save(commit=False)
-                form.user = request.user
-                try:
-                    if form.meta == None:
-                        form.meta = Meta.objects.get(nivel=Meta.INICIANTE)
-                except:
-                    pass
-                p_form.save()
-                sweetify.success(request, 'Seus dados foram atualizados')
-        else:
-            sweetify.error(
-                request, 'Houve um erro na atualização dos dados')
-
-    else:
-
-
-        u_form = UserUpdateForm(instance=request.user)
-        if not request.user.type == 'FRANQUIA':
-            u_form.fields.pop('type')
-        try:
-            exec('p_form = Perfil' + tipo + '(instance=request.user.' + tipo.lower() + ')',globals(),ldict)
-        except:
-            exec('p_form = Perfil' + tipo + '()',globals(),ldict)
-            
-        p_form = ldict['p_form']
-
-        if tipo == 'Revendedor':
-            if not request.user.type == 'FRANQUIA' or not request.user.type == 'SUPERVISOR':
-                p_form.fields.pop('is_aprovado')
-                p_form.fields.pop('meta')
-
-    context = {
-        'u_form': u_form,
-        'p_form': p_form
-    }
-
-    return context
-    
-
 def infoHome(user, pedidos):
 
     try:
         total = sum([pedido.get_meta_total for pedido in pedidos])
         subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
-        qtde_pedidos_pendentes = pedidos.filter(completo=True, status=Pedido.APROV_PEND).count()
+        qtde_pedidos_pendentes = pedidos.filter(
+            completo=True, status=Pedido.APROV_PEND).count()
         qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
         qtde_pedidos_enviados = pedidos.filter(status=Pedido.ENVIADO).count()
-        qtde_pedidos_finalizados = pedidos.filter(status=Pedido.FINALIZADO).count()
+        qtde_pedidos_finalizados = pedidos.filter(
+            status=Pedido.FINALIZADO).count()
     except:
         total = 0
         subtotal = 0
@@ -266,3 +204,41 @@ def infoHome(user, pedidos):
         'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
     }
     return context
+
+
+def perfil_u_form_post(request):
+    u_form = UserUpdateForm(request.POST, instance=request.user)
+    if not request.user.tipo == User.FRANQUIA:
+        u_form.fields.pop('tipo')
+    
+    return u_form
+
+def perfil_u_form_get(request):
+    u_form = UserUpdateForm(instance=request.user)
+    if not request.user.tipo == User.FRANQUIA:
+        u_form.fields.pop('tipo')
+    return u_form
+
+def tira_field_perfil_rev(request, tipo, p_form):
+    if tipo == User.REVENDEDOR:
+            if not request.user.tipo == User.FRANQUIA or not request.user.tipo == User.SUPERVISOR:
+                p_form.fields.pop('is_aprovado')
+                p_form.fields.pop('meta')
+
+def salva_p_form(request, tipo, u_form, p_form):
+    if tipo == User.REVENDEDOR:
+        if not tipo == User.FRANQUIA or not tipo == User.SUPERVISOR:
+            p_form.fields.pop('is_aprovado')
+            p_form.fields.pop('meta')
+
+    if u_form.is_valid() and p_form.is_valid():
+        if temNone(p_form):
+            sweetify.warning(request, 'Preencha todos os campos para continuar')
+        else:
+            u_form.save()
+            form = p_form.save(commit=False)
+            form.user = request.user
+            p_form.save()
+            sweetify.success(request, 'Seus dados foram atualizados')
+    else:
+        sweetify.error(request, 'Houve um erro na atualização dos dados')

@@ -5,46 +5,35 @@ import sweetify
 from django.http import JsonResponse
 import json
 from .models import *
-from .utils import dadosCarrinho, formPerfil, infoHome, renderForm, temNone
+from .utils import dadosCarrinho, infoHome, perfil_u_form_get, perfil_u_form_post, renderForm, salva_p_form, temNone, tira_field_perfil_rev
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from django.views.generic import (
-    ListView,
-    DetailView,
-    CreateView,
-    UpdateView,
-    DeleteView
-)
-
+from django.views.generic import ListView
 
 from vendas.models import Pedido
 from .forms import *
-
-import logging
-
-logger = logging.getLogger(__name__)
 
 global revendedorPed
 revendedorPed = None
 
 
 def supervisor_check(user):
-    if user.type == 'SUPERVISOR':
+    if user.tipo == User.SUPERVISOR:
         return True
     else:
         return False
 
 
 def supervisor_franquia_check(user):
-    if user.type == 'SUPERVISOR' or user.type == 'FRANQUIA':
+    if user.tipo == User.SUPERVISOR or user.tipo == User.FRANQUIA:
         return True
     else:
         return False
 
 
 def franquia_check(user):
-    if user.type == 'FRANQUIA':
+    if user.tipo == User.FRANQUIA:
         return True
     else:
         return False
@@ -57,32 +46,33 @@ def home(request):
     context = {'user': user}
 
     if hasattr(user, 'revendedor'):
-        pedidos = user.revendedor.pedido_set.filter(completo = True,data__month=now.month)
+        pedidos = user.revendedor.pedido_set.filter(
+            completo=True, data__month=now.month)
         width = str((user.revendedor.total_comprado /
-                user.revendedor.get_proxima_meta.valor) * 100) + '%'
-        context = infoHome( user, pedidos)
+                     user.revendedor.get_proxima_meta.valor) * 100) + '%'
+        context = infoHome(user, pedidos)
         context['width'] = width
 
     elif hasattr(user, 'franquia'):
-        pedidos = user.franquia.pedido_set.filter(completo = True,
-            data__month=now.month)
-        context = infoHome( user, pedidos)
+        pedidos = user.franquia.pedido_set.filter(completo=True,
+                                                  data__month=now.month)
+        context = infoHome(user, pedidos)
 
-    
     elif hasattr(user, 'loja'):
-        pedidos = user.loja.pedido_set.filter(completo = True,
-            data__month=now.month)
-        context = infoHome( user, pedidos)
+        pedidos = user.loja.pedido_set.filter(completo=True,
+                                              data__month=now.month)
+        context = infoHome(user, pedidos)
 
     elif hasattr(user, 'supervisor'):
         pedidos = Pedido.objects.none()
         revendedores = user.supervisor.revendedor_set.all()
-        users_rev = User.objects.filter(type='REVENDEDOR', criado__month=now.month).count()
+        users_rev = User.objects.filter(
+            tipo=User.REVENDEDOR, criado__month=now.month).count()
         for revendedor in revendedores:
-            pedidos = pedidos | revendedor.pedido_set.filter( completo = True,
-                data__month=now.month)
-        
-        context = infoHome( user, pedidos)
+            pedidos = pedidos | revendedor.pedido_set.filter(completo=True,
+                                                             data__month=now.month)
+
+        context = infoHome(user, pedidos)
         context['novos_revendedores'] = users_rev
 
     else:
@@ -94,18 +84,92 @@ def home(request):
 
 @login_required
 def perfil(request):
-    tipo = request.user.type
-    if tipo == 'REVENDEDOR':
-         context = formPerfil(request, tipo.capitalize())
+    tipo = request.user.tipo
+    if tipo == User.REVENDEDOR:
+        if request.method == 'POST':
+            u_form = perfil_u_form_post(request)
+            try:
+                p_form = PerfilRevendedor(request.POST, instance=request.user.revendedor)
+            except:
+                p_form = PerfilRevendedor(request.POST)
 
-    elif tipo == 'LOJA':
-        context = formPerfil(request, tipo.capitalize())
-        
-    elif tipo == 'SUPERVISOR':
-        context = formPerfil(request, tipo.capitalize())
+            salva_p_form(request, tipo, u_form, p_form)
 
-    elif tipo == 'FRANQUIA':
-        context = formPerfil(request, tipo.capitalize())
+        else:
+            u_form = perfil_u_form_get(request)
+            try:
+                p_form = PerfilRevendedor(instance=request.user.revendedor)
+                
+            except:
+                p_form = PerfilRevendedor()
+
+            tira_field_perfil_rev(request, tipo, p_form)
+
+
+    elif tipo == User.LOJA:
+        if request.method == 'POST':
+            u_form = perfil_u_form_post(request)
+            try:
+                p_form = PerfilLoja(request.POST, instance=request.user.loja)
+            except:
+                p_form = PerfilLoja(request.POST)
+
+            salva_p_form(request, tipo, u_form, p_form)
+
+        else:
+
+            u_form = perfil_u_form_get(request)
+            try:
+                p_form = PerfilLoja(instance=request.user.loja)
+            except:
+                p_form = PerfilLoja()
+
+            tira_field_perfil_rev(request, tipo, p_form)
+
+    elif tipo == User.SUPERVISOR:
+        if request.method == 'POST':
+            u_form = perfil_u_form_post(request)
+            try:
+                p_form = PerfilSupervisor(request.POST, instance=request.user.supervisor)
+            except:
+                p_form = PerfilSupervisor(request.POST)
+
+            salva_p_form(request, tipo, u_form, p_form)
+
+        else:
+
+            u_form = perfil_u_form_get(request)
+            try:
+                p_form = PerfilSupervisor(instance=request.user.supervisor)
+            except:
+                p_form = PerfilSupervisor()
+
+            tira_field_perfil_rev(request, tipo, p_form)
+
+    elif tipo == User.FRANQUIA:
+        if request.method == 'POST':
+            u_form = perfil_u_form_post(request)
+            try:
+                p_form = PerfilFranquia(request.POST, instance=request.user.franquia)
+            except:
+                p_form = PerfilFranquia(request.POST)
+
+            salva_p_form(request, tipo, u_form, p_form)
+
+        else:
+
+            u_form = perfil_u_form_get(request)
+            try:
+                p_form = PerfilFranquia(instance=request.user.franquia)
+            except:
+                p_form = PerfilFranquia()
+
+            tira_field_perfil_rev(request, tipo, p_form)
+
+    context = {
+        'u_form': u_form,
+        'p_form': p_form
+    }
 
     return render(request, 'vendas/perfil.html', context)
 
@@ -113,14 +177,14 @@ def perfil(request):
 @login_required
 def produtos(request):
     print(revendedorPed)
-    if request.user.type == "REVENDEDOR":
+    if request.user.tipo == User.REVENDEDOR:
         try:
             request.user.revendedor
         except:
             sweetify.error(
                 request, 'Porfavor cadastre seus dados antes de fazer um pedido')
             return redirect('perfil')
-    elif request.user.type == "LOJA":
+    elif request.user.tipo == User.LOJA:
         try:
             request.user.loja
         except:
@@ -141,7 +205,7 @@ def produtos(request):
     produtos = Produto.objects.all()
     context = {'produtos': produtos, 'itensCarrinho': itensCarrinho}
 
-    if request.user.type == "REVENDEDOR":
+    if request.user.tipo == User.REVENDEDOR:
         if request.user.revendedor.is_aprovado:
             return render(request, 'vendas/produtos.html', context)
         else:
@@ -182,11 +246,11 @@ def atualizarItem(request):
     data = json.loads(request.body)
     idProduto = data['idProduto']
     action = data['action']
-    if request.user.type == 'REVENDEDOR':
+    if request.user.tipo == User.REVENDEDOR:
         revendedor = request.user.revendedor
         pedido, created = Pedido.objects.get_or_create(
             revendedor=revendedor, completo=False)
-    elif request.user.type == 'LOJA':
+    elif request.user.tipo == User.LOJA:
         loja = request.user.loja
         pedido, created = Pedido.objects.get_or_create(
             loja=loja, completo=False)
@@ -227,11 +291,11 @@ def processarPedido(request):
     global revendedorPed
 
     if request.user.is_authenticated:
-        if request.user.type == 'REVENDEDOR':
+        if request.user.tipo == User.REVENDEDOR:
             revendedor = request.user.revendedor
             pedido, criado = Pedido.objects.get_or_create(
                 revendedor=revendedor, completo=False)
-        elif request.user.type == 'LOJA':
+        elif request.user.tipo == User.LOJA:
             loja = request.user.loja
             pedido, criado = Pedido.objects.get_or_create(
                 loja=loja, completo=False)
@@ -251,7 +315,7 @@ def processarPedido(request):
     pgto = dados['form']['formaPgto']
 
     if total == pedido.get_meta_total:
-        if request.user.type == 'REVENDEDOR':
+        if request.user.tipo == User.REVENDEDOR:
             pedido.status = Pedido.APROV_PEND
         else:
             pedido.status = Pedido.APROVADO
@@ -280,7 +344,7 @@ def processarPedido(request):
 
 @login_required
 def mostrarPedidos(request):
-    if request.user.type == 'REVENDEDOR':
+    if request.user.tipo == User.REVENDEDOR:
         try:
             request.user.revendedor
         except:
@@ -289,7 +353,7 @@ def mostrarPedidos(request):
             return redirect('perfil')
         pedidos = Pedido.objects.filter(revendedor=request.user.revendedor).exclude(
             completo=False).order_by('-data')
-    elif request.user.type == 'LOJA':
+    elif request.user.tipo == User.LOJA:
         try:
             request.user.loja
         except:
@@ -312,7 +376,7 @@ def detalhePedido(request, pk):
 
 @login_required
 def atualizarPedido(request, pk):
-    if request.user.type == "REVENDEDOR":
+    if request.user.tipo == User.REVENDEDOR:
         pedido = Pedido.objects.get(id=pk)
         try:
             pedido_ex = Pedido.objects.get(
@@ -327,7 +391,7 @@ def atualizarPedido(request, pk):
         sweetify.info(
             request, 'Por favor altere o pedido a faça checkout novamente')
         return redirect('produtos')
-    elif request.user.type == "LOJA":
+    elif request.user.tipo == User.LOJA:
         pedido = Pedido.objects.get(id=pk)
         pedido_ex = Pedido.objects.get(
             loja=request.user.loja, completo=False)
@@ -341,7 +405,7 @@ def atualizarPedido(request, pk):
     else:
         global revendedorPed
         pedido = Pedido.objects.get(id=pk)
-        if request.user.type == 'FRANQUIA' or request.user.type == 'SUPERVISOR':
+        if request.user.tipo == User.FRANQUIA or request.user.tipo == User.SUPERVISOR:
             if pedido.revendedor:
                 revendedor = pedido.revendedor
                 revendedorPed = pedido.revendedor
@@ -513,16 +577,16 @@ def confirmarPedido(request, pk):
     return redirect('meus_pedidos')
 
 
-
 class pesquisaUsuarios(LoginRequiredMixin, ListView):
     model = User
 
     def get_queryset(self):
         query = self.request.GET.get("q")
         object_list = User.objects.filter(
-            Q(email__icontains=query) | Q(type__icontains=query)
+            Q(email__icontains=query) | Q(tipo__icontains=query)
         )
         return object_list
+
 
 class pesquisaRevNovo(LoginRequiredMixin, ListView):
     model = Revendedor
@@ -537,23 +601,24 @@ class pesquisaPedidos(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         query = self.request.GET.get("q")
-        if self.request.user.type == 'REVENDEDOR':
+        if self.request.user.tipo == User.REVENDEDOR:
             object_list = Pedido.objects.filter(Q(completo=True), Q(revendedor=self.request.user.revendedor),
                                                 Q(cod_pedido__icontains=query) | Q(
                                                     status__icontains=query)
                                                 | Q(metodo_de_pagamento__icontains=query)
                                                 )
-        elif self.request.user.type == 'LOJA':
+        elif self.request.user.tipo == User.LOJA:
             object_list = Pedido.objects.filter(Q(completo=True), Q(loja=self.request.user.loja),
                                                 Q(cod_pedido__icontains=query) | Q(
                                                     status__icontains=query)
                                                 | Q(metodo_de_pagamento__icontains=query)
                                                 )
         else:
-            object_list = Pedido.objects.filter(Q(completo=True), 
-                Q(cod_pedido__icontains=query) | Q(status__icontains=query)
-                | Q(metodo_de_pagamento__icontains=query)
-            )
+            object_list = Pedido.objects.filter(Q(completo=True),
+                                                Q(cod_pedido__icontains=query) | Q(
+                                                    status__icontains=query)
+                                                | Q(metodo_de_pagamento__icontains=query)
+                                                )
         return object_list
 
 
@@ -636,18 +701,20 @@ def relatorios(request):
     acao = request.session.get('acao')
     if acao == None:
         acao = 'month'
-    key =  getattr(now, acao)
+    key = getattr(now, acao)
     filtro = 'data__' + acao
     filtro_user = 'criado__' + acao
 
     soma = 0
     pedidos = request.user.franquia.pedido_set.filter(**{filtro: key})
-    pedidos_lojas = request.user.franquia.pedido_set.filter(revendedor=None,**{filtro: key})
+    pedidos_lojas = request.user.franquia.pedido_set.filter(
+        revendedor=None, **{filtro: key})
     print(pedidos_lojas)
-    pedidos_revendedores = request.user.franquia.pedido_set.filter(loja=None,**{filtro: key})
+    pedidos_revendedores = request.user.franquia.pedido_set.filter(
+        loja=None, **{filtro: key})
     supervisores = request.user.franquia.supervisor_set.all()
-    users_rev = User.objects.filter(type='REVENDEDOR', **{filtro_user: key}).count()
-    
+    users_rev = User.objects.filter(
+        tipo=User.REVENDEDOR, **{filtro_user: key}).count()
 
     qtde_pedidos = pedidos.filter().count()
     qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
@@ -658,26 +725,27 @@ def relatorios(request):
     subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
 
     total_lojas = sum([pedido.get_meta_total for pedido in pedidos_lojas])
-    total_revendedores = sum([pedido.get_meta_total for pedido in pedidos_revendedores])
-    subtotal_revendedores = sum([pedido.get_meta_total for pedido in pedidos_revendedores])
-    
+    total_revendedores = sum(
+        [pedido.get_meta_total for pedido in pedidos_revendedores])
+    subtotal_revendedores = sum(
+        [pedido.get_meta_total for pedido in pedidos_revendedores])
 
-
-    context = { 
-                'total': total,
-                'subtotal': subtotal,
-                'total_lojas':total_lojas,
-                'total_revendedores':total_revendedores,
-                'subtotal_revendedores':subtotal_revendedores,
-                'revendedores': soma,
-                'qtde_pedidos': qtde_pedidos,
-                'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
-                'qtde_pedidos_enviados': qtde_pedidos_enviados,
-                'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
-                'novos_revendedores': users_rev, 
-               }
+    context = {
+        'total': total,
+        'subtotal': subtotal,
+        'total_lojas': total_lojas,
+        'total_revendedores': total_revendedores,
+        'subtotal_revendedores': subtotal_revendedores,
+        'revendedores': soma,
+        'qtde_pedidos': qtde_pedidos,
+        'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
+        'qtde_pedidos_enviados': qtde_pedidos_enviados,
+        'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
+        'novos_revendedores': users_rev,
+    }
 
     return render(request, 'vendas/relatorios.html', context)
+
 
 def graficoProdutos(request):
     import itertools
@@ -686,32 +754,33 @@ def graficoProdutos(request):
     acao = request.session.get('acao')
     if acao == None:
         acao = 'month'
-    key =  getattr(now, acao)
+    key = getattr(now, acao)
     filtro = 'data__' + acao
-    
+
     dados = []
     item = []
     response = {}
-    
 
     pedidos = Pedido.objects.filter(completo=True, **{filtro: key})
     for pedido in pedidos:
         set = pedido.itempedido_set.all()
         for i in set:
             item.append(i)
-    
+
     for j in item:
-        dados.append({j.produto.nome:j.quantidade})
+        dados.append({j.produto.nome: j.quantidade})
 
     for d in dados:
         key = list(d.keys())[0]
         response[key] = response.get(key, 0) + d[key]
 
-    sorted_response = dict(sorted(response.items(), key=lambda item: item[1], reverse=True))
+    sorted_response = dict(
+        sorted(response.items(), key=lambda item: item[1], reverse=True))
 
     sorted_response = dict(itertools.islice(sorted_response.items(), 10))
 
     return JsonResponse(sorted_response, safe=False)
+
 
 def graficoRevendedores(request):
     import itertools
@@ -720,32 +789,34 @@ def graficoRevendedores(request):
     acao = request.session.get('acao')
     if acao == None:
         acao = 'month'
-    key =  getattr(now, acao)
+    key = getattr(now, acao)
     filtro = 'criado__' + acao
-    
+
     dados = []
     response = {}
-    
 
-    users_rev = User.objects.filter(type='REVENDEDOR', **{filtro: key})
+    users_rev = User.objects.filter(tipo=User.REVENDEDOR, **{filtro: key})
     for user in users_rev:
         try:
             user.revendedor
-            dados.append({user.revendedor.nome:user.revendedor.total_comprado})
+            dados.append(
+                {user.revendedor.nome: user.revendedor.total_comprado})
         except:
             pass
 
     for d in dados:
         key = list(d.keys())[0]
         response[key] = response.get(key, 0) + d[key]
-    
+
     print(response)
 
-    sorted_response = dict(sorted(response.items(), key=lambda item: item[1], reverse=True))
+    sorted_response = dict(
+        sorted(response.items(), key=lambda item: item[1], reverse=True))
 
     sorted_response = dict(itertools.islice(sorted_response.items(), 10))
 
     return JsonResponse(sorted_response, safe=False)
+
 
 def graficoLojas(request):
     import itertools
@@ -754,61 +825,57 @@ def graficoLojas(request):
     acao = request.session.get('acao')
     if acao == None:
         acao = 'month'
-    key =  getattr(now, acao)
+    key = getattr(now, acao)
     filtro = 'criado__' + acao
-    
+
     dados = []
     response = {}
-    
 
-    users_loja = User.objects.filter(type='LOJA', **{filtro: key})
+    users_loja = User.objects.filter(tipo=User.LOJA, **{filtro: key})
     for user in users_loja:
         try:
             user.loja
-            dados.append({user.loja.razaosocial:user.loja.total_comprado})
+            dados.append({user.loja.razaosocial: user.loja.total_comprado})
         except:
             pass
-    
+
     print(dados)
 
     for d in dados:
         key = list(d.keys())[0]
         response[key] = response.get(key, 0) + d[key]
 
-    sorted_response = dict(sorted(response.items(), key=lambda item: item[1], reverse=True))
+    sorted_response = dict(
+        sorted(response.items(), key=lambda item: item[1], reverse=True))
 
     sorted_response = dict(itertools.islice(sorted_response.items(), 10))
-    
+
     return JsonResponse(sorted_response, safe=False)
 
 
 def graficoTempo(request):
-    import itertools
-
-    print('foi')
 
     now = datetime.datetime.now()
     acao = request.session.get('acao')
     if acao == None:
         acao = 'month'
-    key =  getattr(now, acao)
+    key = getattr(now, acao)
     filtro = 'data__' + acao
-    
+
     dados = []
     response = {}
-    
 
     pedidos = Pedido.objects.filter(completo=True, **{filtro: key})
 
-    if acao == 'day': 
+    if acao == 'day':
         for pedido in pedidos:
-            dados.append({str(pedido.data.hour):1})
-    if acao == 'month': 
+            dados.append({str(pedido.data.hour): 1})
+    if acao == 'month':
         for pedido in pedidos:
-            dados.append({str(pedido.data.day):1})
-    if acao == 'year': 
+            dados.append({str(pedido.data.day): 1})
+    if acao == 'year':
         for pedido in pedidos:
-            dados.append({str(pedido.data.month):1})
+            dados.append({str(pedido.data.month): 1})
 
     for d in dados:
         key = list(d.keys())[0]

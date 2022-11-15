@@ -5,7 +5,6 @@ from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
-    # n sei o que é
     use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
@@ -65,19 +64,22 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     # lista de tipos para dar permissoes especiais
-    class Types(models.TextChoices):
-        REVENDEDOR = "REVENDEDOR", 'Revendedor'
-        LOJA = "LOJA", 'Loja'
-        SUPERVISOR = "SUPERVISOR", 'Supervisor'
-        FRANQUIA = "FRANQUIA", 'Franquia'
 
-    # tipo padrão sempre que um user é criado
-    base_type = Types.REVENDEDOR
+    REVENDEDOR = 'revendedor'
+    LOJA = 'loja'
+    SUPERVISOR = 'supervisor'
+    FRANQUIA = 'franquia'
+
+    opcoes_tipo = [
+        (REVENDEDOR, "Revendedor"),
+        (LOJA, "Loja"),
+        (SUPERVISOR, "Supervisor"),
+        (FRANQUIA, "Franquia"),
+    ]
 
     # campo que armazena o tipo
-    type = models.CharField(
-        _("tipo"), max_length=50, choices=Types.choices, default=base_type
-    , null = True, blank = True)
+    tipo = models.CharField(
+        _("tipo"), max_length=50, choices=opcoes_tipo, default=REVENDEDOR, null = True, blank = True)
 
     # associação com o criado de objetos user
     objects = UserManager()
@@ -85,16 +87,5 @@ class User(AbstractBaseUser, PermissionsMixin):
     # determina o campo usado como login
     USERNAME_FIELD = 'email'
 
-    class Meta:
-        verbose_name = "Conta"
-        verbose_name_plural = "Contas"
-
     def __str__(self):
         return self.email
-
-    # override no save para colocar o tipo padrão na cração do objeto
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.type = self.base_type
-
-        return super().save(*args, **kwargs)

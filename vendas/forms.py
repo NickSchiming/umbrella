@@ -12,38 +12,37 @@ class UserUpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['email', 'type']
+        fields = ['email', 'tipo']
 
 
 class PerfilRevendedor(forms.ModelForm):
     class Meta:
         model = Revendedor
-        fields = ['nome', 'cpf', 'telefone','cep',
-                  'endereco', 'datanasc', 'is_aprovado', 'meta']
+        exclude = ['user', 'supervisor']
 
 class PerfilFranquia(forms.ModelForm):
     class Meta:
         model = Franquia
-        fields = ['razaosocial','cnpj','endereco']
+        exclude = ['user']
 
 class PerfilLoja(forms.ModelForm):
     class Meta:
         model = Loja
-        fields = ['razaosocial','cnpj','endereco']
+        fields = '__all__'
 
 class PerfilSupervisor(forms.ModelForm):
     class Meta:
         model = Supervisor
-        fields = ['nome', 'cpf']
+        fields = '__all__'
     
 
 class FormProduto(forms.ModelForm):
     class Meta:
         model = Produto
-        fields = ['nome','codigo','qtde_estoque','preco', 'image']
+        fields = '__all__'
     
 
 class formMeta(forms.ModelForm):
     class Meta:
         model = Meta
-        fields = ['valor','desconto']
+        fields = '__all__'
