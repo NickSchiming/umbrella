@@ -9,14 +9,14 @@ MULHER = "mulher"
 OUTRO = "outro"
 
 opcoes_sexo = [
-        (HOMEM, "Homem"),
-        (MULHER, "Mulher"),
-        (OUTRO, "Outro"),
-    ]
+    (HOMEM, "Homem"),
+    (MULHER, "Mulher"),
+    (OUTRO, "Outro"),
+]
 
 
 class Franquia(models.Model):
-    #ligação com user
+    # ligação com user
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # campos de perfil
@@ -39,12 +39,13 @@ class Franquia(models.Model):
         _("numero"), max_length=5, blank=True)
     telefone = models.CharField(
         _("telefone"), max_length=30, blank=True)
-    
+
     def __str__(self):
         return self.nome_fantasia
 
+
 class Supervisor(models.Model):
-    #ligação com user
+    # ligação com user
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # campos de perfil
@@ -52,12 +53,12 @@ class Supervisor(models.Model):
     cpf = models.CharField(_("cpf"), max_length=15, unique=True, blank=True)
     telefone = models.CharField(
         _("telefone"), max_length=30, blank=True)
-    sexo = models.CharField(_("sexo"),choices=opcoes_sexo,
-                              max_length=30, blank=True)
+    sexo = models.CharField(_("sexo"), choices=opcoes_sexo,
+                            max_length=30, blank=True)
     datanasc = models.DateField(
         _("Data de nascimento"), auto_now=False, auto_now_add=False, blank=True)
 
-    #ligação com franquia
+    # ligação com franquia
     franquia = models.ForeignKey(
         Franquia, on_delete=models.SET_NULL, null=True)
 
@@ -89,7 +90,7 @@ class Meta(models.Model):
     def __str__(self):
         return self.nivel
 
-    #retorna desconto em decimal
+    # retorna desconto em decimal
     @property
     def descontocalc(self):
         return self.desconto / 100
@@ -118,8 +119,8 @@ class Revendedor(models.Model):
         _("numero"), max_length=5, blank=True)
     datanasc = models.DateField(
         _("Data de nascimento"), auto_now=False, auto_now_add=False, blank=True)
-    sexo = models.CharField(_("sexo"),choices=opcoes_sexo,
-                              max_length=30, blank=True)
+    sexo = models.CharField(_("sexo"), choices=opcoes_sexo,
+                            max_length=30, blank=True)
 
     # ligação com supervisor
     supervisor = models.ForeignKey(Supervisor, verbose_name=_(
@@ -181,15 +182,15 @@ class Loja(models.Model):
         _("numero"), max_length=5, blank=True)
     telefone = models.CharField(
         _("telefone"), max_length=30, blank=True)
-    meta = models.ForeignKey(
-        Meta, on_delete=models.SET_NULL, null=True, blank=True)
 
     def meta_diamante():
         return Meta.objects.get(nivel=Meta.DIAMANTE)
+    meta = models.ForeignKey(
+        Meta, on_delete=models.SET_NULL, null=True, blank=True, default=meta_diamante)
 
     # ligação com franquia
     franquia = models.ForeignKey(Franquia, verbose_name=_(
-        "franquia"), on_delete=models.SET_NULL, null=True, blank=True, default=meta_diamante)
+        "franquia"), on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.razaosocial
@@ -201,7 +202,6 @@ class Loja(models.Model):
         total = sum([pedido.get_meta_total for pedido in pedidos])
         return total
 
-    
 
 class Produto(models.Model):
     codigo = models.IntegerField(_("codigo do produto"), unique=True)
@@ -313,7 +313,7 @@ class Pedido(models.Model):
         itenspedido = self.itempedido_set.all()
         total = sum([item.quantidade for item in itenspedido])
         return total
-    
+
     # retorna se tem produto suficiente em estoque e qual produto falta
     def falta_estoque(self):
         itenspedido = self.itempedido_set.all()
@@ -337,13 +337,14 @@ class Pedido(models.Model):
             item.produto.qtde_estoque += item.quantidade
             item.produto.save()
 
+
 class ItemPedido(models.Model):
 
-    #ligaçao com pedido
+    # ligaçao com pedido
     pedido = models.ForeignKey(Pedido, verbose_name=_(
         "Pedido"), on_delete=models.CASCADE, null=True)
 
-    #ligaçao com produto
+    # ligaçao com produto
     produto = models.ForeignKey(Produto, verbose_name=_(
         "produto"), on_delete=models.CASCADE, null=True)
 

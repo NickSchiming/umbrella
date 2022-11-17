@@ -42,11 +42,11 @@
 				</div>
 				{% endfor %}
 				<h5>Itens: {{pedido.get_carrinho_itens}}</h5>
-				{% if pedido.revendedor.user.type == 'REVENDEDOR' %}
+				{% if pedido.revendedor.user.tipo == 'revendedor' %}
 					<h5>Subtotal: ${{pedido.get_carrinho_total|floatformat:2}}</h5>
 				  	<h5>Desconto: %{{pedido.revendedor.meta.desconto}}</h5>
 					<h5>Total: ${{pedido.get_meta_total|floatformat:2}}</h5>
-				{% elif pedido.loja.user.type == 'LOJA' %}
+				{% elif pedido.loja.user.tipo == 'loja' %}
 					<h5>Total: ${{pedido.get_carrinho_total|floatformat:2}}</h5>
 				{% endif %}
 				
@@ -58,11 +58,11 @@
 
 	<script type="text/javascript">
 		
-		if ('{{pedido.revendedor.user.type}}' == 'REVENDEDOR'){
+		if ('{{pedido.revendedor.user.tipo}}' == 'revendedor'){
 			var subtotal = '{{pedido.get_carrinho_total}}';
 			var total = '{{pedido.get_meta_total}}';
 			
-		}else if ('{{pedido.loja.user.type}}' == 'LOJA')
+		}else if ('{{pedido.loja.user.tipo}}' == 'loja')
 			var total = '{{pedido.get_carrinho_total}}';
 			var subtotal = '{{pedido.get_carrinho_total}}';
 

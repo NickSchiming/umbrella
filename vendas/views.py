@@ -89,7 +89,8 @@ def perfil(request):
         if request.method == 'POST':
             u_form = perfil_u_form_post(request)
             try:
-                p_form = PerfilRevendedor(request.POST, instance=request.user.revendedor)
+                p_form = PerfilRevendedor(
+                    request.POST, instance=request.user.revendedor)
             except:
                 p_form = PerfilRevendedor(request.POST)
 
@@ -99,12 +100,11 @@ def perfil(request):
             u_form = perfil_u_form_get(request)
             try:
                 p_form = PerfilRevendedor(instance=request.user.revendedor)
-                
+
             except:
                 p_form = PerfilRevendedor()
 
             tira_field_perfil_rev(request, tipo, p_form)
-
 
     elif tipo == User.LOJA:
         if request.method == 'POST':
@@ -130,7 +130,8 @@ def perfil(request):
         if request.method == 'POST':
             u_form = perfil_u_form_post(request)
             try:
-                p_form = PerfilSupervisor(request.POST, instance=request.user.supervisor)
+                p_form = PerfilSupervisor(
+                    request.POST, instance=request.user.supervisor)
             except:
                 p_form = PerfilSupervisor(request.POST)
 
@@ -150,7 +151,8 @@ def perfil(request):
         if request.method == 'POST':
             u_form = perfil_u_form_post(request)
             try:
-                p_form = PerfilFranquia(request.POST, instance=request.user.franquia)
+                p_form = PerfilFranquia(
+                    request.POST, instance=request.user.franquia)
             except:
                 p_form = PerfilFranquia(request.POST)
 
