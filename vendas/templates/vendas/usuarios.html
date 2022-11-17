@@ -1,6 +1,9 @@
 {% extends 'vendas/base.html' %}
 {% load static %}
 {% block content %}
+
+	<h1>Usuarios</h1>
+	<hr>
 	
 	<form class="form-inline" action="{% url 'pesquisa_usuarios' %}" method="get">
 		<input class="form-control mr-sm-2" name="q" type="search" placeholder="Pesquisar" aria-label="Pesquisar">
@@ -10,7 +13,7 @@
 	
 	<div class="row">
 		{% if not usuarios %}
-		<h2><strong>Nenhum pedido encontrado</strong></h2>
+		<h2 class="mt-3"><strong>Nenhum usuário encontrado</strong></h2>
 		{% else %}
 			{% for usuario in usuarios %}
 				<div class="col-lg-4">

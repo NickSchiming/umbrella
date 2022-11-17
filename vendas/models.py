@@ -1,3 +1,4 @@
+import datetime
 from django.utils import timezone
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -146,6 +147,13 @@ class Revendedor(models.Model):
         total = sum([pedido.get_meta_total for pedido in pedidos])
         return total
 
+    @property
+    def total_comprado_mes(self):
+        now = datetime.datetime.now()
+        pedidos = self.pedido_set.filter(completo=True, data__month=now.month)
+        total = sum([pedido.get_meta_total for pedido in pedidos])
+        return total
+
     # retorna a proxima meta do revendedor
     @property
     def get_proxima_meta(self):
@@ -193,7 +201,7 @@ class Loja(models.Model):
         "franquia"), on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return self.razaosocial
+        return self.nome_fantasia
 
     # retorna total comprado
     @property

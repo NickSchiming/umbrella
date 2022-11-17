@@ -1,6 +1,9 @@
 {% extends 'vendas/base.html' %}
 {% load static %}
 {% block content %}
+
+<h1>Pedidos</h1>
+<hr>
 	<form class="form-inline" action="{% url 'pesquisa_pedidos' %}" method="get">
 		<input class="form-control mr-sm-2" name="q" type="search" placeholder="Pesquisar" aria-label="Pesquisar">
 		<button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Pesquisar</button>

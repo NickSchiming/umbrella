@@ -8,6 +8,7 @@ from .models import *
 from .utils import dadosCarrinho, infoHome, perfil_u_form_get, perfil_u_form_post, renderForm, salva_p_form, temNone, tira_field_perfil_rev
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
+from babel.dates import format_date, format_datetime, format_time
 
 from django.views.generic import ListView
 
@@ -669,19 +670,18 @@ def atualizarMeta(request, pk):
 def atualizarMetasRevendedores(request):
 
     revendedores = Revendedor.objects.all()
-    bronze, prata, ouro, diamante, iniciante = Meta.objects.all()
-    print(Meta.objects.all())
+    iniciante, bronze, prata, ouro, diamante = Meta.objects.all()
 
     for revendedor in revendedores:
-        if revendedor.total_comprado >= bronze.valor:
+        if revendedor.total_comprado_mes >= bronze.valor:
             revendedor.meta = bronze
-        elif revendedor.total_comprado >= prata.valor:
+        elif revendedor.total_comprado_mes >= prata.valor:
             revendedor.meta = prata
-        elif revendedor.total_comprado >= ouro.valor:
+        elif revendedor.total_comprado_mes >= ouro.valor:
             revendedor.meta = ouro
-        elif revendedor.total_comprado >= diamante.valor:
+        elif revendedor.total_comprado_mes >= diamante.valor:
             revendedor.meta = diamante
-        else:
+        elif revendedor.total_comprado_mes < bronze.valor:
             revendedor.meta = iniciante
         revendedor.save()
 
@@ -692,26 +692,40 @@ def atualizarMetasRevendedores(request):
 def atualizarRelatorio(request):
     dados = json.loads(request.body)
 
-    acao = dados['action']
-    request.session['acao'] = acao
+    request.session['data'] = dados['data']
+    request.session['grupo'] = dados['grupo']
 
     return JsonResponse('feito', safe=False)
 
 
 def relatorios(request):
     now = datetime.datetime.now()
-    acao = request.session.get('acao')
-    if acao == None:
-        acao = 'month'
-    key = getattr(now, acao)
-    filtro = 'data__' + acao
-    filtro_user = 'criado__' + acao
+    data_filtro = request.session.get('data')
+    grupo = request.session.get('grupo')
+
+    if data_filtro == None:
+        data_filtro = 'month'
+    if grupo == None:
+        grupo = 'ambos'
+
+    key = getattr(now, data_filtro)
+    filtro = 'data__' + data_filtro
+    filtro_user = 'criado__' + data_filtro
+        
+
+
+    if data_filtro == 'month':
+        data = format_date(now,"MMMM", locale='pt_BR').capitalize()
+    elif data_filtro == 'day':
+        data = format_date(now,"EEEE", locale='pt_BR').capitalize()
+    elif data_filtro == 'year':
+        data = now.strftime("%Y")
 
     soma = 0
     pedidos = request.user.franquia.pedido_set.filter(**{filtro: key})
+    
     pedidos_lojas = request.user.franquia.pedido_set.filter(
         revendedor=None, **{filtro: key})
-    print(pedidos_lojas)
     pedidos_revendedores = request.user.franquia.pedido_set.filter(
         loja=None, **{filtro: key})
     supervisores = request.user.franquia.supervisor_set.all()
@@ -719,6 +733,7 @@ def relatorios(request):
         tipo=User.REVENDEDOR, **{filtro_user: key}).count()
 
     qtde_pedidos = pedidos.filter().count()
+    qtde_pedidos_pendentes = pedidos.filter(status=Pedido.APROV_PEND).count()
     qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
     qtde_pedidos_enviados = pedidos.filter(status=Pedido.ENVIADO).count()
     qtde_pedidos_finalizados = pedidos.filter(status=Pedido.FINALIZADO).count()
@@ -733,13 +748,17 @@ def relatorios(request):
         [pedido.get_meta_total for pedido in pedidos_revendedores])
 
     context = {
+        'data':data,
         'total': total,
         'subtotal': subtotal,
+        'data_filtro': data_filtro,
+        'grupo': grupo,
         'total_lojas': total_lojas,
         'total_revendedores': total_revendedores,
         'subtotal_revendedores': subtotal_revendedores,
         'revendedores': soma,
         'qtde_pedidos': qtde_pedidos,
+        'qtde_pedidos_pendentes': qtde_pedidos_pendentes,
         'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
         'qtde_pedidos_enviados': qtde_pedidos_enviados,
         'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
@@ -753,11 +772,11 @@ def graficoProdutos(request):
     import itertools
 
     now = datetime.datetime.now()
-    acao = request.session.get('acao')
-    if acao == None:
-        acao = 'month'
-    key = getattr(now, acao)
-    filtro = 'data__' + acao
+    data_filtro = request.session.get('data')
+    if data_filtro == None:
+        data_filtro = 'month'
+    key = getattr(now, data_filtro)
+    filtro = 'data__' + data_filtro
 
     dados = []
     item = []
@@ -788,11 +807,11 @@ def graficoRevendedores(request):
     import itertools
 
     now = datetime.datetime.now()
-    acao = request.session.get('acao')
-    if acao == None:
-        acao = 'month'
-    key = getattr(now, acao)
-    filtro = 'criado__' + acao
+    data_filtro = request.session.get('data')
+    if data_filtro == None:
+        data_filtro = 'month'
+    key = getattr(now, data_filtro)
+    filtro = 'criado__' + data_filtro
 
     dados = []
     response = {}
@@ -824,11 +843,11 @@ def graficoLojas(request):
     import itertools
 
     now = datetime.datetime.now()
-    acao = request.session.get('acao')
-    if acao == None:
-        acao = 'month'
-    key = getattr(now, acao)
-    filtro = 'criado__' + acao
+    data_filtro = request.session.get('data')
+    if data_filtro == None:
+        data_filtro = 'month'
+    key = getattr(now, data_filtro)
+    filtro = 'criado__' + data_filtro
 
     dados = []
     response = {}
@@ -858,24 +877,24 @@ def graficoLojas(request):
 def graficoTempo(request):
 
     now = datetime.datetime.now()
-    acao = request.session.get('acao')
-    if acao == None:
-        acao = 'month'
-    key = getattr(now, acao)
-    filtro = 'data__' + acao
+    data_filtro = request.session.get('data')
+    if data_filtro == None:
+        data_filtro = 'month'
+    key = getattr(now, data_filtro)
+    filtro = 'data__' + data_filtro
 
     dados = []
     response = {}
 
     pedidos = Pedido.objects.filter(completo=True, **{filtro: key})
 
-    if acao == 'day':
+    if data_filtro == 'day':
         for pedido in pedidos:
             dados.append({str(pedido.data.hour): 1})
-    if acao == 'month':
+    if data_filtro == 'month':
         for pedido in pedidos:
             dados.append({str(pedido.data.day): 1})
-    if acao == 'year':
+    if data_filtro == 'year':
         for pedido in pedidos:
             dados.append({str(pedido.data.month): 1})
 

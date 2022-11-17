@@ -4,36 +4,47 @@
 
     <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
 
+    <h1>Relatorios</h1>
     <div class="content-section">
-        <div class="btn-group" role="group">
-            <button class="btn btn-secondary" data-action="day">dia</button>
-            <button class="btn btn-secondary" data-action="month">mes</button>
-            <button class="btn btn-secondary" data-action="year">ano</button>
-        </div>
 
+        <div class="d-flex">
+            <h4 class="mr-4 my-auto">Filtrar dados por:</h4>
+            <button class="btn btn-secondary mr-1 data" data-data="day">dia</button>
+            <button class="btn btn-secondary mr-1 data" data-data="month">mes</button>
+            <button class="btn btn-secondary mr-5 data" data-data="year">ano</button>
+
+            <button class="btn btn-secondary mr-1 grupo" data-grupo="lojas">lojas</button>
+            <button class="btn btn-secondary mr-1 grupo" data-grupo="revendedores">revendedores</button>
+            <button class="btn btn-secondary mr-5 grupo" data-grupo="ambos">ambos</button>
+            
+        </div>
+        <div class="d-flex mt-3">
+            <h4 class=" my-auto">Mostrando dados de <strong>{{data}}</strong> de <strong>{{grupo}}</strong> </h4>
+        </div>
+        
         <hr>
-        <h5>Total vendido: R${{subtotal|floatformat:2}}</h5>
-        <h5>Total vendido com desconto: R${{total|floatformat:2}}</h5>
-        <h5>Total vendido por lojas: R${{total_lojas|floatformat:2}}</h5>
-        <h5>Total vendido por revendedores: R${{subtotal_revendedores|floatformat:2}}</h5>
-        <h5>Total vendido com desconto por revendedores: R${{total_revendedores|floatformat:2}}</h5>
+        <h5>Valor total de vendas bruto: R${{subtotal|floatformat:2}}</h5>
+        <h5>Valor total de vendas com desconto: R${{total|floatformat:2}}</h5>
         
 
         <br>
-        <h5>Quantidade de pedidos: {{ qtde_pedidos }}</h5>
+        <h5>Quantidade de pedidos pendentes: {{ qtde_pedidos_pendentes }}</h5>
         <h5>Quantidade de pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
         <h5>Quantidade de pedidos enviados: {{ qtde_pedidos_enviados }}</h5>
         <h5>Quantidade de pedidos finalizados: {{ qtde_pedidos_finalizados }}</h5>
+        <h5>Quantidade de pedidos totais: {{ qtde_pedidos }}</h5>
         <br>
-        <h5>Novos Revendedores: {{ novos_revendedores }}</h5>
+        {% if grupo == 'revendedores' %}
+            <h5>Novos Revendedores: {{ novos_revendedores }}</h5>
+        {% endif %}
+        
 
         <hr>
 
-        <div class="btn-group" role="group">
-            <button class="btn btn-info" data-url="/grafico_produtos/" >Produtos mais vendidos</button>
-            <button class="btn btn-info" data-url="/grafico_revendedores/">Revendedores que mais venderam</button>
-            <button class="btn btn-info" data-url="/grafico_lojas/">Lojas que mais venderam</button>
-        </div>
+        <button class="btn btn-info" data-url="/grafico_produtos/" >Produtos mais vendidos</button>
+        <button class="btn btn-info" data-url="/grafico_revendedores/">Revendedores que mais venderam</button>
+        <button class="btn btn-info" data-url="/grafico_lojas/">Lojas que mais venderam</button>
+
         <button class="btn btn-info" data-url="/grafico_tempo/" >Estatísticas de vendas por tempo</button>
         
 
@@ -46,14 +57,24 @@
 
 
     <script>
-        var updateBtns = document.getElementsByClassName('btn-secondary')
+        var updateBtnsData = document.getElementsByClassName('data')
+        var updateBtnsGrupo = document.getElementsByClassName('grupo')
         var graficoBtns = document.getElementsByClassName('btn-info')
+        console.log(updateBtnsData)
 
-        for (i = 0; i < updateBtns.length; i++) {
-            updateBtns[i].addEventListener('click', function () {
-                var action = this.dataset.action
-                carregaDados(action)
-        
+        for (i = 0; i < updateBtnsGrupo.length; i++) {
+            updateBtnsGrupo[i].addEventListener('click', function () {
+                var grupo = this.dataset.grupo
+                var data = '{{data_filtro}}'
+                carregaDados(grupo, data)    
+            })
+        }
+
+        for (i = 0; i < updateBtnsData.length; i++) {
+            updateBtnsData[i].addEventListener('click', function () {
+                var data = this.dataset.data
+                var grupo = '{{grupo}}'
+                carregaDados(grupo, data)    
             })
         }
 
@@ -65,7 +86,7 @@
             })
         }
 
-        function carregaDados(action) {
+        function carregaDados(grupo, data) {
             var urlRelatorio = '/atualizar_relatorio/'
 
             fetch(urlRelatorio, {
@@ -74,13 +95,13 @@
                     'Content-Type': 'application/json',
                     'X-CSRFToken': csrftoken,
                 },
-                body: JSON.stringify({ 'action': action, })
+                body: JSON.stringify({ 'grupo': grupo, 'data': data})
             })
                 .then((response) => {
                     return response.json();
                 })
                 .then((dados) => {
-                    location.reload()
+                    location.reload() 
                 });
         }
 
@@ -112,27 +133,37 @@
         function buildProdutosChart(dados,url){
   
             if(url == "/grafico_produtos/"){
-                texto = "Produtos mais vendidos";
+                texto = "Top 10 produtos mais vendidos";
+                labely = 'Valor em R$'
             }
             else if (url == "/grafico_revendedores/"){
-                texto = "Revendedores que mais venderam";
+                texto = "Top 10 revendedores que mais venderam";
+                labely = 'Valor em R$'
             }
             else if (url == "/grafico_lojas/"){
-                texto = "Lojas que mais venderam";
+                texto = "Top 10 lojas que mais venderam";
+                labely = 'Valor em R$'
             }
             else if (url == "/grafico_tempo/"){
                 texto = "Vendas por tempo";
             }
             var chartData = {
+
                 "type":"bar",
                 "scale-x":{
-                    "values":dados.items
+                    "values":dados.items,
+                    label: {
+                        text: "Volume"
+                      },
                 },
                 "series":[
                     {
-                        "values":dados.values
+                        "values":dados.values,
                     }
                 ],
+                label: {
+                    text: "Volume"
+                    },
                 "title": {
                     text: texto
                   }

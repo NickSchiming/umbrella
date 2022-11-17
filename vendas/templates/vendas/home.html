@@ -2,7 +2,7 @@
 {% block content %}
 <div class="content-section">
     {% if user.tipo == "revendedor" %}
-        <h2>Bem vindo {{user.revendedor.nome}}!</h2>
+        <h2>Bem vindo(a) {{user.revendedor.nome}}!</h2>
         <hr>
 
         {% if user.revendedor.is_aprovado %}
@@ -72,7 +72,7 @@
     
     {% elif user.tipo == "supervisor" %}
 
-        <h2>Bem vindo {{user.supervisor.nome}}!</h2>
+        <h2>Bem vindo(a) {{user.supervisor.nome}}!</h2>
         <hr>
 
         <h4>Resumo do dia</h4>

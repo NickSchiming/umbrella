@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito&family=Roboto+Condensed&display=swap');
+
+
 
 html{
 	font-size: 18px;
@@ -7,7 +9,7 @@ html{
 body {
 	margin: 0;
 	padding: 0;
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: 'Roboto Condensed', sans-serif;
 	background-color: #EBEBEB;
 	background-size: cover;
 	background-repeat: no-repeat;
@@ -31,6 +33,7 @@ body {
 }
 
 .navbar {
+	font-family: 'Bebas Neue', cursive;
 	font-size: 25px;
 }
 

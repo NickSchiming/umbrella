@@ -155,7 +155,7 @@ def salvaForm(request, user, p_form, u_form):
         except:
             pass
 
-    if request.user.tipo == User.FRANQUIA and user.tipo == 'LOJA':
+    if request.user.tipo == User.FRANQUIA and user.tipo == User.LOJA:
         try:
             user.loja.franquia = request.user.franquia
             user.loja.save()

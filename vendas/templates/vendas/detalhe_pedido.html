@@ -42,7 +42,7 @@
             <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'confirmar_pedido' pedido.id %}">Confirmar recebimento</a>
           {% endif %}
         </div>
-      {% elif request.user.type == 'FRANQUIA' %}
+      {% elif request.user.tipo == 'franquia' %}
         <div>
           <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
           <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>
@@ -50,7 +50,7 @@
           <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'enviar_pedido' pedido.id %}">Enviar</a>
           {% endif %}
         </div>
-      {% elif request.user.type == 'SUPERVISOR'%}
+      {% elif request.user.tipo == 'supervisor'%}
         <div>
           <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
           <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Deletar</a>
