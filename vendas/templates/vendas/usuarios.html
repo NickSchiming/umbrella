@@ -8,7 +8,12 @@
 	<form class="form-inline" action="{% url 'pesquisa_usuarios' %}" method="get">
 		<input class="form-control mr-sm-2" name="q" type="search" placeholder="Pesquisar" aria-label="Pesquisar">
 		<button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Pesquisar</button>
-		<a class="btn btn-success ml-auto mr-0" href="{% url 'pesquisa_rev_novo' %}">Revendedores com cadastro pendente</a>
+		{% if request.user.tipo == 'supervisor' %}
+			<a class="btn btn-success ml-auto mr-0" href="{% url 'pesquisa_rev_novo' %}">Revendedores com cadastro pendente</a>
+		{% elif request.user.tipo == 'franquia' %}
+			<a class="btn btn-success ml-auto mr-0" href="{% url 'pesquisa_rev_novo' %}">Usuarios com cadastro pendente</a>
+		{% endif %}
+		
 	</form>
 	
 	<div class="row">
@@ -26,18 +31,14 @@
 							<h6 >{{usuario.tipo}}</h6>
 						</div>
 						
-						{% if usuario.revendedor %}
-							<div class="d-inline-flex flex-column">
-								<h6><strong>Status: </strong></h6>
-								{% if usuario.revendedor.is_aprovado %}
-									<h6>Aprovado</h6>
-								{% else %}
-									<h6>Pendente</h6>
-								{% endif %}
-							</div>
-						{% endif %}
-
-						
+						<div class="d-inline-flex flex-column">
+							<h6><strong>Status: </strong></h6>
+							{% if usuario.revendedor.is_aprovado or usuario.franquia.is_aprovado or usuario.loja.is_aprovado or usuario.supervisor.is_aprovado%}
+								<h6>Aprovado</h6>
+							{% else %}
+								<h6>Pendente</h6>
+							{% endif %}
+						</div>
 
                         <div>
                             <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_usuario' usuario.id %}">Atualizar</a>

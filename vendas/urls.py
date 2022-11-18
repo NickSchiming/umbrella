@@ -44,7 +44,7 @@ urlpatterns = [
 
      path('pesquisa_usuarios/', pesquisaUsuarios.as_view(),
          name='pesquisa_usuarios'),
-     path('pesquisa_rev_novo/', pesquisaRevNovo.as_view(),
+     path('pesquisa_rev_novo/', views.pesquisaRevNovo,
          name='pesquisa_rev_novo'),
     path('pesquisa_pedidos/', pesquisaPedidos.as_view(), name='pesquisa_pedidos'),
     path('pesquisa_produtos/', pesquisaProdutos.as_view(),

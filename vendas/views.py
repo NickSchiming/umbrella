@@ -19,6 +19,19 @@ global revendedorPed
 revendedorPed = None
 
 
+def aprovado_check(user):
+    if hasattr(user, 'supervisor'):
+        if user.supervisor.is_aprovado:
+            return True
+        else:
+            return False
+    elif hasattr(user, 'franquia'):
+        if user.franquia.is_aprovado:
+            return True
+        else:
+            return False
+
+
 def supervisor_check(user):
     if user.tipo == User.SUPERVISOR:
         return True
@@ -28,7 +41,18 @@ def supervisor_check(user):
 
 def supervisor_franquia_check(user):
     if user.tipo == User.SUPERVISOR or user.tipo == User.FRANQUIA:
-        return True
+        if hasattr(user, 'supervisor'):
+            if user.supervisor.is_aprovado:
+                return True
+            else:
+                return False
+        elif hasattr(user, 'franquia'):
+            if user.franquia.is_aprovado:
+                return True
+            else:
+                return False
+        else:
+            return False
     else:
         return False
 
@@ -105,8 +129,6 @@ def perfil(request):
             except:
                 p_form = PerfilRevendedor()
 
-            tira_field_perfil_rev(request, tipo, p_form)
-
     elif tipo == User.LOJA:
         if request.method == 'POST':
             u_form = perfil_u_form_post(request)
@@ -124,8 +146,6 @@ def perfil(request):
                 p_form = PerfilLoja(instance=request.user.loja)
             except:
                 p_form = PerfilLoja()
-
-            tira_field_perfil_rev(request, tipo, p_form)
 
     elif tipo == User.SUPERVISOR:
         if request.method == 'POST':
@@ -146,8 +166,6 @@ def perfil(request):
             except:
                 p_form = PerfilSupervisor()
 
-            tira_field_perfil_rev(request, tipo, p_form)
-
     elif tipo == User.FRANQUIA:
         if request.method == 'POST':
             u_form = perfil_u_form_post(request)
@@ -167,7 +185,7 @@ def perfil(request):
             except:
                 p_form = PerfilFranquia()
 
-            tira_field_perfil_rev(request, tipo, p_form)
+    tira_field_perfil_rev(request, tipo, p_form)
 
     context = {
         'u_form': u_form,
@@ -591,12 +609,17 @@ class pesquisaUsuarios(LoginRequiredMixin, ListView):
         return object_list
 
 
-class pesquisaRevNovo(LoginRequiredMixin, ListView):
-    model = Revendedor
-
-    def get_queryset(self):
+def pesquisaRevNovo(request):
+    from itertools import chain
+    if request.user.tipo == User.FRANQUIA:
+        revendedor_list = Revendedor.objects.filter(is_aprovado=False)
+        loja_list = Loja.objects.filter(is_aprovado=False)
+        supervisor_list = Supervisor.objects.filter(is_aprovado=False)
+        object_list = list(chain(revendedor_list, loja_list, supervisor_list))
+    else:
         object_list = Revendedor.objects.filter(is_aprovado=False)
-        return object_list
+
+    return render(request, 'vendas/revendedor_list.html', {'object_list': object_list})
 
 
 class pesquisaPedidos(LoginRequiredMixin, ListView):
@@ -711,24 +734,24 @@ def relatorios(request):
     key = getattr(now, data_filtro)
     filtro = 'data__' + data_filtro
     filtro_user = 'criado__' + data_filtro
-        
-
 
     if data_filtro == 'month':
-        data = format_date(now,"MMMM", locale='pt_BR').capitalize()
+        data = format_date(now, "MMMM", locale='pt_BR').capitalize()
     elif data_filtro == 'day':
-        data = format_date(now,"EEEE", locale='pt_BR').capitalize()
+        data = format_date(now, "EEEE", locale='pt_BR').capitalize()
     elif data_filtro == 'year':
         data = now.strftime("%Y")
 
     soma = 0
-    pedidos = request.user.franquia.pedido_set.filter(**{filtro: key})
-    
-    pedidos_lojas = request.user.franquia.pedido_set.filter(
-        revendedor=None, **{filtro: key})
-    pedidos_revendedores = request.user.franquia.pedido_set.filter(
-        loja=None, **{filtro: key})
-    supervisores = request.user.franquia.supervisor_set.all()
+    if grupo == 'lojas':
+        pedidos = request.user.franquia.pedido_set.filter(
+            revendedor=None, **{filtro: key})
+    elif grupo == 'revendedores':
+        pedidos = request.user.franquia.pedido_set.filter(
+            loja=None, **{filtro: key})
+    else:
+        pedidos = request.user.franquia.pedido_set.filter(**{filtro: key})
+
     users_rev = User.objects.filter(
         tipo=User.REVENDEDOR, **{filtro_user: key}).count()
 
@@ -741,21 +764,12 @@ def relatorios(request):
     total = sum([pedido.get_meta_total for pedido in pedidos])
     subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
 
-    total_lojas = sum([pedido.get_meta_total for pedido in pedidos_lojas])
-    total_revendedores = sum(
-        [pedido.get_meta_total for pedido in pedidos_revendedores])
-    subtotal_revendedores = sum(
-        [pedido.get_meta_total for pedido in pedidos_revendedores])
-
     context = {
-        'data':data,
+        'data': data,
         'total': total,
         'subtotal': subtotal,
         'data_filtro': data_filtro,
         'grupo': grupo,
-        'total_lojas': total_lojas,
-        'total_revendedores': total_revendedores,
-        'subtotal_revendedores': subtotal_revendedores,
         'revendedores': soma,
         'qtde_pedidos': qtde_pedidos,
         'qtde_pedidos_pendentes': qtde_pedidos_pendentes,

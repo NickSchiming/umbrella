@@ -220,6 +220,9 @@ def perfil_u_form_get(request):
     return u_form
 
 def tira_field_perfil_rev(request, tipo, p_form):
+    if not request.user.tipo == User.FRANQUIA:
+        if tipo == User.LOJA or tipo == User.SUPERVISOR:
+            p_form.fields.pop('is_aprovado')
     if tipo == User.REVENDEDOR:
             if not request.user.tipo == User.FRANQUIA or not request.user.tipo == User.SUPERVISOR:
                 p_form.fields.pop('is_aprovado')
