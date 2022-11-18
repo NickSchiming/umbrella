@@ -40,6 +40,7 @@ class Franquia(models.Model):
         _("numero"), max_length=5, blank=True)
     telefone = models.CharField(
         _("telefone"), max_length=30, blank=True)
+    is_aprovado = models.BooleanField(_('Aprovado'), default=False)
 
     def __str__(self):
         return self.nome_fantasia
@@ -58,6 +59,8 @@ class Supervisor(models.Model):
                             max_length=30, blank=True)
     datanasc = models.DateField(
         _("Data de nascimento"), auto_now=False, auto_now_add=False, blank=True)
+
+    is_aprovado = models.BooleanField(_('Aprovado'), default=False)
 
     # ligação com franquia
     franquia = models.ForeignKey(
@@ -87,6 +90,7 @@ class Meta(models.Model):
                              max_length=50)
     valor = models.FloatField(_("valor"))
     desconto = models.FloatField(_("desconto"))
+
 
     def __str__(self):
         return self.nivel
@@ -190,6 +194,7 @@ class Loja(models.Model):
         _("numero"), max_length=5, blank=True)
     telefone = models.CharField(
         _("telefone"), max_length=30, blank=True)
+    is_aprovado = models.BooleanField(_('Aprovado'), default=False)
 
     def meta_diamante():
         return Meta.objects.get(nivel=Meta.DIAMANTE)
