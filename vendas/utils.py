@@ -245,3 +245,26 @@ def salva_p_form(request, tipo, u_form, p_form):
             sweetify.success(request, 'Seus dados foram atualizados')
     else:
         sweetify.error(request, 'Houve um erro na atualização dos dados')
+        
+        
+def aprovado_check(user):
+    if hasattr(user, 'supervisor'):
+        if user.supervisor.is_aprovado:
+            return True
+        else:
+            return False
+    elif hasattr(user, 'franquia'):
+        if user.franquia.is_aprovado:
+            return True
+        else:
+            return False
+    elif hasattr(user, 'loja'):
+        if user.loja.is_aprovado:
+            return True
+        else:
+            return False
+    elif hasattr(user, 'revendedor'):
+        if user.revendedor.is_aprovado:
+            return True
+        else:
+            return False

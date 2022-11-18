@@ -91,7 +91,6 @@ class Meta(models.Model):
     valor = models.FloatField(_("valor"))
     desconto = models.FloatField(_("desconto"))
 
-
     def __str__(self):
         return self.nivel
 
@@ -195,11 +194,6 @@ class Loja(models.Model):
     telefone = models.CharField(
         _("telefone"), max_length=30, blank=True)
     is_aprovado = models.BooleanField(_('Aprovado'), default=False)
-
-    def meta_diamante():
-        return Meta.objects.get(nivel=Meta.DIAMANTE)
-    meta = models.ForeignKey(
-        Meta, on_delete=models.SET_NULL, null=True, blank=True, default=meta_diamante)
 
     # ligação com franquia
     franquia = models.ForeignKey(Franquia, verbose_name=_(
@@ -307,7 +301,7 @@ class Pedido(models.Model):
     @property
     def get_meta_total(self):
         subtotal = self.get_carrinho_total
-        if self.revendedor:
+        if hasattr(self, 'revendedor'):
             total = subtotal * (1 - (self.revendedor.meta.desconto / 100))
         else:
             total = subtotal

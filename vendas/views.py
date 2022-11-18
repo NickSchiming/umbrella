@@ -5,7 +5,7 @@ import sweetify
 from django.http import JsonResponse
 import json
 from .models import *
-from .utils import dadosCarrinho, infoHome, perfil_u_form_get, perfil_u_form_post, renderForm, salva_p_form, temNone, tira_field_perfil_rev
+from .utils import aprovado_check, dadosCarrinho, infoHome, perfil_u_form_get, perfil_u_form_post, renderForm, salva_p_form, temNone, tira_field_perfil_rev
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from babel.dates import format_date, format_datetime, format_time
@@ -19,19 +19,6 @@ global revendedorPed
 revendedorPed = None
 
 
-def aprovado_check(user):
-    if hasattr(user, 'supervisor'):
-        if user.supervisor.is_aprovado:
-            return True
-        else:
-            return False
-    elif hasattr(user, 'franquia'):
-        if user.franquia.is_aprovado:
-            return True
-        else:
-            return False
-
-
 def supervisor_check(user):
     if user.tipo == User.SUPERVISOR:
         return True
@@ -41,18 +28,7 @@ def supervisor_check(user):
 
 def supervisor_franquia_check(user):
     if user.tipo == User.SUPERVISOR or user.tipo == User.FRANQUIA:
-        if hasattr(user, 'supervisor'):
-            if user.supervisor.is_aprovado:
-                return True
-            else:
-                return False
-        elif hasattr(user, 'franquia'):
-            if user.franquia.is_aprovado:
-                return True
-            else:
-                return False
-        else:
-            return False
+        return True
     else:
         return False
 
@@ -197,7 +173,6 @@ def perfil(request):
 
 @login_required
 def produtos(request):
-    print(revendedorPed)
     if request.user.tipo == User.REVENDEDOR:
         try:
             request.user.revendedor
@@ -226,14 +201,11 @@ def produtos(request):
     produtos = Produto.objects.all()
     context = {'produtos': produtos, 'itensCarrinho': itensCarrinho}
 
-    if request.user.tipo == User.REVENDEDOR:
-        if request.user.revendedor.is_aprovado:
-            return render(request, 'vendas/produtos.html', context)
-        else:
-            sweetify.info(request, 'por favor aguarde o cadastro ser aprovado')
-            return redirect('vendas-home')
-    else:
+    if aprovado_check():
         return render(request, 'vendas/produtos.html', context)
+    else:
+        sweetify.info(request, 'por favor aguarde o cadastro ser aprovado')
+        return redirect('vendas-home')
 
 
 @login_required
@@ -246,7 +218,11 @@ def carrinho(request):
 
     context = {'itens': itens, 'pedido': pedido,
                'itensCarrinho': itensCarrinho}
-    return render(request, 'vendas/carrinho.html', context)
+    if aprovado_check():
+        return render(request, 'vendas/produtos.html', context)
+    else:
+        sweetify.info(request, 'por favor aguarde o cadastro ser aprovado')
+        return redirect('vendas-home')
 
 
 @login_required
