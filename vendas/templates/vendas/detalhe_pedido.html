@@ -11,7 +11,7 @@
       <h6>Loja: {{ pedido.loja }}</h6>
       {% endif %}
       <h4>Forma de pagamento: {{pedido.metodo_de_pagamento}}</h4>
-      <h2>Total: ${{ pedido.get_carrinho_total|floatformat:2 }}</h2>
+      <h2>Total: R${{ pedido.get_carrinho_total|floatformat:2 }}</h2>
       <div class="box-element">
         <div class="carrinho-row">
           <div style="flex:2"></div>
@@ -25,11 +25,11 @@
           <div style="flex:2"><img class="row-image"
               src="{{item.produto.imageURL}}"></div>
           <div style="flex:2"><p>{{item.produto.nome}}</p></div>
-          <div style="flex:1"><p>${{item.produto.preco|floatformat:2}}</p></div>
+          <div style="flex:1"><p>R${{item.produto.preco|floatformat:2}}</p></div>
           <div style="flex:1">
             <p class="quantity">{{item.quantidade}}</p>
           </div>
-          <div style="flex:1"><p>${{item.get_total|floatformat:2}}</p></div>
+          <div style="flex:1"><p>R${{item.get_total|floatformat:2}}</p></div>
         </div>
         {% endfor %}
       </div>

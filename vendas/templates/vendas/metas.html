@@ -2,16 +2,23 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-<h1>Metas</h1>
+<h2 class="ml-3">Metas</h2>
 <div class="content-section">
-    {% for meta in metas %}
-
-            <h2 class="account-heading">{{ meta.nivel }} - R${{ meta.valor|floatformat:2 }} - %{{ meta.desconto }} </h2>
-            <div class="form-group">
-            <a class="btn btn-outline-info" href="{% url 'atualizar_meta' meta.id %}">Update</a>
+    <br>
+        {% for meta in metas %}
+            <div class="table">
+                <div class="d-flex">
+                    <div class="form-group">
+                        <a class="btn btn-outline-info" href="{% url 'atualizar_meta' meta.id %}">Atualizar</a>
+                    </div>
+                    <h4 class="account-heading ml-2">{{ meta.nivel }} - R${{ meta.valor|floatformat:2 }} - %{{ meta.desconto }} </h4>
+                </div>
             </div>
-    {% endfor %}
-    <a class="btn btn-outline-success" href="{% url 'atualizar_metas_revendedores'%}">Atualizar metas dos usuarios</a>
+            
+        {% endfor %}
+
+        <a class="btn btn-outline-success" href="{% url 'atualizar_metas_revendedores'%}">Atualizar metas dos usuarios</a>
+    
 </div>
 
 {% endblock content %}

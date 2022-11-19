@@ -6,87 +6,89 @@
         <hr>
 
         {% if user.revendedor.is_aprovado %}
-            <p>Status de cadastro: Aprovado</p>
+            <h5>Status de cadastro: Aprovado</h5>
         {% else %}
-            <p>Status de cadastro: Pendente</p>
+            <h5>Status de cadastro: Pendente</h5>
         {% endif %}
-
-        <h4>Resumo do mês</h4>
-
-        <p>Total comprado: R${{subtotal|floatformat:2}}</p>
-
-        <p>Total comprado com desconto: R${{total|floatformat:2}}</p>
-
-        <div class="container-barra">
-            <p>Meta atual: {{user.revendedor.meta.nivel}}</p>
-            <div class="progress">
-                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:{{width}}"></div>
-            </div>
-            <p>Proxima meta: {{user.revendedor.get_proxima_meta.nivel}}</p>
-            
-        </div>
-        
-        <p>Total necessário para proxima meta: R${{user.revendedor.get_proxima_meta.valor|floatformat:2}}</p>
 
         <br>
 
-        <p>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</p>
-        <p>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</p>
-        <p>Pedidos enviados: {{ qtde_pedidos_enviados }}</p>
-        <p>Pedidos completos: {{ qtde_pedidos_finalizados }}</p>
+        <h4><strong>Resumo do mês de novembro</strong></h4>
+
+        <h5>Total comprado: R${{subtotal|floatformat:2}}</h5>
+
+        <h5>Total comprado com desconto: R${{total|floatformat:2}}</h5>
+
+        <div class="container-barra">
+            <h5>Meta atual: {{user.revendedor.meta.nivel}}</h5>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:{{width}}"></div>
+            </div>
+            <h5>Proxima meta: {{user.revendedor.get_proxima_meta.nivel}}</h5>
+            
+        </div>
+        
+        <h5>Total necessário para proxima meta: R${{user.revendedor.get_proxima_meta.valor|floatformat:2}}</h5>
+
+        <br>
+
+        <h5>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</h5>
+        <h5>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
+        <h5>Pedidos enviados: {{ qtde_pedidos_enviados }}</h5>
+        <h5>Pedidos completos: {{ qtde_pedidos_finalizados }}</h5>
 
     {% elif user.tipo == "franquia" %}
 
         <h2>Bem vindo {{user.franquia.nome_fantasia}}!</h2>
         <hr>
 
-        <h4>Resumo do dia</h4>
+        <h3><strong>Resumo do dia 18 de novembro</strong></h3>
 
-        <p>Total comprado: R${{subtotal|floatformat:2}}</p>
+        <h5>Total comprado: R${{subtotal|floatformat:2}}</h5>
 
-        <p>Total comprado com desconto: R${{total|floatformat:2}}</p>
+        <h5>Total comprado com desconto: R${{total|floatformat:2}}</h5>
 
         <br>
 
-        <p>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</p>
-        <p>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</p>
-        <p>Pedidos enviados: {{ qtde_pedidos_enviados }}</p>
-        <p>Pedidos completos: {{ qtde_pedidos_finalizados }}</p>
+        <h5>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</h5>
+        <h5>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
+        <h5>Pedidos enviados: {{ qtde_pedidos_enviados }}</h5>
+        <h5>Pedidos completos: {{ qtde_pedidos_finalizados }}</h5>
 
     {% elif user.tipo == "loja" %}
 
         <h2>Bem vindo {{user.loja.nome_fantasia}}!</h2>
         <hr>
 
-        <h4>Resumo do mês</h4>
+        <h4><strong>Resumo do mês de novembro</strong></h4>
 
-        <p>Total comprado: R${{subtotal|floatformat:2}}</p>
+        <h5>Total comprado: R${{subtotal|floatformat:2}}</h5>
 
-        <p>Total comprado com desconto: R${{total|floatformat:2}}</p>
+        <h5>Total comprado com desconto: R${{total|floatformat:2}}</h5>
 
         <br>
 
-        <p>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</p>
-        <p>Pedidos enviados: {{ qtde_pedidos_enviados }}</p>
-        <p>Pedidos completos: {{ qtde_pedidos_finalizados }}</p>
+        <h5>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
+        <h5>Pedidos enviados: {{ qtde_pedidos_enviados }}</h5>
+        <h5>Pedidos completos: {{ qtde_pedidos_finalizados }}</h5>
     
     {% elif user.tipo == "supervisor" %}
 
         <h2>Bem vindo(a) {{user.supervisor.nome}}!</h2>
         <hr>
 
-        <h4>Resumo do dia</h4>
+        <h4><strong>Resumo do mes de novembro</strong></h4>
 
-        <p>Total comprado: R${{subtotal|floatformat:2}}</p>
+        <h5>Total comprado: R${{subtotal|floatformat:2}}</h5>
 
-        <p>Total comprado com desconto: R${{total|floatformat:2}}</p>
+        <h5>Total comprado com desconto: R${{total|floatformat:2}}</h5>
 
         <br>
 
-        <p>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</p>
-        <p>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</p>
+        <h5>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</h5>
+        <h5>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
         <br>
-        <p>Novos revendedores: {{ novos_revendedores }}</p>
+        <h5>Novos revendedores: {{ novos_revendedores }}</h5>
 
     {% endif %}
 

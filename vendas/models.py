@@ -21,7 +21,7 @@ class Franquia(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # campos de perfil
-    cnpj = models.CharField(_("cnpj"), max_length=15, unique=True, blank=True)
+    cnpj = models.CharField(_("CNPJ"), max_length=15, unique=True, blank=True)
     nome = models.CharField(
         _("nome"), max_length=50, blank=True)
     nome_fantasia = models.CharField(
@@ -52,7 +52,7 @@ class Supervisor(models.Model):
 
     # campos de perfil
     nome = models.CharField(_("nome"), max_length=100, blank=True)
-    cpf = models.CharField(_("cpf"), max_length=15, unique=True, blank=True)
+    cpf = models.CharField(_("CPF"), max_length=15, unique=True, blank=True)
     telefone = models.CharField(
         _("telefone"), max_length=30, blank=True)
     sexo = models.CharField(_("sexo"), choices=opcoes_sexo,
@@ -107,7 +107,7 @@ class Revendedor(models.Model):
 
     # campos de perfil
     nome = models.CharField(_("Nome"), max_length=100, blank=True)
-    cpf = models.CharField(_("Cpf"), max_length=15, blank=True)
+    cpf = models.CharField(_("CPF"), max_length=15, blank=True)
     telefone = models.CharField(_("Telefone"), max_length=15, blank=True)
     cep = models.CharField(
         _("CEP"), max_length=15, blank=True)
@@ -174,7 +174,7 @@ class Loja(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # campos de perfil
-    cnpj = models.CharField(_("cnpj"), max_length=15, unique=True, blank=True)
+    cnpj = models.CharField(_("CNPJ"), max_length=15, unique=True, blank=True)
     nome = models.CharField(
         _("nome"), max_length=50, blank=True)
     nome_fantasia = models.CharField(
@@ -301,7 +301,7 @@ class Pedido(models.Model):
     @property
     def get_meta_total(self):
         subtotal = self.get_carrinho_total
-        if hasattr(self, 'revendedor'):
+        if self.revendedor:
             total = subtotal * (1 - (self.revendedor.meta.desconto / 100))
         else:
             total = subtotal

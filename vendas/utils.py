@@ -222,11 +222,17 @@ def perfil_u_form_get(request):
 def tira_field_perfil_rev(request, tipo, p_form):
     if not request.user.tipo == User.FRANQUIA:
         if tipo == User.LOJA or tipo == User.SUPERVISOR:
-            p_form.fields.pop('is_aprovado')
+            try:
+                p_form.fields.pop('is_aprovado')
+            except:
+                pass
     if tipo == User.REVENDEDOR:
             if not request.user.tipo == User.FRANQUIA or not request.user.tipo == User.SUPERVISOR:
-                p_form.fields.pop('is_aprovado')
-                p_form.fields.pop('meta')
+                try:
+                    p_form.fields.pop('is_aprovado')
+                    p_form.fields.pop('meta')
+                except:
+                    pass
 
 def salva_p_form(request, tipo, u_form, p_form):
     if tipo == User.REVENDEDOR:

@@ -14,14 +14,16 @@
 			<div class="col-lg-4">
 				<img class="thumbnail" src="{{produto.imageURL}}">
 				<div class="box-element product">
-					<h6><strong>{{produto.nome}}</strong></h6>
+					<h5><strong>{{produto.nome}}</strong></h5>
 					<hr>
-					<h6><strong>Quantidade em estoque:  {{produto.qtde_estoque}}</strong></h6>
-                    <h4 tyle="display: inline-block; float: right"><strong>${{produto.preco|floatformat:2}}</strong></h4>
-                    <div>
-                        <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_produto' produto.id %}">Atualizar</a>
-                        <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_produto' produto.id %}">Deletar</a>
-                    </div>
+					<h5>Quantidade em estoque:  {{produto.qtde_estoque}}</h5>
+					<div class="d-flex">
+						<div>
+							<a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_produto' produto.id %}">Atualizar</a>
+							<a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_produto' produto.id %}">Deletar</a>
+						</div>
+						<h4 class="my-auto ml-auto"><strong>R${{produto.preco|floatformat:2}}</strong></h4>
+					</div>
 				</div>
 			</div>
 		{% endfor %}

@@ -47,4 +47,4 @@ class FormProduto(forms.ModelForm):
 class formMeta(forms.ModelForm):
     class Meta:
         model = Meta
-        fields = '__all__'
+        exclude = ['nivel']

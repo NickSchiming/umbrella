@@ -3,6 +3,7 @@
 body {
     margin: 0;
     font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
 }
 
 .main-login {
@@ -24,7 +25,6 @@ body {
 }
 
 .left-login>h1 {
-    font-size: 3vw;
     color: black;
 }
 
@@ -88,7 +88,6 @@ body {
     padding: 15px;
     background: #fff;
     color: black;
-    font-size: 12pt;
     /* box-shadow: 0px 10px 40px #00000056; */
     outline-color: rgb(255, 0, 0);
     box-sizing: border-box;
@@ -120,7 +119,6 @@ body {
     padding: 15px;
     background: #fff;
     color: black;
-    font-size: 12pt;
     /* box-shadow: 0px 10px 40px #00000056; */
     outline-color: rgb(255, 0, 0);
     box-sizing: border-box;
@@ -128,19 +126,16 @@ body {
 
 p {
     margin: auto;
-    font-size: 20px;
 }
 
 .reset {
     color: #f0ffffde;
     margin: 10px 0px;
-    font-size: 20px;
 }
 
 .textfield>label {
     color: #f0ffffde;
     margin: 10px 0px;
-    font-size: 20px;
 }
 
 .textfield>span {
@@ -166,7 +161,6 @@ a.btn-login {
     background: white;
     cursor: pointer;
     box-shadow: 0px 10px 40px -12px #212529;
-    font-size: 20px;
 }
 
 .btn-cadastrar {
@@ -196,7 +190,6 @@ a.btn-login {
 
 .senha {
     margin: auto;
-    font-size: 20px;
     color: white;
 }
 

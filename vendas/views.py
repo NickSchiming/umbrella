@@ -201,7 +201,7 @@ def produtos(request):
     produtos = Produto.objects.all()
     context = {'produtos': produtos, 'itensCarrinho': itensCarrinho}
 
-    if aprovado_check():
+    if aprovado_check(request.user):
         return render(request, 'vendas/produtos.html', context)
     else:
         sweetify.info(request, 'por favor aguarde o cadastro ser aprovado')
@@ -218,8 +218,8 @@ def carrinho(request):
 
     context = {'itens': itens, 'pedido': pedido,
                'itensCarrinho': itensCarrinho}
-    if aprovado_check():
-        return render(request, 'vendas/produtos.html', context)
+    if aprovado_check(request.user):
+        return render(request, 'vendas/carrinho.html', context)
     else:
         sweetify.info(request, 'por favor aguarde o cadastro ser aprovado')
         return redirect('vendas-home')
@@ -235,6 +235,7 @@ def checkout(request):
 
     context = {'itens': itens, 'pedido': pedido,
                'itensCarrinho': itensCarrinho}
+    print(pedido)
     return render(request, 'vendas/checkout.html', context)
 
 
@@ -456,7 +457,7 @@ def deletarPedido(request, pk):
     pedido.devolve_produtos()
     pedido.delete()
     sweetify.success(request, 'Pedido excluido com sucesso')
-    return redirect('pedidos')
+    return redirect('meus_pedidos')
 
 
 @login_required

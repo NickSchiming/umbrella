@@ -18,7 +18,7 @@
 					<hr>
 					<button data-produto="{{produto.id}}" data-action="add" class="btn
 						btn-outline-secondary add-btn update-carrinho">Adicionar ao carrinho</button>
-					<h4 tyle="display: inline-block; float: right"><strong>${{produto.preco|floatformat:2}}</strong></h4>
+					<h4 style="display: inline-block; float: right"><strong>R${{produto.preco|floatformat:2}}</strong></h4>
 				</div>
 			</div>
 		{% endfor %}
