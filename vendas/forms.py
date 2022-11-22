@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import DateField, DateInput, DateTimeInput, NumberInput, Textarea
 
 from users.models import User
 
@@ -9,18 +10,43 @@ from .models import (Franquia, Loja, Meta, Produto,
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()
 
+    def __init__(self, *args, **kwargs):
+        super(UserUpdateForm, self).__init__(*args, **kwargs)
+
+        for field_name in self.fields:
+            field = self.fields.get(field_name)
+            if field and isinstance(field , forms.TypedChoiceField):
+                field.choices = field.choices[1:]
+
     class Meta:
         model = User
         fields = ['email', 'tipo']
 
 
 class PerfilRevendedor(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(PerfilRevendedor, self).__init__(*args, **kwargs)
+
+        for field_name in self.fields:
+            field = self.fields.get(field_name)
+            if field and isinstance(field , forms.TypedChoiceField):
+                field.choices = field.choices[1:]
+                
     class Meta:
         model = Revendedor
         exclude = ['user', 'supervisor']
+        widgets = {
+                'datanasc': DateInput(
+                format=('%Y-%m-%d'),
+                attrs={'placeholder': 'Selecione uma data',
+               'type': 'date'
+              }),
+}
 
 
 class PerfilFranquia(forms.ModelForm):
+                
     class Meta:
         model = Franquia
         exclude = ['user']
@@ -33,9 +59,21 @@ class PerfilLoja(forms.ModelForm):
 
 
 class PerfilSupervisor(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(PerfilSupervisor, self).__init__(*args, **kwargs)
+
+        for field_name in self.fields:
+            field = self.fields.get(field_name)
+            if field and isinstance(field , forms.TypedChoiceField):
+                field.choices = field.choices[1:]
+
     class Meta:
         model = Supervisor
         exclude = ['user', 'franquia']
+        widgets = {
+            'datanasc': DateInput(attrs={'type': 'date'})
+        }
 
 
 class FormProduto(forms.ModelForm):

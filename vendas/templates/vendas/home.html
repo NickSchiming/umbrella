@@ -34,6 +34,7 @@
 
         <h5>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</h5>
         <h5>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
+        <h5>Pedidos cancelados: {{ qtde_pedidos_aprovados }}</h5>
         <h5>Pedidos enviados: {{ qtde_pedidos_enviados }}</h5>
         <h5>Pedidos completos: {{ qtde_pedidos_finalizados }}</h5>
 
@@ -52,6 +53,7 @@
 
         <h5>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</h5>
         <h5>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
+        <h5>Pedidos cancelados: {{ qtde_pedidos_aprovados }}</h5>
         <h5>Pedidos enviados: {{ qtde_pedidos_enviados }}</h5>
         <h5>Pedidos completos: {{ qtde_pedidos_finalizados }}</h5>
 
@@ -69,6 +71,7 @@
         <br>
 
         <h5>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
+        <h5>Pedidos cancelados: {{ qtde_pedidos_aprovados }}</h5>
         <h5>Pedidos enviados: {{ qtde_pedidos_enviados }}</h5>
         <h5>Pedidos completos: {{ qtde_pedidos_finalizados }}</h5>
     
@@ -76,19 +79,23 @@
 
         <h2>Bem vindo(a) {{user.supervisor.nome}}!</h2>
         <hr>
-
-        <h4><strong>Resumo do mes de novembro</strong></h4>
+        <h4><strong>Resumo do mês de novembro</strong></h4>
+        <h5>Novos revendedores: {{ novos_revendedores }}</h5>
+        <br>
+        <h5>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</h5>
+        <h5>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
+        <h5>Pedidos cancelados: {{ qtde_pedidos_aprovados }}</h5>
+        <br>
+        <h4><strong>Resumo dos revendedores subordinados do mês de novembro</strong></h4>
 
         <h5>Total comprado: R${{subtotal|floatformat:2}}</h5>
 
         <h5>Total comprado com desconto: R${{total|floatformat:2}}</h5>
 
-        <br>
+        
 
-        <h5>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</h5>
-        <h5>Pedidos aprovados: {{ qtde_pedidos_aprovados }}</h5>
-        <br>
-        <h5>Novos revendedores: {{ novos_revendedores }}</h5>
+        
+        
 
     {% endif %}
 

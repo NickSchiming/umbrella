@@ -37,7 +37,7 @@
         {{ p_form|crispy }}
       </fieldset>
       <div class="form-group">
-        <button id=btn class="btn btn-outline-info">Update</button>
+        <button id=btn class="btn btn-outline-info">Atualizar</button>
       </div>
     </form>
 </div>
@@ -50,5 +50,23 @@
       background-repeat: no-repeat;
   }
   </style>
+
+
+  <script type="text/javascript">
+    $("#id_cep").focusout(function(){
+      url = "https://viacep.com.br/ws/"+ $(this).val() +"/json/?callback=?"
+      $.ajax({
+        url: url,
+        dataType: 'json',
+        success: function(resposta){
+          $("#id_logradouro").val(resposta.logradouro);
+          $("#id_bairro").val(resposta.bairro);
+          $("#id_cidade").val(resposta.localidade);
+          $("#id_uf").val(resposta.uf);
+          $("#id_numero").focus();
+        },
+      });
+    });
+  </script>
 
 {% endblock content %}

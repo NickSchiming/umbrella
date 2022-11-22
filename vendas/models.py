@@ -10,8 +10,8 @@ MULHER = "mulher"
 OUTRO = "outro"
 
 opcoes_sexo = [
-    (HOMEM, "Homem"),
-    (MULHER, "Mulher"),
+    (HOMEM, "Masculino"),
+    (MULHER, "Feminino"),
     (OUTRO, "Outro"),
 ]
 

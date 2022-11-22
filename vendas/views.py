@@ -8,7 +8,7 @@ from .models import *
 from .utils import aprovado_check, dadosCarrinho, infoHome, perfil_u_form_get, perfil_u_form_post, renderForm, salva_p_form, temNone, tira_field_perfil_rev
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
-from babel.dates import format_date, format_datetime, format_time
+from babel.dates import format_date
 
 from django.views.generic import ListView
 
@@ -464,7 +464,12 @@ def deletarPedido(request, pk):
 @user_passes_test(supervisor_franquia_check)
 def lista_usuarios(request):
     usuarios = User.objects.all()
-    return render(request, "vendas/usuarios.html", {'usuarios': usuarios})
+    if aprovado_check(request.user):
+        return render(request, "vendas/usuarios.html", {'usuarios': usuarios})
+    else:
+        sweetify.info(request, 'por favor aguarde o cadastro ser aprovado')
+        return redirect('vendas-home')
+    
 
 
 @login_required
@@ -494,11 +499,16 @@ def deletarUsuario(request, pk):
 @user_passes_test(supervisor_franquia_check)
 def lista_pedidos(request):
     pedidos = Pedido.objects.all().exclude(completo=False)
-    return render(request, "vendas/pedidos.html", {'pedidos': pedidos})
+    if aprovado_check(request.user):
+        return render(request, "vendas/pedidos.html", {'pedidos': pedidos})
+    else:
+        sweetify.info(request, 'por favor aguarde o cadastro ser aprovado')
+        return redirect('vendas-home')
+    
 
 
 @login_required
-@user_passes_test(supervisor_franquia_check)
+@user_passes_test(franquia_check)
 def lista_produtos(request):
     produtos = Produto.objects.all()
     return render(request, "vendas/cadastro_produtos.html", {'produtos': produtos})
