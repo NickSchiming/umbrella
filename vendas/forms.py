@@ -39,10 +39,11 @@ class PerfilRevendedor(forms.ModelForm):
         widgets = {
                 'datanasc': DateInput(
                 format=('%Y-%m-%d'),
-                attrs={'placeholder': 'Selecione uma data',
-               'type': 'date'
-              }),
-}
+                attrs={
+                    'placeholder': 'Selecione uma data',
+                    'type': 'date'
+                }),
+            }
 
 
 class PerfilFranquia(forms.ModelForm):
@@ -72,8 +73,14 @@ class PerfilSupervisor(forms.ModelForm):
         model = Supervisor
         exclude = ['user', 'franquia']
         widgets = {
-            'datanasc': DateInput(attrs={'type': 'date'})
-        }
+                'datanasc': DateInput(
+                format=('%Y-%m-%d'),
+                attrs={
+                    'placeholder': 'Selecione uma data',
+                    'type': 'date'
+                }),
+            }
+
 
 
 class FormProduto(forms.ModelForm):

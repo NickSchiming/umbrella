@@ -241,12 +241,14 @@ class Pedido(models.Model):
     APROVADO = "aprovado"
     ENVIADO = "enviado"
     FINALIZADO = "finalizado"
+    CANCELADO = "cancelado"
 
     opcoes_status = [
         (APROV_PEND, "Aprovação pendente"),
         (APROVADO, "Aprovado"),
         (ENVIADO, "Enviado"),
         (FINALIZADO, "Finalizado"),
+        (CANCELADO, "Cancelado")
     ]
 
     status = models.CharField(choices=opcoes_status,

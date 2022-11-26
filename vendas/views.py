@@ -80,6 +80,12 @@ def home(request):
         sweetify.info(request, 'Por favor, finalize seu cadastro!')
         return redirect('perfil')
 
+    now = datetime.datetime.now()
+    mes = format_date(now, "MMMM", locale='pt_BR').capitalize()
+    context['mes'] = mes
+    dia = format_date(now, "d", locale='pt_BR').capitalize()
+    context['dia'] = dia
+
     return render(request, 'vendas/home.html', context)
 
 
@@ -320,10 +326,11 @@ def processarPedido(request):
         pedido.metodo_de_pagamento = pgto
         pedido.subtotal = subtotal
         pedido.total = total
-        try:
-            pedido.franquia = pedido.revendedor.supervisor.franquia
-        except:
+        if pedido.revendedor == None:
             pedido.franquia = pedido.loja.franquia
+        else:
+            pedido.franquia = pedido.revendedor.supervisor.franquia
+
         pedido.completo = True
 
     estoque = pedido.falta_estoque()
@@ -455,8 +462,9 @@ def atualizarPedido(request, pk):
 def deletarPedido(request, pk):
     pedido = Pedido.objects.get(id=pk)
     pedido.devolve_produtos()
-    pedido.delete()
-    sweetify.success(request, 'Pedido excluido com sucesso')
+    pedido.status = Pedido.CANCELADO
+    pedido.save()
+    sweetify.success(request, 'Pedido cancelado com sucesso')
     return redirect('meus_pedidos')
 
 
@@ -469,7 +477,6 @@ def lista_usuarios(request):
     else:
         sweetify.info(request, 'por favor aguarde o cadastro ser aprovado')
         return redirect('vendas-home')
-    
 
 
 @login_required
@@ -504,7 +511,6 @@ def lista_pedidos(request):
     else:
         sweetify.info(request, 'por favor aguarde o cadastro ser aprovado')
         return redirect('vendas-home')
-    
 
 
 @login_required
@@ -776,6 +782,8 @@ def graficoProdutos(request):
     data_filtro = request.session.get('data')
     if data_filtro == None:
         data_filtro = 'month'
+    
+
     key = getattr(now, data_filtro)
     filtro = 'data__' + data_filtro
 
@@ -809,22 +817,19 @@ def graficoRevendedores(request):
 
     now = datetime.datetime.now()
     data_filtro = request.session.get('data')
+
     if data_filtro == None:
         data_filtro = 'month'
+
     key = getattr(now, data_filtro)
-    filtro = 'criado__' + data_filtro
+    filtro = 'data__' + data_filtro
 
     dados = []
     response = {}
 
-    users_rev = User.objects.filter(tipo=User.REVENDEDOR, **{filtro: key})
-    for user in users_rev:
-        try:
-            user.revendedor
-            dados.append(
-                {user.revendedor.nome: user.revendedor.total_comprado})
-        except:
-            pass
+    pedidos = request.user.franquia.pedido_set.filter(loja=None, **{filtro: key})
+    for pedido in pedidos:
+            dados.append({pedido.revendedor.nome: pedido.get_meta_total})
 
     for d in dados:
         key = list(d.keys())[0]
@@ -848,20 +853,15 @@ def graficoLojas(request):
     if data_filtro == None:
         data_filtro = 'month'
     key = getattr(now, data_filtro)
-    filtro = 'criado__' + data_filtro
+    filtro = 'data__' + data_filtro
 
     dados = []
     response = {}
 
-    users_loja = User.objects.filter(tipo=User.LOJA, **{filtro: key})
-    for user in users_loja:
-        try:
-            user.loja
-            dados.append({user.loja.razaosocial: user.loja.total_comprado})
-        except:
-            pass
-
-    print(dados)
+    pedidos = request.user.franquia.pedido_set.filter(revendedor=None,**{filtro: key})
+    print(pedidos)
+    for pedido in pedidos:
+            dados.append({pedido.loja.nome_fantasia: pedido.get_meta_total})
 
     for d in dados:
         key = list(d.keys())[0]
@@ -884,10 +884,13 @@ def graficoTempo(request):
     key = getattr(now, data_filtro)
     filtro = 'data__' + data_filtro
 
+    
+
     dados = []
     response = {}
 
     pedidos = Pedido.objects.filter(completo=True, **{filtro: key})
+    
 
     if data_filtro == 'day':
         for pedido in pedidos:

@@ -36,8 +36,16 @@
 
       {% if pedido.revendedor.user == request.user or pedido.loja.user == request.user %}
         <div>
-          <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
-          <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Cancelar</a>
+          {% if  pedido.status == 'cancelado' %}
+            <br>
+            <h4>Pedido cancelado</h4>
+          {% elif  pedido.status == 'finalizado' %}
+            <br>
+            <h4>Pedido finalizado</h4>
+          {% elif pedido.status != 'enviado' %}
+            <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
+            <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Cancelar</a>
+          {% endif %}
           {% if pedido.status == 'enviado' %}
             <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'confirmar_pedido' pedido.id %}">Confirmar recebimento</a>
           {% endif %}

@@ -13,7 +13,7 @@
 
         <br>
 
-        <h4><strong>Resumo do mês de novembro</strong></h4>
+        <h4><strong>Resumo do mês de {{mes}}</strong></h4>
 
         <h5>Total comprado: R${{subtotal|floatformat:2}}</h5>
 
@@ -43,7 +43,7 @@
         <h2>Bem vindo {{user.franquia.nome_fantasia}}!</h2>
         <hr>
 
-        <h3><strong>Resumo do dia 18 de novembro</strong></h3>
+        <h3><strong>Resumo do dia {{dia}} de {{mes}}</strong></h3>
 
         <h5>Total comprado: R${{subtotal|floatformat:2}}</h5>
 
@@ -62,7 +62,7 @@
         <h2>Bem vindo {{user.loja.nome_fantasia}}!</h2>
         <hr>
 
-        <h4><strong>Resumo do mês de novembro</strong></h4>
+        <h4><strong>Resumo do mês de {{mes}}</strong></h4>
 
         <h5>Total comprado: R${{subtotal|floatformat:2}}</h5>
 
@@ -79,7 +79,7 @@
 
         <h2>Bem vindo(a) {{user.supervisor.nome}}!</h2>
         <hr>
-        <h4><strong>Resumo do mês de novembro</strong></h4>
+        <h4><strong>Resumo do mês de {{mes}}</strong></h4>
         <h5>Novos revendedores: {{ novos_revendedores }}</h5>
         <br>
         <h5>Pedidos pendentes: {{ qtde_pedidos_pendentes }}</h5>
