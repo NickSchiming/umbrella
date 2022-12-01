@@ -202,3 +202,8 @@ h6 {
 .form-perfil{
 	margin-right: 0;
 }
+
+
+.asteriskField {
+    display: none;
+}

@@ -2,6 +2,8 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.js"></script>
+
 <div class="content-section">  
     <form id="form" method="POST" enctype="multipart/form-data">
       {% csrf_token %}
@@ -53,7 +55,31 @@
 
 
   <script type="text/javascript">
+
+
+    jQuery("#id_telefone")
+        .mask("(99) 9999-9999?9")
+        .focusout(function (event) {  
+            var target, phone, element;  
+            target = (event.currentTarget) ? event.currentTarget : event.srcElement;  
+            phone = target.value.replace(/\D/g, '');
+            element = $(target);  
+            element.unmask();  
+            if(phone.length > 10) {  
+                element.mask("(99) 99999-999?9");  
+            } else {  
+                element.mask("(99) 9999-9999?9");  
+            }  
+        });
+
+    jQuery("#id_cpf").mask("999.999.999-99");
+
+    jQuery("#id_cep").mask("99.999-999");
+ 
+
     $("#id_cep").focusout(function(){
+      cep = $(this).val()
+      alert(cep)
       url = "https://viacep.com.br/ws/"+ $(this).val() +"/json/?callback=?"
       $.ajax({
         url: url,
@@ -66,6 +92,10 @@
           $("#id_numero").focus();
         },
       });
+    });
+
+    $(document).on("keydown", ":input:not(textarea):not(:submit)", function(event) { 
+      return event.key != "Enter";
     });
   </script>
 

@@ -753,6 +753,7 @@ def relatorios(request):
     qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
     qtde_pedidos_enviados = pedidos.filter(status=Pedido.ENVIADO).count()
     qtde_pedidos_finalizados = pedidos.filter(status=Pedido.FINALIZADO).count()
+    qtde_pedidos_cancelados = pedidos.filter(status=Pedido.CANCELADO).count()
 
     total = sum([pedido.get_meta_total for pedido in pedidos])
     subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
@@ -769,6 +770,7 @@ def relatorios(request):
         'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
         'qtde_pedidos_enviados': qtde_pedidos_enviados,
         'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
+        'qtde_pedidos_cancelados': qtde_pedidos_cancelados,
         'novos_revendedores': users_rev,
     }
 
@@ -782,7 +784,6 @@ def graficoProdutos(request):
     data_filtro = request.session.get('data')
     if data_filtro == None:
         data_filtro = 'month'
-    
 
     key = getattr(now, data_filtro)
     filtro = 'data__' + data_filtro
@@ -827,9 +828,10 @@ def graficoRevendedores(request):
     dados = []
     response = {}
 
-    pedidos = request.user.franquia.pedido_set.filter(loja=None, **{filtro: key})
+    pedidos = request.user.franquia.pedido_set.filter(
+        loja=None, **{filtro: key})
     for pedido in pedidos:
-            dados.append({pedido.revendedor.nome: pedido.get_meta_total})
+        dados.append({pedido.revendedor.nome: pedido.get_meta_total})
 
     for d in dados:
         key = list(d.keys())[0]
@@ -858,10 +860,11 @@ def graficoLojas(request):
     dados = []
     response = {}
 
-    pedidos = request.user.franquia.pedido_set.filter(revendedor=None,**{filtro: key})
+    pedidos = request.user.franquia.pedido_set.filter(
+        revendedor=None, **{filtro: key})
     print(pedidos)
     for pedido in pedidos:
-            dados.append({pedido.loja.nome_fantasia: pedido.get_meta_total})
+        dados.append({pedido.loja.nome_fantasia: pedido.get_meta_total})
 
     for d in dados:
         key = list(d.keys())[0]
@@ -884,13 +887,10 @@ def graficoTempo(request):
     key = getattr(now, data_filtro)
     filtro = 'data__' + data_filtro
 
-    
-
     dados = []
     response = {}
 
     pedidos = Pedido.objects.filter(completo=True, **{filtro: key})
-    
 
     if data_filtro == 'day':
         for pedido in pedidos:

@@ -1,5 +1,7 @@
 from django import forms
 from django.forms import DateField, DateInput, DateTimeInput, NumberInput, Textarea
+from localflavor.br.forms import BRCPFField, BRCNPJField
+from phonenumber_field.formfields import PhoneNumberField
 
 from users.models import User
 
@@ -25,6 +27,8 @@ class UserUpdateForm(forms.ModelForm):
 
 class PerfilRevendedor(forms.ModelForm):
 
+    cpf = BRCPFField()
+
     def __init__(self, *args, **kwargs):
         super(PerfilRevendedor, self).__init__(*args, **kwargs)
 
@@ -47,6 +51,8 @@ class PerfilRevendedor(forms.ModelForm):
 
 
 class PerfilFranquia(forms.ModelForm):
+
+    CNPJ = BRCNPJField()
                 
     class Meta:
         model = Franquia
@@ -54,12 +60,17 @@ class PerfilFranquia(forms.ModelForm):
 
 
 class PerfilLoja(forms.ModelForm):
+
+    CNPJ = BRCNPJField()
+
     class Meta:
         model = Loja
         exclude = ['user', 'franquia', 'meta']
 
 
 class PerfilSupervisor(forms.ModelForm):
+
+    cpf = BRCPFField()
 
     def __init__(self, *args, **kwargs):
         super(PerfilSupervisor, self).__init__(*args, **kwargs)

@@ -15,6 +15,10 @@ body {
     align-items: center;
 }
 
+.asteriskField {
+    display: none;
+}
+
 .left-login {
     width: 50vw;
     height: 100vh;

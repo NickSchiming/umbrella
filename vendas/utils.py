@@ -182,6 +182,8 @@ def infoHome(user, pedidos):
         qtde_pedidos_pendentes = pedidos.filter(
             completo=True, status=Pedido.APROV_PEND).count()
         qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
+        qtde_pedidos_cancelados = pedidos.filter(
+            status=Pedido.CANCELADO).count()
         qtde_pedidos_enviados = pedidos.filter(status=Pedido.ENVIADO).count()
         qtde_pedidos_finalizados = pedidos.filter(
             status=Pedido.FINALIZADO).count()
@@ -202,6 +204,7 @@ def infoHome(user, pedidos):
         'qtde_pedidos_aprovados': qtde_pedidos_aprovados,
         'qtde_pedidos_enviados': qtde_pedidos_enviados,
         'qtde_pedidos_finalizados': qtde_pedidos_finalizados,
+        'qtde_pedidos_cancelados': qtde_pedidos_cancelados
     }
     return context
 
@@ -210,14 +213,16 @@ def perfil_u_form_post(request):
     u_form = UserUpdateForm(request.POST, instance=request.user)
     if not request.user.tipo == User.FRANQUIA:
         u_form.fields.pop('tipo')
-    
+
     return u_form
+
 
 def perfil_u_form_get(request):
     u_form = UserUpdateForm(instance=request.user)
     if not request.user.tipo == User.FRANQUIA:
         u_form.fields.pop('tipo')
     return u_form
+
 
 def tira_field_perfil_rev(request, tipo, p_form):
     if not request.user.tipo == User.FRANQUIA:
@@ -227,12 +232,13 @@ def tira_field_perfil_rev(request, tipo, p_form):
             except:
                 pass
     if tipo == User.REVENDEDOR:
-            if not request.user.tipo == User.FRANQUIA or not request.user.tipo == User.SUPERVISOR:
-                try:
-                    p_form.fields.pop('is_aprovado')
-                    p_form.fields.pop('meta')
-                except:
-                    pass
+        if not request.user.tipo == User.FRANQUIA or not request.user.tipo == User.SUPERVISOR:
+            try:
+                p_form.fields.pop('is_aprovado')
+                p_form.fields.pop('meta')
+            except:
+                pass
+
 
 def salva_p_form(request, tipo, u_form, p_form):
     if tipo == User.REVENDEDOR:
@@ -242,7 +248,8 @@ def salva_p_form(request, tipo, u_form, p_form):
 
     if u_form.is_valid() and p_form.is_valid():
         if temNone(p_form):
-            sweetify.warning(request, 'Preencha todos os campos para continuar')
+            sweetify.warning(
+                request, 'Preencha todos os campos para continuar')
         else:
             u_form.save()
             form = p_form.save(commit=False)
@@ -251,8 +258,8 @@ def salva_p_form(request, tipo, u_form, p_form):
             sweetify.success(request, 'Seus dados foram atualizados')
     else:
         sweetify.error(request, 'Houve um erro na atualização dos dados')
-        
-        
+
+
 def aprovado_check(user):
     if hasattr(user, 'supervisor'):
         if user.supervisor.is_aprovado:

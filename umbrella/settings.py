@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'vendas.apps.VendasConfig',
     'sweetify',
     'crispy_forms',
+    'phonenumber_field',
+    'phonenumbers',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
