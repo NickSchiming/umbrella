@@ -144,14 +144,14 @@
 			
 	    <ul class="navbar-nav ml-auto">
 			
-			<div class="form-inline my-2 my-lg-0">
+			<li class="form-inline my-2 my-lg-0">
 				<a href="{% url 'carrinho' %}">
 				<img  id="carrinho-icon" src="{% static 'vendas/images/cart.png' %}">
 				</a>
 				<p id="carrinho-total">{{itensCarrinho}}</p>
-			</div>
+			</li>
 			<li class="nav-item">
-				<a class="nav-link" href="{% url 'logout' %}"> <img class="img-icone" src="{% static 'vendas/images/leave.png' %}"> </a>
+				<a class="leave nav-link" href="{% url 'logout' %}"> <img class="img-icone" src="{% static 'vendas/images/leave.png' %}"> </a>
 			</li>
 		</ul>	
 	</nav>

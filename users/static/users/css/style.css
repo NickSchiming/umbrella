@@ -39,15 +39,15 @@ body {
 
 .right-login {
     width: 50vw;
-    height: 100vh;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .card-login {
-    margin-top: 5%;
-    margin-bottom: 5%;
+    margin-top: auto;
+    margin-bottom: auto;
     width: 60%;
     display: flex;
     justify-content: center;

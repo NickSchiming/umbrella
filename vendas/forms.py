@@ -2,6 +2,7 @@ from django import forms
 from django.forms import DateField, DateInput, DateTimeInput, NumberInput, Textarea
 from localflavor.br.forms import BRCPFField, BRCNPJField
 from phonenumber_field.formfields import PhoneNumberField
+from django.utils.translation import gettext_lazy as _
 
 from users.models import User
 
@@ -17,7 +18,7 @@ class UserUpdateForm(forms.ModelForm):
 
         for field_name in self.fields:
             field = self.fields.get(field_name)
-            if field and isinstance(field , forms.TypedChoiceField):
+            if field and isinstance(field, forms.TypedChoiceField):
                 field.choices = field.choices[1:]
 
     class Meta:
@@ -27,33 +28,33 @@ class UserUpdateForm(forms.ModelForm):
 
 class PerfilRevendedor(forms.ModelForm):
 
-    cpf = BRCPFField()
+    cpf = BRCPFField(label=_('CPF'))
 
     def __init__(self, *args, **kwargs):
         super(PerfilRevendedor, self).__init__(*args, **kwargs)
 
         for field_name in self.fields:
             field = self.fields.get(field_name)
-            if field and isinstance(field , forms.TypedChoiceField):
+            if field and isinstance(field, forms.TypedChoiceField):
                 field.choices = field.choices[1:]
-                
+
     class Meta:
         model = Revendedor
         exclude = ['user', 'supervisor']
         widgets = {
-                'datanasc': DateInput(
+            'datanasc': DateInput(
                 format=('%Y-%m-%d'),
                 attrs={
                     'placeholder': 'Selecione uma data',
                     'type': 'date'
                 }),
-            }
+        }
 
 
 class PerfilFranquia(forms.ModelForm):
 
-    CNPJ = BRCNPJField()
-                
+    cnpj = BRCNPJField()
+
     class Meta:
         model = Franquia
         exclude = ['user']
@@ -61,7 +62,7 @@ class PerfilFranquia(forms.ModelForm):
 
 class PerfilLoja(forms.ModelForm):
 
-    CNPJ = BRCNPJField()
+    cnpj = BRCNPJField(label=_('CNPJ'))
 
     class Meta:
         model = Loja
@@ -70,28 +71,27 @@ class PerfilLoja(forms.ModelForm):
 
 class PerfilSupervisor(forms.ModelForm):
 
-    cpf = BRCPFField()
+    cpf = BRCPFField(label=_('CPF'))
 
     def __init__(self, *args, **kwargs):
         super(PerfilSupervisor, self).__init__(*args, **kwargs)
 
         for field_name in self.fields:
             field = self.fields.get(field_name)
-            if field and isinstance(field , forms.TypedChoiceField):
+            if field and isinstance(field, forms.TypedChoiceField):
                 field.choices = field.choices[1:]
 
     class Meta:
         model = Supervisor
         exclude = ['user', 'franquia']
         widgets = {
-                'datanasc': DateInput(
+            'datanasc': DateInput(
                 format=('%Y-%m-%d'),
                 attrs={
                     'placeholder': 'Selecione uma data',
                     'type': 'date'
                 }),
-            }
-
+        }
 
 
 class FormProduto(forms.ModelForm):

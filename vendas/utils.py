@@ -281,3 +281,26 @@ def aprovado_check(user):
             return True
         else:
             return False
+
+
+def verifica_perfil(request, revendedorPed):
+    if request.user.tipo == User.REVENDEDOR:
+        try:
+            request.user.revendedor
+        except:
+            sweetify.error(
+                request, 'Porfavor cadastre seus dados antes de fazer um pedido')
+            return True
+    elif request.user.tipo == User.LOJA:
+        try:
+            request.user.loja
+        except:
+            sweetify.error(
+                request, 'Porfavor cadastre seus dados antes de fazer um pedido')
+            return True
+    else:
+        if revendedorPed == None:
+            sweetify.error(request, 'Selecione um pedido para poder altera-lo')
+            return True
+    
+    return False

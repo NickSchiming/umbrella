@@ -203,7 +203,11 @@ h6 {
 	margin-right: 0;
 }
 
-
 .asteriskField {
     display: none;
+}
+
+.leave{
+	display: table;
+	margin: auto 5px auto auto;
 }

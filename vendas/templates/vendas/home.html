@@ -2,7 +2,7 @@
 {% block content %}
 <div class="content-section">
     {% if user.tipo == "revendedor" %}
-        <h2>Bem vindo(a) {{user.revendedor.nome}}!</h2>
+        <h2>Bem-vindo(a) {{user.revendedor.nome}}!</h2>
         <hr>
 
         {% if user.revendedor.is_aprovado %}
@@ -40,7 +40,7 @@
 
     {% elif user.tipo == "franquia" %}
 
-        <h2>Bem vindo {{user.franquia.nome_fantasia}}!</h2>
+        <h2>Bem-vindo {{user.franquia.nome_fantasia}}!</h2>
         <hr>
 
         <h3><strong>Resumo do dia {{dia}} de {{mes}}</strong></h3>
@@ -59,7 +59,7 @@
 
     {% elif user.tipo == "loja" %}
 
-        <h2>Bem vindo {{user.loja.nome_fantasia}}!</h2>
+        <h2>Bem-vindo {{user.loja.nome_fantasia}}!</h2>
         <hr>
 
         <h4><strong>Resumo do mês de {{mes}}</strong></h4>
@@ -77,7 +77,7 @@
     
     {% elif user.tipo == "supervisor" %}
 
-        <h2>Bem vindo(a) {{user.supervisor.nome}}!</h2>
+        <h2>Bem-vindo(a) {{user.supervisor.nome}}!</h2>
         <hr>
         <h4><strong>Resumo do mês de {{mes}}</strong></h4>
         <h5>Novos revendedores: {{ novos_revendedores }}</h5>

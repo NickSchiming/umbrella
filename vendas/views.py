@@ -5,7 +5,7 @@ import sweetify
 from django.http import JsonResponse
 import json
 from .models import *
-from .utils import aprovado_check, dadosCarrinho, infoHome, perfil_u_form_get, perfil_u_form_post, renderForm, salva_p_form, temNone, tira_field_perfil_rev
+from .utils import aprovado_check, dadosCarrinho, infoHome, perfil_u_form_get, perfil_u_form_post, renderForm, salva_p_form, temNone, tira_field_perfil_rev, verifica_perfil
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from babel.dates import format_date
@@ -179,24 +179,8 @@ def perfil(request):
 
 @login_required
 def produtos(request):
-    if request.user.tipo == User.REVENDEDOR:
-        try:
-            request.user.revendedor
-        except:
-            sweetify.error(
-                request, 'Porfavor cadastre seus dados antes de fazer um pedido')
-            return redirect('perfil')
-    elif request.user.tipo == User.LOJA:
-        try:
-            request.user.loja
-        except:
-            sweetify.error(
-                request, 'Porfavor cadastre seus dados antes de fazer um pedido')
-            return redirect('perfil')
-    else:
-        if revendedorPed == None:
-            sweetify.error(request, 'Selecione um pedido para poder altera-lo')
-            return redirect('pedidos')
+    if verifica_perfil(request, revendedorPed):
+        return redirect('perfil')
 
     dados = dadosCarrinho(request, revendedorPed)
 
@@ -216,6 +200,8 @@ def produtos(request):
 
 @login_required
 def carrinho(request):
+    if verifica_perfil(request, revendedorPed):
+        return redirect('perfil')
     data = dadosCarrinho(request, revendedorPed)
 
     itensCarrinho = data['itensCarrinho']
@@ -319,7 +305,7 @@ def processarPedido(request):
     pgto = dados['form']['formaPgto']
 
     if total == pedido.get_meta_total:
-        if request.user.tipo == User.REVENDEDOR:
+        if request.user.tipo != User.LOJA and hasattr(pedido, 'revendedor'):
             pedido.status = Pedido.APROV_PEND
         else:
             pedido.status = Pedido.APROVADO
@@ -737,23 +723,28 @@ def relatorios(request):
 
     soma = 0
     if grupo == 'lojas':
-        pedidos = request.user.franquia.pedido_set.filter(
+        pedidos_cancel = request.user.franquia.pedido_set.filter(
             revendedor=None, **{filtro: key})
+        pedidos = pedidos_cancel.exclude(status=Pedido.CANCELADO)
     elif grupo == 'revendedores':
-        pedidos = request.user.franquia.pedido_set.filter(
+        pedidos_cancel = request.user.franquia.pedido_set.filter(
             loja=None, **{filtro: key})
+        pedidos = pedidos_cancel.exclude(status=Pedido.CANCELADO)
     else:
-        pedidos = request.user.franquia.pedido_set.filter(**{filtro: key})
+        pedidos_cancel = request.user.franquia.pedido_set.filter(
+            **{filtro: key})
+        pedidos = pedidos_cancel.exclude(status=Pedido.CANCELADO)
 
     users_rev = User.objects.filter(
         tipo=User.REVENDEDOR, **{filtro_user: key}).count()
 
-    qtde_pedidos = pedidos.filter().count()
+    qtde_pedidos = pedidos_cancel.filter().count()
     qtde_pedidos_pendentes = pedidos.filter(status=Pedido.APROV_PEND).count()
     qtde_pedidos_aprovados = pedidos.filter(status=Pedido.APROVADO).count()
     qtde_pedidos_enviados = pedidos.filter(status=Pedido.ENVIADO).count()
     qtde_pedidos_finalizados = pedidos.filter(status=Pedido.FINALIZADO).count()
-    qtde_pedidos_cancelados = pedidos.filter(status=Pedido.CANCELADO).count()
+    qtde_pedidos_cancelados = pedidos_cancel.filter(
+        status=Pedido.CANCELADO).count()
 
     total = sum([pedido.get_meta_total for pedido in pedidos])
     subtotal = sum([pedido.get_carrinho_total for pedido in pedidos])
@@ -792,7 +783,9 @@ def graficoProdutos(request):
     item = []
     response = {}
 
-    pedidos = Pedido.objects.filter(completo=True, **{filtro: key})
+    pedidos_cancel = Pedido.objects.filter(
+        completo=True, **{filtro: key})
+    pedidos = pedidos_cancel.exclude(status=Pedido.CANCELADO)
     for pedido in pedidos:
         set = pedido.itempedido_set.all()
         for i in set:
@@ -828,8 +821,8 @@ def graficoRevendedores(request):
     dados = []
     response = {}
 
-    pedidos = request.user.franquia.pedido_set.filter(
-        loja=None, **{filtro: key})
+    pedidos = request.user.franquia.pedido_set.filter(completo=True,
+                                                      loja=None, **{filtro: key}).exclude(status=Pedido.CANCELADO)
     for pedido in pedidos:
         dados.append({pedido.revendedor.nome: pedido.get_meta_total})
 
@@ -860,8 +853,8 @@ def graficoLojas(request):
     dados = []
     response = {}
 
-    pedidos = request.user.franquia.pedido_set.filter(
-        revendedor=None, **{filtro: key})
+    pedidos = request.user.franquia.pedido_set.filter(completo=True,
+                                                      revendedor=None, **{filtro: key}).exclude(status=Pedido.CANCELADO)
     print(pedidos)
     for pedido in pedidos:
         dados.append({pedido.loja.nome_fantasia: pedido.get_meta_total})
@@ -890,7 +883,8 @@ def graficoTempo(request):
     dados = []
     response = {}
 
-    pedidos = Pedido.objects.filter(completo=True, **{filtro: key})
+    pedidos = Pedido.objects.filter(
+        completo=True, **{filtro: key}).exclude(status=Pedido.CANCELADO)
 
     if data_filtro == 'day':
         for pedido in pedidos:
