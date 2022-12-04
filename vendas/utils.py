@@ -290,17 +290,17 @@ def verifica_perfil(request, revendedorPed):
         except:
             sweetify.error(
                 request, 'Porfavor cadastre seus dados antes de fazer um pedido')
-            return True
+            return 1
     elif request.user.tipo == User.LOJA:
         try:
             request.user.loja
         except:
             sweetify.error(
                 request, 'Porfavor cadastre seus dados antes de fazer um pedido')
-            return True
+            return 1
     else:
         if revendedorPed == None:
-            sweetify.error(request, 'Selecione um pedido para poder altera-lo')
-            return True
+            sweetify.warning(request, 'Selecione um pedido para poder altera-lo')
+            return 2
     
-    return False
+    return 0

@@ -23,7 +23,7 @@
         {% for item in itens %}
         <div class="carrinho-row">
           <div style="flex:2"><img class="row-image"
-              src="{{item.produto.imageURL}}"></div>
+              src="{{item.produto.ima}}"></div>
           <div style="flex:2"><p>{{item.produto.nome}}</p></div>
           <div style="flex:1"><p>R${{item.produto.preco|floatformat:2}}</p></div>
           <div style="flex:1">
@@ -76,7 +76,7 @@
         {% else  %}
           <div>
             <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_pedido' pedido.id %}">Alterar</a>
-            <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_pedido' pedido.id %}">Cancelar</a>
+            <a id="btn-deleta" class="btn btn-danger btn-me mt-1 mb-1">Cancelar</a>
             {% if pedido.status == 'aprovacao_pendente' %}
             <a class="btn btn-success btn-me mt-1 mb-1" href="{% url 'aprovar_pedido' pedido.id %}">Aprovar</a>
             {% endif %}
@@ -87,4 +87,30 @@
 
   </div>
 </article>
+
+  <script>
+
+    $("#btn-deleta").click(function() {
+      Swal.fire({
+        title: 'Tem certeza?',
+        text: "O pedido será cancelado e os itens devolvidos a estoque!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        cancelButtonText: 'Não',
+        confirmButtonText: 'Sim',
+        customClass: {
+          actions: 'my-actions',
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "{% url 'deletar_pedido' pedido.id %}"
+        }
+      })
+    });
+
+    
+
+  </script>
 {% endblock content %}

@@ -179,8 +179,10 @@ def perfil(request):
 
 @login_required
 def produtos(request):
-    if verifica_perfil(request, revendedorPed):
+    if verifica_perfil(request, revendedorPed) == 1:
         return redirect('perfil')
+    elif verifica_perfil(request, revendedorPed) == 2:
+        return redirect('pedidos')
 
     dados = dadosCarrinho(request, revendedorPed)
 
@@ -451,7 +453,10 @@ def deletarPedido(request, pk):
     pedido.status = Pedido.CANCELADO
     pedido.save()
     sweetify.success(request, 'Pedido cancelado com sucesso')
-    return redirect('meus_pedidos')
+    if request.user.tipo not in (User.SUPERVISOR, User.FRANQUIA):
+        return redirect('meus_pedidos')
+    else:
+        return redirect('pedidos')
 
 
 @login_required

@@ -50,4 +50,27 @@
 			{% endfor %}
 		{% endif %}
 	</div>
+
+	<script>
+
+		$("#btn-deleta").click(function() {
+			Swal.fire({
+			  title: 'Tem certeza?',
+			  text: "O pedido será cancelado e os itens devolvidos a estoque!",
+			  icon: 'warning',
+			  showCancelButton: true,
+			  confirmButtonColor: '#3085d6',
+			  cancelButtonColor: '#d33',
+			  cancelButtonText: 'Não',
+			  confirmButtonText: 'Sim',
+			  customClass: {
+				actions: 'my-actions',
+			  }
+			}).then((result) => {
+			  if (result.isConfirmed) {
+				window.location.href = "{% url 'deletar_pedido' pedido.id %}"
+			  }
+			})
+		  });
+	</script>
 {% endblock content %}

@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from users.models import User
+from PIL import Image
 
 # Definição das escolhas dos campos sexo
 HOMEM = "homem"
@@ -222,15 +223,6 @@ class Produto(models.Model):
 
     def __str__(self):
         return str(self.codigo) + ' - ' + self.nome
-
-    @property
-    def imageURL(self):
-        try:
-            url = self.image.url
-        except:
-            url = ''
-        return url
-
 
 class Pedido(models.Model):
     cod_pedido = models.CharField(
