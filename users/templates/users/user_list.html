@@ -39,7 +39,7 @@
 
                         <div>
                             <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_usuario' usuario.id %}">Atualizar</a>
-                            <a id="btn-deleta" class="btn btn-danger btn-me mt-1 mb-1">Deletar</a>
+                            <a id="btn-deleta" class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_usuario' usuario.id %}">Deletar</a>
                         </div>
 					</div>
 				</div>
@@ -47,25 +47,4 @@
 		{% endif %}
 	</div>
 
-	<script>
-		$("#btn-deleta").click(function() {
-			Swal.fire({
-			  title: 'Tem certeza?',
-			  text: "O pedido será cancelado e os itens devolvidos a estoque!",
-			  icon: 'warning',
-			  showCancelButton: true,
-			  confirmButtonColor: '#3085d6',
-			  cancelButtonColor: '#d33',
-			  cancelButtonText: 'Não',
-			  confirmButtonText: 'Sim',
-			  customClass: {
-				actions: 'my-actions',
-			  }
-			}).then((result) => {
-			  if (result.isConfirmed) {
-				window.location.href = "{% url 'deletar_usuario' usuario.id %}"
-			  }
-			})
-		  });
-	</script>
 {% endblock content %}

@@ -33,7 +33,7 @@
 				</div>
 				{% for item in itens %}
 					<div class="carrinho-row">
-						<div style="flex:2"><img class="row-image" src="{{item.produto.imageURL}}"></div>
+						<div style="flex:2"><img class="row-image" src="{{item.produto.image.url}}"></div>
 						<div style="flex:2"><p>{{item.produto.nome}}</p></div>
 						<div style="flex:1"><p>R${{item.produto.preco|floatformat:2}}</p></div>
 						<div style="flex:1">

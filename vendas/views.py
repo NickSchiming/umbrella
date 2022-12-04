@@ -462,7 +462,7 @@ def deletarPedido(request, pk):
 @login_required
 @user_passes_test(supervisor_franquia_check)
 def lista_usuarios(request):
-    usuarios = User.objects.all()
+    usuarios = User.objects.all().order_by('-criado')
     if aprovado_check(request.user):
         return render(request, "vendas/usuarios.html", {'usuarios': usuarios})
     else:
@@ -496,7 +496,7 @@ def deletarUsuario(request, pk):
 @login_required
 @user_passes_test(supervisor_franquia_check)
 def lista_pedidos(request):
-    pedidos = Pedido.objects.all().exclude(completo=False)
+    pedidos = Pedido.objects.all().exclude(completo=False).order_by('-data')
     if aprovado_check(request.user):
         return render(request, "vendas/pedidos.html", {'pedidos': pedidos})
     else:
@@ -589,7 +589,7 @@ class pesquisaUsuarios(LoginRequiredMixin, ListView):
         query = self.request.GET.get("q")
         object_list = User.objects.filter(
             Q(email__icontains=query) | Q(tipo__icontains=query)
-        )
+        ).order_by('-criado')
         return object_list
 
 
@@ -600,6 +600,7 @@ def pesquisaRevNovo(request):
         loja_list = Loja.objects.filter(is_aprovado=False)
         supervisor_list = Supervisor.objects.filter(is_aprovado=False)
         object_list = list(chain(revendedor_list, loja_list, supervisor_list))
+        print(object_list)
     else:
         object_list = Revendedor.objects.filter(is_aprovado=False)
 
