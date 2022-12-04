@@ -43,7 +43,7 @@
 
                         <div>
                             <a class="btn btn-secondary btn-me mt-1 mb-1" href="{% url 'atualizar_usuario' revendedor.user.id %}">Atualizar</a>
-                            <a class="btn btn-danger btn-me mt-1 mb-1" href="{% url 'deletar_usuario' revendedor.user.id %}">Deletar</a>
+                            <a id="btn-deleta" class="btn btn-danger btn-me mt-1 mb-1"">Deletar</a>
                         </div>
 					</div>
 				</div>
@@ -68,7 +68,7 @@
 			  }
 			}).then((result) => {
 			  if (result.isConfirmed) {
-				window.location.href = "{% url 'deletar_pedido' pedido.id %}"
+				window.location.href = "{% url 'deletar_usuario' pedido.id %}"
 			  }
 			})
 		  });
