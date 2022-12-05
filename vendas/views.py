@@ -679,16 +679,17 @@ def atualizarMetasRevendedores(request):
 
     revendedores = Revendedor.objects.all()
     iniciante, bronze, prata, ouro, diamante = Meta.objects.all()
+    print(Meta.objects.all())
 
     for revendedor in revendedores:
-        if revendedor.total_comprado_mes >= bronze.valor:
-            revendedor.meta = bronze
-        elif revendedor.total_comprado_mes >= prata.valor:
-            revendedor.meta = prata
+        if revendedor.total_comprado_mes >= diamante.valor:
+            revendedor.meta = diamante
         elif revendedor.total_comprado_mes >= ouro.valor:
             revendedor.meta = ouro
-        elif revendedor.total_comprado_mes >= diamante.valor:
-            revendedor.meta = diamante
+        elif revendedor.total_comprado_mes >= prata.valor:
+            revendedor.meta = prata
+        elif revendedor.total_comprado_mes >= bronze.valor:
+            revendedor.meta = bronze
         elif revendedor.total_comprado_mes < bronze.valor:
             revendedor.meta = iniciante
         revendedor.save()
