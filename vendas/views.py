@@ -9,15 +9,12 @@ from .utils import aprovado_check, dadosCarrinho, infoHome, perfil_u_form_get, p
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from babel.dates import format_date
+from django.core import serializers
 
 from django.views.generic import ListView
 
 from vendas.models import Pedido
 from .forms import *
-
-global revendedorPed
-revendedorPed = None
-
 
 def supervisor_check(user):
     if user.tipo == User.SUPERVISOR:
@@ -179,12 +176,12 @@ def perfil(request):
 
 @login_required
 def produtos(request):
-    if verifica_perfil(request, revendedorPed) == 1:
+    if verifica_perfil(request, request.session.get('revendped_id')) == 1:
         return redirect('perfil')
-    elif verifica_perfil(request, revendedorPed) == 2:
+    elif verifica_perfil(request, request.session.get('revendped_id')) == 2:
         return redirect('pedidos')
 
-    dados = dadosCarrinho(request, revendedorPed)
+    dados = dadosCarrinho(request, request.session.get('revendped_id'),request.session.get('tipo'))
 
     itensCarrinho = dados['itensCarrinho']
     pedido = dados['pedido']
@@ -202,9 +199,9 @@ def produtos(request):
 
 @login_required
 def carrinho(request):
-    if verifica_perfil(request, revendedorPed):
+    if verifica_perfil(request, request.session.get('revendped_id')):
         return redirect('perfil')
-    data = dadosCarrinho(request, revendedorPed)
+    data = dadosCarrinho(request, request.session.get('revendped_id'),request.session.get('tipo'))
 
     itensCarrinho = data['itensCarrinho']
     pedido = data['pedido']
@@ -221,7 +218,7 @@ def carrinho(request):
 
 @login_required
 def checkout(request):
-    data = dadosCarrinho(request, revendedorPed)
+    data = dadosCarrinho(request, request.session.get('revendped_id'),request.session.get('tipo'))
 
     itensCarrinho = data['itensCarrinho']
     pedido = data['pedido']
@@ -247,13 +244,16 @@ def atualizarItem(request):
         pedido, created = Pedido.objects.get_or_create(
             loja=loja, completo=False)
     else:
-        revendedor = revendedorPed
-        try:
+        tipo = request.session.get('tipo')
+        id_revend = request.session.get('revendped_id')
+        if tipo == 'revendedor':
+            revendedor = Revendedor.objects.get(id=id_revend)
             pedido, created = Pedido.objects.get_or_create(
                 revendedor=revendedor, completo=False)
-        except:
+        elif tipo == 'loja':
+            loja = Loja.objects.get(id=id_revend)
             pedido, created = Pedido.objects.get_or_create(
-                loja=revendedor, completo=False)
+                loja=loja, completo=False)
     produto = Produto.objects.get(id=idProduto)
 
     itemPedido, created = ItemPedido.objects.get_or_create(
@@ -280,7 +280,6 @@ def atualizarItem(request):
 def processarPedido(request):
     cod_pedido = str(datetime.datetime.now().timestamp())[12:]
     dados = json.loads(request.body)
-    global revendedorPed
 
     if request.user.is_authenticated:
         if request.user.tipo == User.REVENDEDOR:
@@ -292,13 +291,16 @@ def processarPedido(request):
             pedido, criado = Pedido.objects.get_or_create(
                 loja=loja, completo=False)
         else:
-            revendedor = revendedorPed
-            try:
-                pedido, criado = Pedido.objects.get_or_create(
+            tipo = request.session.get('tipo')
+            id_revend = request.session.get('revendped_id')
+            if tipo == 'revendedor':
+                revendedor = Revendedor.objects.get(id=id_revend)
+                pedido, created = Pedido.objects.get_or_create(
                     revendedor=revendedor, completo=False)
-            except:
-                pedido, criado = Pedido.objects.get_or_create(
-                    loja=revendedor, completo=False)
+            elif tipo == 'loja':
+                loja = Loja.objects.get(id=id_revend)
+                pedido, created = Pedido.objects.get_or_create(
+                    loja=loja, completo=False)
 
     subtotal = float(dados['form']['subtotal'].replace(',', '.'))
     total = float(dados['form']['total'].replace(',', '.'))
@@ -328,7 +330,7 @@ def processarPedido(request):
                        estoque[1] + ' está em falta no momento')
         return JsonResponse('Falta de estoque', safe=False)
     else:
-        revendedorPed = None
+        request.session['revendped_id'] = None
         pedido.baixa_estoque()
         pedido.save()
         sweetify.success(request, 'Pedido feito com sucesso!')
@@ -396,12 +398,11 @@ def atualizarPedido(request, pk):
             request, 'Por favor altere o pedido a faça checkout novamente')
         return redirect('produtos')
     else:
-        global revendedorPed
         pedido = Pedido.objects.get(id=pk)
         if request.user.tipo == User.FRANQUIA or request.user.tipo == User.SUPERVISOR:
             if pedido.revendedor:
-                revendedor = pedido.revendedor
-                revendedorPed = pedido.revendedor
+                request.session['revendped_id'] = pedido.revendedor.id
+                request.session['tipo'] = 'revendedor'
                 pedido.completo = False
                 pedido.devolve_produtos()
                 pedido.save()
@@ -409,8 +410,8 @@ def atualizarPedido(request, pk):
                     request, 'Por favor altere o pedido a faça checkout novamente')
                 return redirect('produtos')
             else:
-                loja = pedido.loja
-                revendedorPed = pedido.loja
+                request.session['revendped_id'] = pedido.loja.id
+                request.session['tipo'] = 'loja'
                 pedido.completo = False
                 pedido.devolve_produtos()
                 pedido.save()
@@ -419,11 +420,10 @@ def atualizarPedido(request, pk):
                 return redirect('produtos')
         else:
             if pedido.revendedor:
-                revendedor = pedido.revendedor
                 pedido_ex = Pedido.objects.get(
-                    revendedor=revendedor, completo=False)
-                print('revendedor: ' + str(pedido.revendedor))
-                revendedorPed = pedido.revendedor
+                    revendedor=pedido.revendedor, completo=False)
+                request.session['revendped_id'] = pedido.revendedor.id
+                request.session['tipo'] = 'revendedor'
                 pedido_ex.delete()
                 pedido.completo = False
                 pedido.devolve_produtos()
@@ -432,11 +432,10 @@ def atualizarPedido(request, pk):
                     request, 'Por favor altere o pedido a faça checkout novamente')
                 return redirect('produtos')
             else:
-                loja = pedido.loja
                 pedido_ex = Pedido.objects.get(
-                    loja=loja, completo=False)
-                print('loja: ' + str(pedido.loja))
-                revendedorPed = pedido.loja
+                    loja=pedido.loja, completo=False)
+                request.session['revendped_id'] = pedido.loja.id
+                request.session['tipo'] = 'loja'
                 pedido_ex.delete()
                 pedido.completo = False
                 pedido.devolve_produtos()

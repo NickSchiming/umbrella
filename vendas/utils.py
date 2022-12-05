@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def dadosCarrinho(request, revendedorPed):
+def dadosCarrinho(request, revendped_id, tipo):
     if request.user.tipo == User.REVENDEDOR:
         revendedor = request.user.revendedor
         pedido, criado = Pedido.objects.get_or_create(
@@ -24,13 +24,16 @@ def dadosCarrinho(request, revendedorPed):
         itensCarrinho = pedido.get_carrinho_itens
         return {'itensCarrinho': itensCarrinho, 'pedido': pedido, 'itens': itens}
     else:
-        revendedor = revendedorPed
-        try:
-            pedido, criado = Pedido.objects.get_or_create(
+        tipo = request.session.get('tipo')
+        id_revend = request.session.get('revendped_id')
+        if tipo == 'revendedor':
+            revendedor = Revendedor.objects.get(id=id_revend)
+            pedido, created = Pedido.objects.get_or_create(
                 revendedor=revendedor, completo=False)
-        except:
-            pedido, criado = Pedido.objects.get_or_create(
-                loja=revendedor, completo=False)
+        elif tipo == 'loja':
+            loja = Loja.objects.get(id=id_revend)
+            pedido, created = Pedido.objects.get_or_create(
+                loja=loja, completo=False)
         itens = pedido.itempedido_set.all()
         itensCarrinho = pedido.get_carrinho_itens
         return {'itensCarrinho': itensCarrinho, 'pedido': pedido, 'itens': itens}
@@ -283,7 +286,7 @@ def aprovado_check(user):
             return False
 
 
-def verifica_perfil(request, revendedorPed):
+def verifica_perfil(request, revendped_id):
     if request.user.tipo == User.REVENDEDOR:
         try:
             request.user.revendedor
@@ -299,7 +302,7 @@ def verifica_perfil(request, revendedorPed):
                 request, 'Porfavor cadastre seus dados antes de fazer um pedido')
             return 1
     else:
-        if revendedorPed == None:
+        if revendped_id == None:
             sweetify.warning(request, 'Selecione um pedido para poder altera-lo')
             return 2
     
