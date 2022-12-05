@@ -199,6 +199,8 @@ def infoHome(user, pedidos):
         qtde_pedidos_enviados = 0
         qtde_pedidos_finalizados = 0
 
+        print(qtde_pedidos_aprovados)
+
     context = {
         'user': user,
         'total': total,

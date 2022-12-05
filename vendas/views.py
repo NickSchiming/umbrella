@@ -64,15 +64,16 @@ def home(request):
     elif hasattr(user, 'supervisor'):
         pedidos = Pedido.objects.none()
         revendedores = user.supervisor.revendedor_set.all()
+        
         users_rev = User.objects.filter(
             tipo=User.REVENDEDOR, criado__month=now.month).count()
         for revendedor in revendedores:
             pedidos = pedidos | revendedor.pedido_set.filter(completo=True,
                                                              data__month=now.month)
         context = infoHome(user, pedidos)
-        context['qtde_pedidos_aprovados'] = pedidos.filter(Q(status=Pedido.APROVADO) | Q(status=Pedido.FINALIZADO) | Q(status=Pedido.ENVIADO)).count()
+        context['qtde_pedidos_aprovados'] =  context['qtde_pedidos_aprovados'] + context['qtde_pedidos_enviados'] + context['qtde_pedidos_finalizados']
         context['novos_revendedores'] = users_rev
-
+ 
     else:
         sweetify.info(request, 'Por favor, finalize seu cadastro!')
         return redirect('perfil')
