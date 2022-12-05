@@ -69,8 +69,8 @@ def home(request):
         for revendedor in revendedores:
             pedidos = pedidos | revendedor.pedido_set.filter(completo=True,
                                                              data__month=now.month)
-
         context = infoHome(user, pedidos)
+        context['qtde_pedidos_aprovados'] = pedidos.filter(Q(status=Pedido.APROVADO) | Q(status=Pedido.FINALIZADO) | Q(status=Pedido.ENVIADO)).count()
         context['novos_revendedores'] = users_rev
 
     else:
