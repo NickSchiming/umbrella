@@ -95,11 +95,11 @@ def renderForm(request, user):
                 p_form = PerfilLoja()
 
     elif user.tipo == User.SUPERVISOR:
-        if request.method == 'POST':
+        if request.method == 'POST': 
             u_form = UserUpdateForm(request.POST, instance=user)
             try:
                 p_form = PerfilSupervisor(
-                    request.POST, instance=user.supervisor)
+                    request.POST, instance=user.supervisor)  
             except:
                 p_form = PerfilSupervisor(request.POST)
 
