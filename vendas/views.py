@@ -16,6 +16,7 @@ from django.views.generic import ListView
 from vendas.models import Pedido
 from .forms import *
 
+
 def supervisor_check(user):
     if user.tipo == User.SUPERVISOR:
         return True
@@ -53,7 +54,7 @@ def home(request):
 
     elif hasattr(user, 'franquia'):
         pedidos = user.franquia.pedido_set.filter(completo=True,
-                                                  data__month=now.month)
+                                                  data__day=now.day)
         context = infoHome(user, pedidos)
 
     elif hasattr(user, 'loja'):
@@ -64,16 +65,18 @@ def home(request):
     elif hasattr(user, 'supervisor'):
         pedidos = Pedido.objects.none()
         revendedores = user.supervisor.revendedor_set.all()
-        
+
         users_rev = User.objects.filter(
             tipo=User.REVENDEDOR, criado__month=now.month).count()
         for revendedor in revendedores:
             pedidos = pedidos | revendedor.pedido_set.filter(completo=True,
                                                              data__month=now.month)
         context = infoHome(user, pedidos)
-        context['qtde_pedidos_aprovados'] =  context['qtde_pedidos_aprovados'] + context['qtde_pedidos_enviados'] + context['qtde_pedidos_finalizados']
+        context['qtde_pedidos_aprovados'] = context['qtde_pedidos_aprovados'] + \
+            context['qtde_pedidos_enviados'] + \
+            context['qtde_pedidos_finalizados']
         context['novos_revendedores'] = users_rev
- 
+
     else:
         sweetify.info(request, 'Por favor, finalize seu cadastro!')
         return redirect('perfil')
@@ -182,7 +185,8 @@ def produtos(request):
     elif verifica_perfil(request, request.session.get('revendped_id')) == 2:
         return redirect('pedidos')
 
-    dados = dadosCarrinho(request, request.session.get('revendped_id'),request.session.get('tipo'))
+    dados = dadosCarrinho(request, request.session.get(
+        'revendped_id'), request.session.get('tipo'))
 
     itensCarrinho = dados['itensCarrinho']
     pedido = dados['pedido']
@@ -202,7 +206,8 @@ def produtos(request):
 def carrinho(request):
     if verifica_perfil(request, request.session.get('revendped_id')):
         return redirect('perfil')
-    data = dadosCarrinho(request, request.session.get('revendped_id'),request.session.get('tipo'))
+    data = dadosCarrinho(request, request.session.get(
+        'revendped_id'), request.session.get('tipo'))
 
     itensCarrinho = data['itensCarrinho']
     pedido = data['pedido']
@@ -219,7 +224,8 @@ def carrinho(request):
 
 @login_required
 def checkout(request):
-    data = dadosCarrinho(request, request.session.get('revendped_id'),request.session.get('tipo'))
+    data = dadosCarrinho(request, request.session.get(
+        'revendped_id'), request.session.get('tipo'))
 
     itensCarrinho = data['itensCarrinho']
     pedido = data['pedido']
