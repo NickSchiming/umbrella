@@ -4,7 +4,7 @@ Trabalho de Graduação pensado e planejado pela minha equipe, e programado por 
 O sistema foi planejado para ser usado por revendedores cadastrados na empresa e não clientes em geral, por tanto, seu cadastro como revendedor deve ser 
 aprovado antes de realizar qualquer operação, (por razão de interatividade seu cadastro como revendedor é automaticamente aprovado e podera fazer pedidos).
 
-link para acesso do sistema: https://umbrella-tcc.herokuapp.com/
+link para acesso do sistema: https://umbrella-tcc.herokuapp.com/ (fora do ar)
 
 # Nome do Sistema
 * Umbrella, By The ADS Academy
